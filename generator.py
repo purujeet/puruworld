@@ -2018,7 +2018,7 @@ def main():
   entries = root.findall('atom:entry', ns)
   print(f"Parsed {len(entries)} elements from XML.")
   
-  output_dir = 'blog_site'
+  output_dir = '.'
   os.makedirs(output_dir, exist_ok=True)
   
   posts_metadata = []
