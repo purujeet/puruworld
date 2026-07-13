@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="JSON Formatter /* Scoped styles to avoid impacting external CSS */ .json-formatter-container { font-family: Arial, sans-serif; display: flex; height:...">
+  <title>Json Formatter - puru world official</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+  <script src="../main.js" defer></script>
+</head>
+<body>
+  <header>
+    <div class="container header-content">
+      <div class="logo">
+        <a href="../index.html" style="background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 8px; font-weight: 800;">
+          <svg style="width: 28px; height: 28px; fill: url(#accentGradientPage);" viewBox="0 0 24 24">
+            <defs>
+              <linearGradient id="accentGradientPage" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#8b5cf6" />
+                <stop offset="100%" stop-color="#6366f1" />
+              </linearGradient>
+            </defs>
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/>
+          </svg>
+          Puru's Blog
+        </a>
+      </div>
+      <nav class="nav-links">
+        <a href="../index.html" class="nav-link">Home</a>
+        <a href="../p/subscribe-today.html" class="nav-link">Subscribe</a>
+        <button class="theme-toggle-btn" aria-label="Toggle dark mode" id="theme-toggle">
+          <svg class="moon-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293a8 8 0 01-10.586-10.586 8.001 8.001 0 1010.586 10.586z"></path></svg>
+          <svg class="sun-icon" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path></svg>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container post-layout">
+    <div class="back-btn-wrapper">
+      <a href="../index.html" class="back-btn">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        Back to Home
+      </a>
+    </div>
+
+    <article>
+      <div class="post-header">
+        <h1 class="post-header-title">Json Formatter</h1>
+      </div>
+
+      <div class="post-main-content" style="max-width: 800px; margin: 0 auto;">
+        <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Formatter</title>
+    <style>
+        /* Scoped styles to avoid impacting external CSS */
+        .json-formatter-container {
+            font-family: Arial, sans-serif;
+            display: flex;
+            height: 100vh;
+            margin: 0;
+            padding: 10px;
+            box-sizing: border-box;
+            background-color: #f4f4f4;
+            isolation: isolate;
+        }
+
+        .json-formatter-container .pane {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            margin: 0 5px;
+            background-color: #fff;
+            border-radius: 4px;
+            padding: 10px;
+        }
+
+        .json-formatter-container textarea {
+            width: 100%;
+            height: 80%;
+            resize: none;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+
+        .json-formatter-container .buttons {
+            margin-top: 8px;
+            text-align: center;
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .json-formatter-container button {
+            padding: 6px 8px;
+            margin: 0 2px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+            font-size: 12px;
+            min-width: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .json-formatter-container button:hover {
+            background-color: #0056b3;
+        }
+
+        .json-formatter-container #output {
+            height: 70%;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            background-color: #fafafa;
+            white-space: pre-wrap;
+        }
+
+        /* Search bar, buttons, and view selector styles */
+        .json-formatter-container .controls {
+            margin-bottom: 8px;
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .json-formatter-container .controls input {
+            flex: 1;
+            padding: 6px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .json-formatter-container .controls select {
+            padding: 6px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 12px;
+            background-color: #fff;
+            cursor: pointer;
+        }
+
+        .json-formatter-container .controls select:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        /* Simplified Tree View Styles */
+        .json-formatter-container .tree-node {
+            margin-left: 15px;
+            list-style: none;
+        }
+
+        .json-formatter-container .tree-node.collapsed > .tree-content {
+            display: none;
+        }
+
+        .json-formatter-container .tree-node .toggle {
+            display: inline-block;
+            width: 15px;
+            text-align: center;
+            margin-right: 5px;
+            color: #007bff;
+            cursor: pointer;
+            user-select: none;
+            font-weight: bold;
+        }
+
+        .json-formatter-container .tree-node.collapsed .toggle::before {
+            content: '>';
+        }
+
+        .json-formatter-container .tree-node:not(.collapsed) .toggle::before {
+            content: '>';
+            display: inline-block;
+            transform: rotate(90deg);
+        }
+
+        .json-formatter-container .tree-node > span:not(.toggle) {
+            color: #333;
+        }
+
+        .json-formatter-container .tree-content {
+            padding-left: 10px;
+        }
+
+        .json-formatter-container .tree-node li {
+            padding: 2px 0;
+        }
+
+        /* Color coding for JSON value types */
+        .json-formatter-container .tree-node li.string {
+            color: #d32f2f;
+        }
+
+        .json-formatter-container .tree-node li.number {
+            color: #1976d2;
+        }
+
+        .json-formatter-container .tree-node li.boolean {
+            color: #7b1fa2;
+        }
+
+        .json-formatter-container .tree-node li.null {
+            color: #616161;
+        }
+
+        /* Inline value styling for leaf nodes */
+        .json-formatter-container .tree-node li.leaf {
+            display: block;
+            margin-right: 10px;
+            margin-bottom: 2px;
+        }
+
+        /* Highlight for search matches */
+        .json-formatter-container .highlight {
+            background-color: #fff9c4;
+        }
+
+        .json-formatter-container .error, .json-formatter-container .success {
+            margin-bottom: 8px;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .json-formatter-container .error {
+            color: #d32f2f;
+        }
+
+        .json-formatter-container .success {
+            color: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="json-formatter-container">
+        <div class="pane">
+            <h3>Input JSON</h3>
+            <textarea id="inputJson" placeholder="Paste your JSON here..."></textarea>
+            <div class="buttons">
+                <button onclick="formatJson()">Format</button>
+                <button onclick="compactJson()">Compact</button>
+                <button onclick="beautifyJson()">Beautify</button>
+                <button onclick="correctJson()">Fix JSON</button>
+            </div>
+            <div id="inputError" class="error"></div>
+        </div>
+        <div class="pane">
+            <h3>Formatted JSON</h3>
+            <div id="outputError" class="error"></div>
+            <div id="outputSuccess" class="success"></div>
+            <div class="controls">
+                <input id="searchInput" type="text" placeholder="Search JSON...">
+                <button onclick="searchTree()">Search</button>
+                <button onclick="validateJson()">Validate</button>
+                <button onclick="copyJson()">Copy</button>
+                <button onclick="downloadJson()">Download</button>
+                <select id="viewSelect" onchange="changeView()">
+                    <option value="tree">Tree View</option>
+                    <option value="indentation">Indentation View</option>
+                </select>
+                <div id="treeControls" style="display: none;">
+                    <button onclick="collapseAll()">Collapse All</button>
+                    <button onclick="expandAll()">Expand All</button>
+                </div>
+            </div>
+            <div id="output"></div>
+        </div>
+    </div>
+
+    <script>
+        let parsedJson = null; // Store parsed JSON for rendering and searching
+        let formattedJson = ''; // Store formatted JSON string
+
+        function formatJson() {
+            const input = document.getElementById('inputJson').value;
+            const inputError = document.getElementById('inputError');
+
+            inputError.textContent = '';
+
+            try {
+                const parsed = JSON.parse(input);
+                document.getElementById('inputJson').value = JSON.stringify(parsed, null, 2);
+                updateOutput(parsed); // Update output after formatting
+            } catch (e) {
+                inputError.textContent = 'Invalid JSON: ' + e.message;
+            }
+        }
+
+        function compactJson() {
+            const input = document.getElementById('inputJson').value;
+            const inputError = document.getElementById('inputError');
+
+            inputError.textContent = '';
+
+            try {
+                const parsed = JSON.parse(input);
+                document.getElementById('inputJson').value = JSON.stringify(parsed);
+                updateOutput(parsed); // Update output after compacting
+            } catch (e) {
+                inputError.textContent = 'Invalid JSON: ' + e.message;
+            }
+        }
+
+        function beautifyJson() {
+            const input = document.getElementById('inputJson').value;
+            const inputError = document.getElementById('inputError');
+            const output = document.getElementById('output');
+            const outputError = document.getElementById('outputError');
+            const outputSuccess = document.getElementById('outputSuccess');
+
+            inputError.textContent = '';
+            outputError.textContent = '';
+            outputSuccess.textContent = '';
+            output.innerHTML = '';
+
+            try {
+                parsedJson = JSON.parse(input);
+                formattedJson = JSON.stringify(parsedJson, null, 2);
+                renderOutput();
+            } catch (e) {
+                inputError.textContent = 'Invalid JSON: ' + e.message;
+                parsedJson = null;
+                formattedJson = '';
+            }
+        }
+
+        function correctJson() {
+            const input = document.getElementById('inputJson').value;
+            const inputError = document.getElementById('inputError');
+            const output = document.getElementById('output');
+            const outputError = document.getElementById('outputError');
+            const outputSuccess = document.getElementById('outputSuccess');
+
+            inputError.textContent = '';
+            outputError.textContent = '';
+            outputSuccess.textContent = '';
+            output.innerHTML = '';
+
+            try {
+                // Try parsing original input first
+                parsedJson = JSON.parse(input);
+                formattedJson = JSON.stringify(parsedJson, null, 2);
+                document.getElementById('inputJson').value = formattedJson;
+                renderOutput();
+            } catch (e) {
+                try {
+                    let corrected = input.trim();
+                    // Step 1: Remove JavaScript-style comments (// and /* */)
+                    corrected = corrected.replace(/\/\/.*$/gm, '');
+                    corrected = corrected.replace(/\/\*[\s\S]*?\*\//g, '');
+                    // Step 2: Add quotes around unquoted keys
+                    corrected = corrected.replace(/([{,]\s*)(\w+)(?=\s*:)/g, '$1"$2"');
+                    // Step 3: Replace single quotes with double quotes
+                    corrected = corrected.replace(/'/g, '"');
+                    // Step 4: Add quotes around unquoted string values
+                    corrected = corrected.replace(/:(\s*)(\w+)(?=\s*[,}])/g, ':$1"$2"');
+                    // Step 5: Fix invalid boolean/null literals
+                    corrected = corrected.replace(/\b(True|False|TRUE|FALSE|Null|NULL)\b/g, (match) => {
+                        const lower = match.toLowerCase();
+                        return lower === 'true' || lower === 'false' ? lower : 'null';
+                    });
+                    // Step 6: Remove trailing commas in objects and arrays
+                    corrected = corrected.replace(/,(\s*[}\]])/g, '$1');
+                    // Step 7: Add missing commas between key-value pairs, arrays, or objects
+                    corrected = corrected.replace(/([}\]"'])(?=\s*"[^"]*"\s*:)/g, '$1,');
+                    corrected = corrected.replace(/([}\]"'])(?=\s*\[)/g, '$1,');
+                    corrected = corrected.replace(/([}\]"'])(?=\s*{)/g, '$1,');
+                    // Step 8: Fix malformed numbers (leading zeros, multiple decimals)
+                    corrected = corrected.replace(/:(\s*)0+(\d+\.?\d*)/g, ':$1$2');
+                    corrected = corrected.replace(/(\d)\.(\d*)\.(\d*)/g, '$1.$2$3');
+                    // Step 9: Fix invalid escape sequences
+                    corrected = corrected.replace(/\\[^"\\/bfnrtu]/g, '\\\\');
+                    // Step 10: Add missing colons after keys
+                    corrected = corrected.replace(/("\w+")(\s*[{["])/g, '$1:$2');
+                    // Step 11: Remove extra colons
+                    corrected = corrected.replace(/:+/g, ':');
+                    // Step 12: Quote unquoted Unicode characters in strings
+                    corrected = corrected.replace(/"([^"]*?)(\p{Extended_Pictographic}|\p{Emoji_Presentation})([^"]*?)"/gu, (match, p1, emoji, p2) => {
+                        return `"${p1}\\u${emoji.codePointAt(0).toString(16).padStart(4, '0')}${p2}"`;
+                    });
+                    // Step 13: Add missing closing braces/brackets
+                    corrected = addMissingBraces(corrected);
+                    // Step 14: Remove extra whitespace
+                    corrected = corrected.replace(/\s+/g, ' ').trim();
+                    parsedJson = JSON.parse(corrected);
+                    formattedJson = JSON.stringify(parsedJson, null, 2);
+                    document.getElementById('inputJson').value = formattedJson;
+                    renderOutput();
+                } catch (correctionError) {
+                    inputError.textContent = 'Unable to correct JSON: ' + correctionError.message;
+                    parsedJson = null;
+                    formattedJson = '';
+                }
+            }
+        }
+
+        function validateJson() {
+            const input = document.getElementById('inputJson').value;
+            const outputError = document.getElementById('outputError');
+            const outputSuccess = document.getElementById('outputSuccess');
+            const output = document.getElementById('output');
+
+            outputError.textContent = '';
+            outputSuccess.textContent = '';
+            output.innerHTML = '';
+
+            try {
+                parsedJson = JSON.parse(input);
+                formattedJson = JSON.stringify(parsedJson, null, 2);
+                outputSuccess.textContent = 'JSON is valid!';
+                renderOutput();
+            } catch (e) {
+                parsedJson = null;
+                formattedJson = '';
+                outputError.textContent = 'Invalid JSON: ' + e.message;
+            }
+        }
+
+        function copyJson() {
+            const outputError = document.getElementById('outputError');
+            const outputSuccess = document.getElementById('outputSuccess');
+            const output = document.getElementById('output');
+
+            outputError.textContent = '';
+            outputSuccess.textContent = '';
+            output.innerHTML = '';
+
+            if (!parsedJson) {
+                outputError.textContent = 'No valid JSON to copy.';
+                return;
+            }
+
+            navigator.clipboard.writeText(formattedJson).then(() => {
+                outputSuccess.textContent = 'JSON copied to clipboard!';
+                renderOutput();
+            }).catch(() => {
+                outputError.textContent = 'Failed to copy JSON.';
+                renderOutput();
+            });
+        }
+
+        function downloadJson() {
+            const outputError = document.getElementById('outputError');
+            const outputSuccess = document.getElementById('outputSuccess');
+            const output = document.getElementById('output');
+
+            outputError.textContent = '';
+            outputSuccess.textContent = '';
+            output.innerHTML = '';
+
+            if (!parsedJson) {
+                outputError.textContent = 'No valid JSON to download.';
+                return;
+            }
+
+            const blob = new Blob([formattedJson], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'formatted.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            outputSuccess.textContent = 'JSON downloaded!';
+            renderOutput();
+        }
+
+        function addMissingBraces(input) {
+            let openBraces = 0;
+            let openBrackets = 0;
+            let result = input;
+
+            // Count open and close braces/brackets
+            for (let i = 0; i < input.length; i++) {
+                if (input[i] === '{') openBraces++;
+                else if (input[i] === '}') openBraces--;
+                else if (input[i] === '[') openBrackets++;
+                else if (input[i] === ']') openBrackets--;
+            }
+
+            // Add missing closing braces
+            while (openBraces > 0) {
+                result += '}';
+                openBraces--;
+            }
+
+            // Add missing closing brackets
+            while (openBrackets > 0) {
+                result += ']';
+                openBrackets--;
+            }
+
+            return result;
+        }
+
+        function updateOutput(inputJson) {
+            const output = document.getElementById('output');
+            const outputError = document.getElementById('outputError');
+            const outputSuccess = document.getElementById('outputSuccess');
+
+            outputError.textContent = '';
+            outputSuccess.textContent = '';
+            output.innerHTML = '';
+
+            try {
+                parsedJson = inputJson || JSON.parse(document.getElementById('inputJson').value);
+                formattedJson = JSON.stringify(parsedJson, null, 2);
+                renderOutput();
+            } catch (e) {
+                parsedJson = null;
+                formattedJson = '';
+                outputError.textContent = 'Invalid JSON: ' + e.message;
+            }
+        }
+
+        function renderOutput() {
+            const output = document.getElementById('output');
+            const outputError = document.getElementById('outputError');
+            const outputSuccess = document.getElementById('outputSuccess');
+            const treeControls = document.getElementById('treeControls');
+            const view = document.getElementById('viewSelect').value;
+
+            treeControls.style.display = view === 'tree' ? 'flex' : 'none';
+
+            if (!parsedJson) {
+                if (!outputError.textContent && !outputSuccess.textContent) {
+                    outputError.textContent = 'No valid JSON to display.';
+                }
+                return;
+            }
+
+            output.innerHTML = '';
+
+            if (view === 'tree') {
+                renderTreeView(parsedJson, output);
+            } else if (view === 'indentation') {
+                output.textContent = formattedJson;
+            }
+        }
+
+        function changeView() {
+            if (!parsedJson) return;
+            renderOutput();
+        }
+
+        function collapseAll() {
+            document.querySelectorAll('.tree-node').forEach(node => {
+                node.classList.add('collapsed');
+                const toggle = node.querySelector('.toggle');
+                if (toggle) toggle.textContent = '';
+            });
+        }
+
+        function expandAll() {
+            document.querySelectorAll('.tree-node').forEach(node => {
+                node.classList.remove('collapsed');
+                const toggle = node.querySelector('.toggle');
+                if (toggle) toggle.textContent = '';
+            });
+        }
+
+        function renderTreeView(data, parentElement) {
+            parentElement.innerHTML = '';
+            const ul = document.createElement('ul');
+            ul.className = 'tree-node';
+            if (data !== null && typeof data === 'object') {
+                const li = document.createElement('li');
+                li.className = 'tree-node collapsed';
+                const toggle = document.createElement('span');
+                toggle.className = 'toggle';
+                toggle.onclick = () => toggleNode(toggle, li);
+                li.appendChild(toggle);
+                const keySpan = document.createElement('span');
+                keySpan.textContent = Array.isArray(data) ? '[Array]' : '{Object}';
+                keySpan.dataset.path = '';
+                li.appendChild(keySpan);
+                const content = document.createElement('div');
+                content.className = 'tree-content';
+                li.appendChild(content);
+                renderNode(data, content, '');
+                ul.appendChild(li);
+            } else {
+                // Handle non-object/array root (rare case, e.g., a single string or number)
+                const li = document.createElement('li');
+                li.className = 'leaf';
+                const keyValueSpan = document.createElement('span');
+                keyValueSpan.textContent = JSON.stringify(data);
+                keyValueSpan.dataset.path = '';
+                if (typeof data === 'string') li.className += ' string';
+                else if (typeof data === 'number') li.className += ' number';
+                else if (typeof data === 'boolean') li.className += ' boolean';
+                else if (data === null) li.className += ' null';
+                li.appendChild(keyValueSpan);
+                ul.appendChild(li);
+            }
+            parentElement.appendChild(ul);
+        }
+
+        function renderNode(data, parentElement, path = '') {
+            if (Array.isArray(data)) {
+                data.forEach((item, index) => {
+                    const li = document.createElement('li');
+                    if (item !== null && typeof item === 'object') {
+                        li.className = 'tree-node collapsed';
+                        const toggle = document.createElement('span');
+                        toggle.className = 'toggle';
+                        toggle.onclick = () => toggleNode(toggle, li);
+                        li.appendChild(toggle);
+                        const keySpan = document.createElement('span');
+                        keySpan.textContent = `[${index}]`;
+                        keySpan.dataset.path = `${path}[${index}]`;
+                        li.appendChild(keySpan);
+                        const content = document.createElement('div');
+                        content.className = 'tree-content';
+                        li.appendChild(content);
+                        renderNode(item, content, `${path}[${index}]`);
+                    } else {
+                        li.className = 'leaf';
+                        const keyValueSpan = document.createElement('span');
+                        keyValueSpan.textContent = `[${index}]: ${JSON.stringify(item)}`;
+                        keyValueSpan.dataset.path = `${path}[${index}]`;
+                        if (typeof item === 'string') li.className += ' string';
+                        else if (typeof item === 'number') li.className += ' number';
+                        else if (typeof item === 'boolean') li.className += ' boolean';
+                        else if (item === null) li.className += ' null';
+                        li.appendChild(keyValueSpan);
+                    }
+                    parentElement.appendChild(li);
+                });
+            } else if (data !== null && typeof data === 'object') {
+                Object.keys(data).forEach(key => {
+                    const li = document.createElement('li');
+                    if (data[key] !== null && typeof data[key] === 'object') {
+                        li.className = 'tree-node collapsed';
+                        const toggle = document.createElement('span');
+                        toggle.className = 'toggle';
+                        toggle.onclick = () => toggleNode(toggle, li);
+                        li.appendChild(toggle);
+                        const keySpan = document.createElement('span');
+                        keySpan.textContent = `${key}`;
+                        keySpan.dataset.path = path ? `${path}.${key}` : key;
+                        li.appendChild(keySpan);
+                        const content = document.createElement('div');
+                        content.className = 'tree-content';
+                        li.appendChild(content);
+                        renderNode(data[key], content, path ? `${path}.${key}` : key);
+                    } else {
+                        li.className = 'leaf';
+                        const keyValueSpan = document.createElement('span');
+                        keyValueSpan.textContent = `${key}: ${JSON.stringify(data[key])}`;
+                        keyValueSpan.dataset.path = path ? `${path}.${key}` : key;
+                        if (typeof data[key] === 'string') li.className += ' string';
+                        else if (typeof data[key] === 'number') li.className += ' number';
+                        else if (typeof data[key] === 'boolean') li.className += ' boolean';
+                        else if (data[key] === null) li.className += ' null';
+                        li.appendChild(keyValueSpan);
+                    }
+                    parentElement.appendChild(li);
+                });
+            }
+        }
+
+        function toggleNode(toggle, li) {
+            const isCollapsed = li.classList.contains('collapsed');
+            li.classList.toggle('collapsed', !isCollapsed);
+            toggle.textContent = '';
+        }
+
+        function searchTree() {
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+            const output = document.getElementById('output');
+            const outputError = document.getElementById('outputError');
+            const outputSuccess = document.getElementById('outputSuccess');
+            const view = document.getElementById('viewSelect').value;
+
+            if (!parsedJson) {
+                outputError.textContent = 'Please beautify or correct JSON first.';
+                outputError.style.color = '#d32f2f';
+                return;
+            }
+
+            outputError.textContent = '';
+            outputSuccess.textContent = '';
+            document.querySelectorAll('.highlight').forEach(el => el.classList.remove('highlight'));
+            document.querySelectorAll('.tree-node.collapsed').forEach(node => {
+                node.classList.remove('collapsed');
+                const toggle = node.querySelector('.toggle');
+                if (toggle) toggle.textContent = '';
+            });
+
+            if (!searchInput || view !== 'tree') {
+                return;
+            }
+
+            const matches = document.querySelectorAll('.tree-node span[data-path], .leaf span[data-path]');
+            let matchFound = false;
+            matches.forEach(element => {
+                const text = element.textContent.toLowerCase();
+                const path = element.dataset.path;
+                if (text.includes(searchInput) || (path && path.toLowerCase().includes(searchInput))) {
+                    element.classList.add('highlight');
+                    let parent = element.closest('.tree-node');
+                    while (parent) {
+                        parent.classList.remove('collapsed');
+                        const toggle = parent.querySelector('.toggle');
+                        if (toggle) toggle.textContent = '';
+                        parent = parent.parentElement.closest('.tree-node');
+                    }
+                    matchFound = true;
+                }
+            });
+
+            if (!matchFound) {
+                outputError.textContent = 'No matches found.';
+                outputError.style.color = '#d32f2f';
+            }
+        }
+
+        // Add input event listener for real-time updates
+        document.getElementById('inputJson').addEventListener('input', function() {
+            const input = this.value;
+            const inputError = document.getElementById('inputError');
+            const outputError = document.getElementById('outputError');
+            const outputSuccess = document.getElementById('outputSuccess');
+
+            inputError.textContent = '';
+            outputError.textContent = '';
+            outputSuccess.textContent = '';
+
+            try {
+                const parsed = JSON.parse(input);
+                updateOutput(parsed);
+            } catch (e) {
+                inputError.textContent = 'Invalid JSON: ' + e.message;
+                parsedJson = null;
+                formattedJson = '';
+                document.getElementById('output').innerHTML = '';
+            }
+        });
+
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchTree();
+            }
+        });
+    </script>
+</body>
+</html>
+      </div>
+    </article>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 puru world official. All rights reserved.</p>
+      <p>Migrated from Blogger to Static HTML Site.</p>
+    </div>
+  </footer>
+</body>
+</html>

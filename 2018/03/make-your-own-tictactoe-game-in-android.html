@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Now stay tuned with the new videos.Just click the button mention below of youtube: App Code for MainActivity.java: import android.support.v7.app.AppCo...">
+  <title>Make your own tic-tac-toe game on Android - puru world official</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../style.css">
+  <script src="../../main.js" defer></script>
+</head>
+<body>
+  <header>
+    <div class="container header-content">
+      <div class="logo">
+        <a href="../../index.html" style="background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 8px; font-weight: 800;">
+          <svg style="width: 28px; height: 28px; fill: url(#accentGradientDetail);" viewBox="0 0 24 24">
+            <defs>
+              <linearGradient id="accentGradientDetail" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#8b5cf6" />
+                <stop offset="100%" stop-color="#6366f1" />
+              </linearGradient>
+            </defs>
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/>
+          </svg>
+          Puru's Blog
+        </a>
+      </div>
+      <nav class="nav-links">
+        <a href="../../index.html" class="nav-link">Home</a>
+        <a href="../../p/subscribe-today.html" class="nav-link">Subscribe</a>
+        <button class="theme-toggle-btn" aria-label="Toggle dark mode" id="theme-toggle">
+          <svg class="moon-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+          <svg class="sun-icon" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path></svg>
+        </button>
+      </nav>
+      <div class="scroll-progress-container">
+        <div class="scroll-progress-bar"></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container post-layout">
+    <div class="back-btn-wrapper">
+      <a href="../../index.html" class="back-btn">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        Back to Home
+      </a>
+    </div>
+
+    <article>
+      <div class="post-header">
+        <h1 class="post-header-title">Make your own tic-tac-toe game on Android</h1>
+        <div class="post-header-meta">
+          <span>
+            <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
+            Mar 7, 2018
+          </span>
+          <span>
+            <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+            15 min read
+          </span>
+        </div>
+        <div class="post-header-tags">
+          <span class="filter-tag" style="cursor:default">Android tutorial</span>
+        </div>
+      </div>
+
+      <img class="post-hero-image" src="https://2.bp.blogspot.com/rU5QgSdPnpy22mtlAz4eoPeiCALl4npHDZdduR44gSsNRXBk51B0Kf4dLQ2yLW-_Vy97=h900-rw" alt="Make your own tic-tac-toe game on Android" loading="eager" decoding="async">
+
+      <div class="post-content-container">
+        <div class="post-main-content">
+          <div dir="ltr" style="text-align: left;" trbidi="on">
+<div dir="ltr" style="text-align: left;" trbidi="on">
+<iframe allowfullscreen="" frameborder="0" height="270" src="https://www.youtube.com/embed/MhSBeVsL1bw" width="480"></iframe><br />
+<br />
+<br />
+Now stay tuned with the new videos.Just click the button mention below of youtube:<br />
+<script src="https://apis.google.com/js/platform.js"></script>
+
+<br />
+<div class="g-ytsubscribe" data-channelid="UCFoVp5Va975oQQpevpQErQQ" data-count="default" data-layout="full" data-theme="dark">
+</div>
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<b>App Code for MainActivity.java:</b><br />
+<br />
+<br />
+import android.support.v7.app.AppCompatActivity;<br />
+<br />
+import android.os.Bundle;<br />
+<br />
+import android.view.View;<br />
+<br />
+import android.widget.Button;<br />
+<br />
+import android.widget.Toast;<br />
+<br />
+<br />
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {<br />
+<br />
+int chance=0;<br />
+<br />
+&nbsp; &nbsp; Button btn1,btn2,btn3,btn4,btn5,btn6,btn7,btn8,btn9,reset;<br />
+<br />
+&nbsp; &nbsp; @Override<br />
+<br />
+&nbsp; &nbsp; protected void onCreate(Bundle savedInstanceState) {<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; super.onCreate(savedInstanceState);<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; setContentView(R.layout.activity_main);<br />
+<br />
+&nbsp; &nbsp; btn1=(Button)findViewById(R.id.btn1);<br />
+<br />
+&nbsp; &nbsp; btn2=(Button)findViewById(R.id.btn2);<br />
+<br />
+&nbsp; &nbsp; btn3=(Button)findViewById(R.id.btn3);<br />
+<br />
+&nbsp; &nbsp; btn4=(Button)findViewById(R.id.btn4);<br />
+<br />
+&nbsp; &nbsp; btn5=(Button)findViewById(R.id.btn5);<br />
+<br />
+&nbsp; &nbsp; btn6=(Button)findViewById(R.id.btn6);<br />
+<br />
+&nbsp; &nbsp; btn7=(Button)findViewById(R.id.btn7);<br />
+<br />
+&nbsp; &nbsp; btn8=(Button)findViewById(R.id.btn8);<br />
+<br />
+&nbsp; &nbsp; btn9=(Button)findViewById(R.id.btn9);<br />
+<br />
+&nbsp; &nbsp; reset=(Button)findViewById(R.id.reset);<br />
+<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; btn1.setOnClickListener(this);<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; btn2.setOnClickListener(this);<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; btn3.setOnClickListener(this);<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; btn4.setOnClickListener(this);<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; btn5.setOnClickListener(this);<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; btn6.setOnClickListener(this);<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; btn7.setOnClickListener(this);<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; btn8.setOnClickListener(this);<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; btn9.setOnClickListener(this);<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; reset.setOnClickListener(this);<br />
+<br />
+<br />
+&nbsp; &nbsp; }<br />
+<br />
+<br />
+&nbsp; &nbsp; @Override<br />
+<br />
+&nbsp; &nbsp; public void onClick(View view) {<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; switch(view.getId()){<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; case R.id.btn1:<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; if(btn1.getText().toString().equals("")){<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; if(chance==0){<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; chance=1;<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; btn1.setText("O");<br />
+<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; result();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; else{<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; chance=0;<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; btn1.setText("X");<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; result();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+break;<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; case R.id.btn2:<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; if(btn2.getText().toString().equals("")){<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; if(chance==0){<br />
+<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; chance=1;<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; btn2.setText("O");<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; result();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; else{<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; chance=0;<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; btn2.setText("X");<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; result();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; break;<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; case R.id.btn3:<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; if(btn3.getText().toString().equals("")){<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; if(chance==0){<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; chance=1;<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; btn3.setText("O");<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; result();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; else{<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; chance=0;<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; btn3.setText("X");<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; result();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; break;<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; case R.id.btn4:<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; if(btn4.getText().toString().equals("")){<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; if(chance==0){<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; chance=1;<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; btn4.setText("O");<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; result();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; else{<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; chance=0;<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; btn4.setText("X");<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; result();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; break;<br />
+<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; case R.id.btn5:<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; if(btn5.getText().toString().equals("")){<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; if(chance==0){<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; chance=1;<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; btn5.setText("O");<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; result();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; else{<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; chance=0;<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; btn5.setText("X");<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; result();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; break;<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; case R.id.btn6:<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; if(btn6.getText().toString().equals("")){<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; if(chance==0){<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; chance=1;<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; btn6.setText("O");<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; result();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; else{<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; chance=0;<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; btn6.setText("X");<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; result();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; break;<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; case R.id.btn7:<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; if(btn7.getText().toString().equals("")){<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; if(chance==0){<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; chance=1;<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; btn7.setText("O");<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; result();<br />
+<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; else{<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; chance=0;<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; btn7.setText("X");<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; result();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; break;<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; case R.id.btn8:<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; if(btn8.getText().toString().equals("")){<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; if(chance==0){<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; chance=1;<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; btn8.setText("O");<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; result();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; else{<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; chance=0;<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; btn8.setText("X");<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; result();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; break;<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; case R.id.btn9:<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; if(btn9.getText().toString().equals("")){<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; if(chance==0){<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; chance=1;<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; btn9.setText("O");<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; result();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; else{<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; chance=0;<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; btn9.setText("X");<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; result();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; break;<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; case R.id.reset:<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; btn1.setText("");<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; btn2.setText("");<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; btn3.setText("");<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; btn4.setText("");<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; btn5.setText("");<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; btn6.setText("");<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; btn7.setText("");<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; btn8.setText("");<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; btn9.setText("");<br />
+<br />
+<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+&nbsp; &nbsp; }<br />
+<br />
+<br />
+&nbsp; &nbsp; public void result(){<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; if(btn1.getText().toString().equals("X") &amp;&amp; btn2.getText().toString().equals("X") &amp;&amp; btn3.getText().toString().equals("X")){<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Toast.makeText(this, "Player X wins", Toast.LENGTH_SHORT).show();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; reset.callOnClick();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; else if(btn4.getText().toString().equals("X") &amp;&amp; btn5.getText().toString().equals("X") &amp;&amp; btn6.getText().toString().equals("X")){<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Toast.makeText(this, "Player X wins", Toast.LENGTH_SHORT).show();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; reset.callOnClick();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; else if(btn7.getText().toString().equals("X") &amp;&amp; btn8.getText().toString().equals("X") &amp;&amp; btn9.getText().toString().equals("X")){<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Toast.makeText(this, "Player X wins", Toast.LENGTH_SHORT).show();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; reset.callOnClick();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; else if(btn1.getText().toString().equals("O") &amp;&amp; btn2.getText().toString().equals("O") &amp;&amp; btn3.getText().toString().equals("O")){<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Toast.makeText(this, "Player O wins", Toast.LENGTH_SHORT).show();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; reset.callOnClick();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; else if(btn4.getText().toString().equals("O") &amp;&amp; btn5.getText().toString().equals("O") &amp;&amp; btn6.getText().toString().equals("O")){<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Toast.makeText(this, "Player O wins", Toast.LENGTH_SHORT).show();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; reset.callOnClick();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; else if(btn7.getText().toString().equals("O") &amp;&amp; btn8.getText().toString().equals("O") &amp;&amp; btn9.getText().toString().equals("O")){<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Toast.makeText(this, "Player O wins", Toast.LENGTH_SHORT).show();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; reset.callOnClick();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+<br />
+<br />
+<br />
+&nbsp; &nbsp; &nbsp; else&nbsp; if(btn1.getText().toString().equals("X") &amp;&amp; btn4.getText().toString().equals("X") &amp;&amp; btn7.getText().toString().equals("X")){<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Toast.makeText(this, "Player X wins", Toast.LENGTH_SHORT).show();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; reset.callOnClick();<br />
+<br />
+&nbsp; &nbsp; &nbsp; }<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; else if(btn2.getText().toString().equals("X") &amp;&amp; btn5.getText().toString().equals("X") &amp;&amp; btn8.getText().toString().equals("X")){<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Toast.makeText(this, "Player X wins", Toast.LENGTH_SHORT).show();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; reset.callOnClick();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; else if(btn3.getText().toString().equals("X") &amp;&amp; btn6.getText().toString().equals("X") &amp;&amp; btn9.getText().toString().equals("X")){<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Toast.makeText(this, "Player X wins", Toast.LENGTH_SHORT).show();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; reset.callOnClick();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; else if(btn1.getText().toString().equals("O") &amp;&amp; btn4.getText().toString().equals("O") &amp;&amp; btn7.getText().toString().equals("O")){<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Toast.makeText(this, "Player O wins", Toast.LENGTH_SHORT).show();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; reset.callOnClick();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; else if(btn2.getText().toString().equals("O") &amp;&amp; btn5.getText().toString().equals("O") &amp;&amp; btn8.getText().toString().equals("O")){<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Toast.makeText(this, "Player O wins", Toast.LENGTH_SHORT).show();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; reset.callOnClick();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; else if(btn3.getText().toString().equals("O") &amp;&amp; btn6.getText().toString().equals("O") &amp;&amp; btn9.getText().toString().equals("O")){<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Toast.makeText(this, "Player O wins", Toast.LENGTH_SHORT).show();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; reset.callOnClick();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; else if(btn1.getText().toString().equals("X") &amp;&amp; btn5.getText().toString().equals("X") &amp;&amp; btn9.getText().toString().equals("X")){<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Toast.makeText(this, "Player X wins", Toast.LENGTH_SHORT).show();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; reset.callOnClick();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; else if(btn3.getText().toString().equals("X") &amp;&amp; btn5.getText().toString().equals("X") &amp;&amp; btn7.getText().toString().equals("X")){<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Toast.makeText(this, "Player X wins", Toast.LENGTH_SHORT).show();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; reset.callOnClick();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; else if(btn1.getText().toString().equals("O") &amp;&amp; btn5.getText().toString().equals("O") &amp;&amp; btn9.getText().toString().equals("O")){<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Toast.makeText(this, "Player O wins", Toast.LENGTH_SHORT).show();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; reset.callOnClick();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; else if(btn3.getText().toString().equals("O") &amp;&amp; btn5.getText().toString().equals("O") &amp;&amp; btn7.getText().toString().equals("O")){<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Toast.makeText(this, "Player O wins", Toast.LENGTH_SHORT).show();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; reset.callOnClick();<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; }<br />
+<br />
+<br />
+<br />
+<br />
+&nbsp; &nbsp; }<br />
+<br />
+<br />
+<br />
+<br />
+}<br />
+<br />
+<div>
+<br /></div>
+<div>
+<br /></div>
+<div>
+<br /></div>
+<div>
+<b>App code for activity_main.xml:</b></div>
+<div>
+<div>
+<b><br /></b> &lt;?xml version="1.0" encoding="utf-8"?&gt;</div>
+<div>
+&lt;LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"</div>
+<div>
+&nbsp; &nbsp; android:layout_width="match_parent"</div>
+<div>
+&nbsp; &nbsp; android:layout_height="match_parent"</div>
+<div>
+&nbsp; &nbsp; android:orientation="vertical"</div>
+<div>
+&nbsp; &nbsp; android:weightSum="3"&gt;</div>
+<div>
+<br /></div>
+<div>
+&nbsp; &nbsp; &lt;LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; android:layout_width="match_parent"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; android:layout_height="wrap_content"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; android:layout_weight="1"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; android:orientation="horizontal"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; android:weightSum="3"&gt;</div>
+<div>
+<br /></div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &lt;Button</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:id="@+id/btn1"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:layout_width="wrap_content"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:layout_height="match_parent"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:layout_weight="1"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:textSize="40sp" /&gt;</div>
+<div>
+<br /></div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &lt;Button</div>
+<div>
+<br /></div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:id="@+id/btn2"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:layout_width="wrap_content"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:layout_height="match_parent"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:layout_weight="1"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:textSize="40sp" /&gt;</div>
+<div>
+<br /></div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &lt;Button</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:id="@+id/btn3"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:layout_width="wrap_content"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:layout_height="match_parent"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:layout_weight="1"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:textSize="40sp" /&gt;</div>
+<div>
+<br /></div>
+<div>
+&nbsp; &nbsp; &lt;/LinearLayout&gt;</div>
+<div>
+<br /></div>
+<div>
+<br /></div>
+<div>
+&nbsp; &nbsp; &lt;LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; android:layout_width="match_parent"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; android:layout_height="wrap_content"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; android:layout_weight="1"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; android:orientation="horizontal"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; android:weightSum="3"&gt;</div>
+<div>
+<br /></div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &lt;Button</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:id="@+id/btn4"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:layout_width="wrap_content"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:layout_height="match_parent"</div>
+<div>
+<br /></div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:layout_weight="1"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:textSize="40sp" /&gt;</div>
+<div>
+<br /></div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &lt;Button</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:id="@+id/btn5"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:layout_width="wrap_content"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:layout_height="match_parent"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:layout_weight="1"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:textSize="40sp" /&gt;</div>
+<div>
+<br /></div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &lt;Button</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:id="@+id/btn6"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:layout_width="wrap_content"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:layout_height="match_parent"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:layout_weight="1"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:textSize="40sp" /&gt;</div>
+<div>
+<br /></div>
+<div>
+&nbsp; &nbsp; &lt;/LinearLayout&gt;</div>
+<div>
+<br /></div>
+<div>
+<br /></div>
+<div>
+&nbsp; &nbsp; &lt;LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; android:layout_width="match_parent"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; android:layout_height="wrap_content"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; android:layout_weight="1"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; android:orientation="horizontal"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; android:weightSum="3"&gt;</div>
+<div>
+<br /></div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &lt;Button</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:id="@+id/btn7"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:layout_width="wrap_content"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:layout_height="match_parent"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:layout_weight="1"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:textSize="40sp" /&gt;</div>
+<div>
+<br /></div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &lt;Button</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:id="@+id/btn8"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:layout_width="wrap_content"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:layout_height="match_parent"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:layout_weight="1"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:textSize="40sp" /&gt;</div>
+<div>
+<br /></div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &lt;Button</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:id="@+id/btn9"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:layout_width="wrap_content"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:layout_height="match_parent"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:layout_weight="1"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; android:textSize="40sp" /&gt;</div>
+<div>
+<br /></div>
+<div>
+&nbsp; &nbsp; &lt;/LinearLayout&gt;</div>
+<div>
+<br /></div>
+<div>
+&nbsp; &nbsp; &lt;Button</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; android:id="@+id/reset"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; android:layout_width="wrap_content"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; android:layout_height="wrap_content"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; android:layout_gravity="center"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; android:text="RESET"</div>
+<div>
+&nbsp; &nbsp; &nbsp; &nbsp; android:textSize="25sp" /&gt;</div>
+<div>
+<br /></div>
+<div>
+&lt;/LinearLayout&gt;</div>
+<div>
+<br /></div>
+</div>
+<br />
+<h4 style="text-align: left;">
+<b>If you love our work then share it with your friends.</b></h4>
+<div class="separator">
+<br /></div>
+<h4 style="clear: both; text-align: center;">
+<b style="text-align: left;"><span style="color: orange;">We have made an app with the above code and added some more games on it</span></b></h4>
+<div class="separator">
+<br /></div>
+<figure class="post-figure"><span ><img data-original- data-original-  src="https://2.bp.blogspot.com/rU5QgSdPnpy22mtlAz4eoPeiCALl4npHDZdduR44gSsNRXBk51B0Kf4dLQ2yLW-_Vy97=h900-rw"  / loading="lazy" decoding="async" class="post-image"></span><figcaption class="post-figcaption">Snapshot of our app</figcaption></figure>
+<b><br />link:&nbsp;<a href="https://play.google.com/store/apps/details?id=puruworld.fungames1" target="_blank">https://play.google.com/store/apps/details?id=puruworld.fungames1</a></b> <b><br /></b> 
+
+
+
+
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- interstittial -->
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="8980910491820091"
+     data-ad-slot="5977997177"
+     data-ad-format="auto"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+
+
+<b>Keywords:</b><br />
+<b>puruworldofficial</b><br />
+
+
+
+tic tac toe android studio,<br />
+tic tac toe in android studio,<br />
+tic tac toe,<br />
+tictactoe android studio sample,<br />
+tic tac toe android,<br />
+how to make xo in andriod studio,<br />
+tic tac toe game coding in android studio,<br />
+how to make xo in android studio,<br />
+tic tac toe android app tutorial,<br />
+<div>
+<div>
+Develop TicTacToe game in Android Studio,</div>
+<div>
+Learn to create a Tic-Tac-Toe Game with Android Studio,</div>
+<div>
+Make your own tictactoe game in android,</div>
+<div>
+Android Development Lecture 22 (Making tic tac toe Game),</div>
+<div>
+How to Make a Tic Tac Toe Game in Android - Part 4 - ORIENTATION CHANGE &amp; RESET FUNCTIONALITY,</div>
+<div>
+Android | TicTacToe Tutorial Part 1,</div>
+<div>
+Android | TicTacToe Tutorial Part 2,</div>
+<div>
+How to Make a Tic Tac Toe Game in Android - Part 1 - THE LAYOUT - Android Studio Tutorial,</div>
+<div>
+how to make simple game in android studio,</div>
+<div>
+Understanding logic of TIC TAC TOE app for android development,</div>
+<div>
+Tic Tac Toe 2D Game in Android Studio Tutorial,</div>
+</div>
+<div>
+puruworld<br />
+puruworldofficial<br />
+puru blog<br />
+puruworld blog<br />
+puruworldofficial<br />
+puruworldofficial blog<br />
+blog of puru</div>
+two player tic tac toe game in android studio<br />
+tic tac toe game in android studio source code<br />
+tic tac toe game logic android<br />
+tic tac toe multiplayer android source code<br />
+android tic tac toe layout<br />
+tic tac toe android source code download<br />
+tic tac toe 2 player android code<br />
+tic tac toe android github<br />
+<div>
+make your own tictactoe game in android</div>
+<div>
+<br /></div>
+<b></b> <b><br /></b> <b><br /></b> <b><br /></b></div>
+<iframe frameborder="0" marginheight="0" marginwidth="0" scrolling="no" src="//ws-in.amazon-adsystem.com/widgets/q?ServiceVersion=20070822&amp;OneJS=1&amp;Operation=GetAdHtml&amp;MarketPlace=IN&amp;source=ac&amp;ref=tf_til&amp;ad_type=product_link&amp;tracking_id=purujeetsingh-21&amp;marketplace=amazon&amp;region=IN&amp;placement=B002U1ZBG0&amp;asins=B002U1ZBG0&amp;linkId=28835d08231b53ca32274049f4ca3585&amp;show_border=true&amp;link_opens_in_new_window=false&amp;price_color=ffffff&amp;title_color=000000&amp;bg_color=98d6e0" style="height: 240px; width: 120px;"> </iframe></div>
+
+        </div>
+        
+        <aside class="post-sidebar">
+          <div class="sidebar-widget" id="toc-widget" style="display: none;">
+            <h3>Table of Contents</h3>
+            <nav class="toc-links" id="toc-links">
+              <!-- TOC links will load dynamically -->
+            </nav>
+          </div>
+          
+          <div class="sidebar-widget">
+            <h3>Share this Article</h3>
+            <div class="share-links">
+              <button class="share-btn" onclick="sharePost('twitter', 'Make your own tic-tac-toe game on Android')">
+                <svg fill="currentColor" viewBox="0 0 24 24"><path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.03c0 2.08 1.48 3.82 3.44 4.21a4.2 4.2 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.52 8.52 0 0 1-5.3 1.83c-.35 0-.69-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21 16 21 20.33 14.5 20.33 8.8c0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.24z"/></svg>
+                Twitter / X
+              </button>
+              <button class="share-btn" onclick="sharePost('facebook', 'Make your own tic-tac-toe game on Android')">
+                <svg fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c4.56-.93 8-4.96 8-9.75z"/></svg>
+                Facebook
+              </button>
+              <button class="share-btn" onclick="sharePost('linkedin', 'Make your own tic-tac-toe game on Android')">
+                <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
+                LinkedIn
+              </button>
+              <button class="share-btn" onclick="sharePost('copy', 'Make your own tic-tac-toe game on Android')">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 002-2M8 5a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                Copy Link
+              </button>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </article>
+
+    
+    <section class="related-posts-section">
+      <h2>You Might Also Like</h2>
+      <div class="posts-grid">
+        
+      <article class="post-card">
+        <div class="card-image-wrapper">
+          <img class="card-image" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgDutAiEvlWDGNqrcpUucQWMBUeAImtK6rSzDj11EYr2eH6rBgYy78epOa4l64BqbhfOVig9wzfn70egZ4EvYIbdauxFBY4Md9hKvq4JswYYZH2mEN2i1W8MknJ-ZYHdvOanHpxnm7gHdglR4ghY4hKn_JZd2EU6fJIBNsW20FLwZc29Lyq5EfvdrqKoA/s1600/How%20to%20Develop%20Healthy%20Boundaries%20with%20Technology%20in%20Your%20Teenagers=s320" alt="How to Develop Healthy Boundaries with Technology in Your Teenagers" loading="lazy" decoding="async">
+        </div>
+        <div class="card-content">
+          <div class="card-meta">
+            <span>
+              <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
+              Apr 9, 2026
+            </span>
+          </div>
+          <h3 class="card-title" style="font-size:1.1rem;"><a href="../../2026/04/how-to-develop-healthy-boundaries-with.html">How to Develop Healthy Boundaries with Technology in Your Teenagers</a></h3>
+          <p class="card-excerpt" style="font-size:0.85rem; margin-bottom:12px;">In today's digitally-driven world, technology has become a ubiquitous presence in our everyday lives. From smartphones and social media to video games and strea...</p>
+          <div class="card-tags">
+            
+          </div>
+        </div>
+      </article>
+    
+      <article class="post-card">
+        <div class="card-image-wrapper">
+          <img class="card-image" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhgp0NkqjENoaBTbYbV3DfX85j1E7W9LgxjLa9dauRlSTkiggtIwx9_g_yUwR-_NViOjyJlI2p3MCgqfD0porUq5zaJwCR5zaxWB-5mIbdayJDk3O8LwsfG-uDbDVJlkYLlVToKEa0NTw_Zli_uiDBugGAURrKlUnnYOeaP4MvA1Hm6FHNNBXBjShPVcg/s1600/How%20to%20Create%20Passive%20Income%20Streams=s320" alt="How to Create Passive Income Streams" loading="lazy" decoding="async">
+        </div>
+        <div class="card-content">
+          <div class="card-meta">
+            <span>
+              <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
+              Apr 8, 2026
+            </span>
+          </div>
+          <h3 class="card-title" style="font-size:1.1rem;"><a href="../../2026/04/how-to-create-passive-income-streams.html">How to Create Passive Income Streams</a></h3>
+          <p class="card-excerpt" style="font-size:0.85rem; margin-bottom:12px;">Creating passive income streams is a great way to achieve financial freedom and security. Passive income is income that you earn without actively working for it...</p>
+          <div class="card-tags">
+            
+          </div>
+        </div>
+      </article>
+    
+      <article class="post-card">
+        <div class="card-image-wrapper">
+          <img class="card-image" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhE_nQ5-BUYYauE7kUpw9UOAOBvfvgHxTPF2ljVVXywir8uCWyb1MdeOqcGLfuIbUykMP4dyeg4WiYmdPu402hJDZxCOGF2C3wttIRCx8oNseyGmY0orYFcIn-40MEHEhcvGAJ9S46Ea53Tzi1lkIiERHEYIFenHUElPKYzm_KFSuXTjZTrEUCSyqVguQ/s1600/How%20to%20Establish%20Healthy%20Boundaries%20in%20Relationships=s320" alt="How to Establish Healthy Boundaries in Relationships" loading="lazy" decoding="async">
+        </div>
+        <div class="card-content">
+          <div class="card-meta">
+            <span>
+              <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
+              Apr 7, 2026
+            </span>
+          </div>
+          <h3 class="card-title" style="font-size:1.1rem;"><a href="../../2026/04/how-to-establish-healthy-boundaries-in.html">How to Establish Healthy Boundaries in Relationships</a></h3>
+          <p class="card-excerpt" style="font-size:0.85rem; margin-bottom:12px;">Establishing healthy boundaries in relationships is essential for fostering positive and fulfilling connections with others. Boundaries are like invisible lines...</p>
+          <div class="card-tags">
+            
+          </div>
+        </div>
+      </article>
+    
+      </div>
+    </section>
+  
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 puru world official. All rights reserved.</p>
+      <p>Migrated from Blogger to Static HTML Site.</p>
+    </div>
+  </footer>
+</body>
+</html>

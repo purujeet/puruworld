@@ -1,11 +1,91 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="puru world official - A blog on everyday need daily. Exploring technology, lifeskills, travel, and more.">
+  <title>puru world official</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style.css">
+  <script src="./posts-metadata.js"></script>
+  <script src="./main.js" defer></script>
+</head>
 <body>
-	<!--iframe src="https://puruworld-developer-edition.ap16.force.com/Service/s" title="puruworld site" style="height:100%; width:100%; position:fixed;"-->
-	<iframe src="https://puruworld-dev-ed.my.site.com" title="puruworld site" style="height:100%; width:100%; position:fixed;">
-	
-</iframe>
-</iframe>
+  <header>
+    <div class="container header-content">
+      <div class="logo">
+        <svg style="width: 28px; height: 28px; fill: url(#accentGradient);" viewBox="0 0 24 24">
+          <defs>
+            <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#8b5cf6" />
+              <stop offset="100%" stop-color="#6366f1" />
+            </linearGradient>
+          </defs>
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/>
+        </svg>
+        Puru's Blog
+      </div>
+      <nav class="nav-links">
+        <a href="./index.html" class="nav-link">Home</a>
+        <a href="./p/subscribe-today.html" class="nav-link">Subscribe</a>
+        <button class="theme-toggle-btn" aria-label="Toggle dark mode" id="theme-toggle">
+          <svg class="moon-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+          <svg class="sun-icon" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path></svg>
+        </button>
+      </nav>
+    </div>
+  </header>
 
+  <main class="container">
+    <section class="hero">
+      <div class="hero-bg-blobs">
+        <div class="hero-blob hero-blob-1"></div>
+        <div class="hero-blob hero-blob-2"></div>
+      </div>
+      <h1>puru world official</h1>
+      <p>A beautiful destination for regular updates, lifestyle guides, technical tutorials, and emotional intelligence strategies.</p>
+      <div class="blog-stats">
+        <span>
+          <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+          1,500+ Articles
+        </span>
+        <span>
+          <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/></svg>
+          5+ Categories
+        </span>
+      </div>
+    </section>
+
+    <section class="search-filter-section" id="search-filter-section">
+      <div class="search-box-wrapper">
+        <span class="search-icon">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </span>
+        <input type="text" id="search-box" class="search-box" placeholder="Search across 1,500+ blog articles...">
+        <span class="clear-icon" id="clear-search-icon" onclick="resetFilters()">&times;</span>
+      </div>
+
+      <div class="tags-wrapper" id="tags-wrapper">
+        <!-- Tags will load dynamically -->
+      </div>
+    </section>
+
+    <div class="posts-grid" id="posts-grid">
+      <!-- Posts will render dynamically -->
+    </div>
+
+    <div class="pagination" id="pagination">
+      <!-- Pagination will render dynamically -->
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 puru world official. All rights reserved.</p>
+      <p>Migrated from Blogger to Static HTML Site.</p>
+    </div>
+  </footer>
 </body>
 </html>

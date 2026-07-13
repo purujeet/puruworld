@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="body { margin: 0; padding: 0; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background: linear-g...">
+  <title>Spin The bottle - puru world official</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+  <script src="../main.js" defer></script>
+</head>
+<body>
+  <header>
+    <div class="container header-content">
+      <div class="logo">
+        <a href="../index.html" style="background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 8px; font-weight: 800;">
+          <svg style="width: 28px; height: 28px; fill: url(#accentGradientPage);" viewBox="0 0 24 24">
+            <defs>
+              <linearGradient id="accentGradientPage" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#8b5cf6" />
+                <stop offset="100%" stop-color="#6366f1" />
+              </linearGradient>
+            </defs>
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/>
+          </svg>
+          Puru's Blog
+        </a>
+      </div>
+      <nav class="nav-links">
+        <a href="../index.html" class="nav-link">Home</a>
+        <a href="../p/subscribe-today.html" class="nav-link">Subscribe</a>
+        <button class="theme-toggle-btn" aria-label="Toggle dark mode" id="theme-toggle">
+          <svg class="moon-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293a8 8 0 01-10.586-10.586 8.001 8.001 0 1010.586 10.586z"></path></svg>
+          <svg class="sun-icon" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path></svg>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container post-layout">
+    <div class="back-btn-wrapper">
+      <a href="../index.html" class="back-btn">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        Back to Home
+      </a>
+    </div>
+
+    <article>
+      <div class="post-header">
+        <h1 class="post-header-title">Spin The bottle</h1>
+      </div>
+
+      <div class="post-main-content" style="max-width: 800px; margin: 0 auto;">
+        <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .bottle-container {
+            position: relative;
+            width: 200px;
+            height: 300px;
+            perspective: 1000px;
+            margin-bottom: 2rem;
+            cursor: pointer;
+        }
+
+        .bottle {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 2s ease-out;
+        }
+
+        .bottle-body {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .bottle-neck {
+            width: 40px;
+            height: 80px;
+            background: linear-gradient(#2e7d32, #1b5e20);
+            border-radius: 10px 10px 0 0;
+            border: 2px solid #1b5e20;
+        }
+
+        .bottle-main {
+            width: 80px;
+            height: 180px;
+            background: linear-gradient(#4caf50, #2e7d32);
+            border: 2px solid #1b5e20;
+            border-radius: 0 0 20px 20px;
+        }
+
+        .spin-button {
+            background: #d81b60;
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+            text-transform: uppercase;
+        }
+
+        .spin-button:hover {
+            background: #ad1457;
+            transform: translateY(-4px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+        }
+
+        .spin-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .spin-button .material-icons {
+            font-size: 1.5rem;
+        }
+
+        @media (max-width: 600px) {
+            .bottle-container {
+                width: 150px;
+                height: 225px;
+            }
+
+            .bottle-neck {
+                width: 30px;
+                height: 60px;
+            }
+
+            .bottle-main {
+                width: 60px;
+                height: 135px;
+            }
+
+            .spin-button {
+                padding: 0.75rem 1.5rem;
+                font-size: 1rem;
+            }
+
+            .spin-button .material-icons {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+  <center>
+    <div class="bottle-container" onclick="spinBottle()">
+        <div class="bottle" id="bottle">
+            <div class="bottle-body">
+                <div class="bottle-neck" id="bottleNeck"></div>
+                <div class="bottle-main" id="bottleMain"></div>
+            </div>
+        </div>
+    </div>
+    <button class="spin-button" onclick="spinBottle()">
+        <span class="material-icons">refresh</span> Spin Again
+    </button>
+</center>
+    <script>
+        const colorSets = [
+            {
+                neck: { gradient: 'linear-gradient(#2e7d32, #1b5e20)', border: '#1b5e20' },
+                main: { gradient: 'linear-gradient(#4caf50, #2e7d32)', border: '#1b5e20' }
+            },
+            {
+                neck: { gradient: 'linear-gradient(#d81b60, #ad1457)', border: '#ad1457' },
+                main: { gradient: 'linear-gradient(#f06292, #d81b60)', border: '#ad1457' }
+            },
+            {
+                neck: { gradient: 'linear-gradient(#0288d1, #01579b)', border: '#01579b' },
+                main: { gradient: 'linear-gradient(#29b6f6, #0288d1)', border: '#01579b' }
+            },
+            {
+                neck: { gradient: 'linear-gradient(#ff6f00, #e65100)', border: '#e65100' },
+                main: { gradient: 'linear-gradient(#ffa726, #ff6f00)', border: '#e65100' }
+            }
+        ];
+
+        let currentAngle = 0;
+
+        function spinBottle() {
+            const bottle = document.getElementById('bottle');
+            const bottleNeck = document.getElementById('bottleNeck');
+            const bottleMain = document.getElementById('bottleMain');
+            
+            // Increment rotation angle (multiple full spins plus a random angle)
+            const randomAngle = 1080 + Math.floor(Math.random() * 360);
+            currentAngle += randomAngle;
+            bottle.style.transform = `rotate(${currentAngle}deg)`;
+            
+            // Randomly select a color set
+            const randomColorSet = colorSets[Math.floor(Math.random() * colorSets.length)];
+            bottleNeck.style.background = randomColorSet.neck.gradient;
+            bottleNeck.style.borderColor = randomColorSet.neck.border;
+            bottleMain.style.background = randomColorSet.main.gradient;
+            bottleMain.style.borderColor = randomColorSet.main.border;
+        }
+    </script>
+</body>
+</html>
+      </div>
+    </article>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 puru world official. All rights reserved.</p>
+      <p>Migrated from Blogger to Static HTML Site.</p>
+    </div>
+  </footer>
+</body>
+</html>
