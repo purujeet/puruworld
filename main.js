@@ -34,9 +34,10 @@ document.addEventListener('DOMContentLoaded', () => {
     initHomePage();
   }
 
-  // Videos Grid logic
+  // Videos Grid logic (Standalone fallback)
   const videosGrid = document.getElementById('videos-grid');
-  if (videosGrid) {
+  const isStandaloneVideosPage = videosGrid && !document.getElementById('posts-grid');
+  if (isStandaloneVideosPage) {
     initVideosPage();
   }
 
@@ -52,6 +53,7 @@ let activeTag = null;
 let searchQuery = '';
 let currentPage = 1;
 const postsPerPage = 12;
+let activeTab = 'blog';
 
 function initHomePage() {
   try {
@@ -63,23 +65,81 @@ function initHomePage() {
     if (searchBox) {
       searchBox.value = ''; // Clear search box on reload
       searchBox.addEventListener('input', (e) => {
-        searchQuery = e.target.value.toLowerCase().trim();
-        currentPage = 1;
+        const query = e.target.value.toLowerCase().trim();
+        
+        if (activeTab === 'blog') {
+          searchQuery = query;
+          currentPage = 1;
+          applyFilters();
+        } else {
+          applyVideoFilters();
+        }
 
         const clearIcon = document.getElementById('clear-search-icon');
         if (clearIcon) {
-          clearIcon.style.display = searchQuery ? 'block' : 'none';
+          clearIcon.style.display = query ? 'block' : 'none';
         }
-
-        applyFilters();
       });
     }
 
     renderTags();
-    renderPostsGrid();
+    
+    // Check URL parameters for active tab
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('tab') === 'videos') {
+      switchTab('videos');
+    } else {
+      switchTab('blog');
+    }
   } catch (error) {
     console.error('Failed to load posts database:', error);
     document.getElementById('posts-grid').innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">Failed to load posts.</p>';
+  }
+}
+
+function switchTab(tab) {
+  activeTab = tab;
+  
+  const tabBlog = document.getElementById('tab-blog');
+  const tabVideos = document.getElementById('tab-videos');
+  const postsGrid = document.getElementById('posts-grid');
+  const videosGrid = document.getElementById('videos-grid');
+  const pagination = document.getElementById('pagination');
+  const tagsWrapper = document.getElementById('tags-wrapper');
+  const searchBox = document.getElementById('search-box');
+  
+  if (!tabBlog || !tabVideos) return;
+  
+  if (tab === 'blog') {
+    tabBlog.classList.add('active');
+    tabVideos.classList.remove('active');
+    if (postsGrid) postsGrid.style.display = 'grid';
+    if (videosGrid) videosGrid.style.display = 'none';
+    if (pagination) pagination.style.display = 'flex';
+    if (tagsWrapper) tagsWrapper.style.display = 'flex';
+    if (searchBox) {
+      searchBox.placeholder = 'Search across 1,500+ blog articles...';
+      searchBox.value = searchQuery;
+    }
+    applyFilters();
+  } else {
+    tabBlog.classList.remove('active');
+    tabVideos.classList.add('active');
+    if (postsGrid) postsGrid.style.display = 'none';
+    if (videosGrid) videosGrid.style.display = 'grid';
+    if (pagination) pagination.style.display = 'none';
+    if (tagsWrapper) tagsWrapper.style.display = 'none';
+    if (searchBox) {
+      searchBox.placeholder = 'Search YouTube video library...';
+      searchBox.value = '';
+    }
+    applyVideoFilters();
+  }
+
+  // Update clear icon state
+  const clearIcon = document.getElementById('clear-search-icon');
+  if (clearIcon && searchBox) {
+    clearIcon.style.display = searchBox.value ? 'block' : 'none';
   }
 }
 
@@ -116,16 +176,18 @@ function selectTag(tag) {
   
   // Update UI active state
   const tagsWrapper = document.getElementById('tags-wrapper');
-  const buttons = tagsWrapper.querySelectorAll('.filter-tag');
-  buttons.forEach(btn => {
-    const isAll = tag === null && btn.textContent.includes('All Posts');
-    const isMatch = tag !== null && btn.textContent.startsWith(tag + ' ');
-    if (isAll || isMatch) {
-      btn.classList.add('active');
-    } else {
-      btn.classList.remove('active');
-    }
-  });
+  if (tagsWrapper) {
+    const buttons = tagsWrapper.querySelectorAll('.filter-tag');
+    buttons.forEach(btn => {
+      const isAll = tag === null && btn.textContent.includes('All Posts');
+      const isMatch = tag !== null && btn.textContent.startsWith(tag + ' ');
+      if (isAll || isMatch) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+  }
   
   applyFilters();
 }
@@ -141,6 +203,56 @@ function applyFilters() {
   });
 
   renderPostsGrid();
+}
+
+function applyVideoFilters() {
+  const videosGrid = document.getElementById('videos-grid');
+  if (!videosGrid) return;
+
+  const allVideos = window.videosData || [];
+  const query = document.getElementById('search-box')?.value.toLowerCase().trim() || '';
+
+  const filteredVideos = allVideos.filter(video => {
+    return !query || 
+           video.title.toLowerCase().includes(query) ||
+           video.description.toLowerCase().includes(query);
+  });
+
+  if (filteredVideos.length === 0) {
+    videosGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 40px 0;">No videos found matching your search.</p>';
+    updateSearchInfoBar(0);
+    return;
+  }
+
+  updateSearchInfoBar(filteredVideos.length);
+
+  videosGrid.innerHTML = filteredVideos.map(video => {
+    const displayTitle = query ? highlightText(video.title, query) : video.title;
+    const displayExcerpt = query ? highlightText(video.description, query) : video.description;
+
+    return `
+      <article class="post-card video-card" onclick="playVideo('${video.id}')" style="cursor: pointer;">
+        <div class="card-image-wrapper">
+          <img class="card-image" src="${video.thumbnail}" alt="${video.title}" loading="lazy">
+          <div class="play-overlay">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+          </div>
+        </div>
+        <div class="card-content">
+          <div class="card-meta">
+            <span>
+              <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
+              ${video.formattedDate}
+            </span>
+          </div>
+          <h2 class="card-title" style="font-size: 1.15rem; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${displayTitle}</h2>
+          <p class="card-excerpt" style="font-size: 0.85rem; margin-bottom: 0;">${displayExcerpt}</p>
+        </div>
+      </article>
+    `;
+  }).join('');
 }
 
 function highlightText(text, query) {
@@ -160,10 +272,18 @@ function updateSearchInfoBar(totalResults) {
   if (!filterSection) return;
 
   let infoBar = document.getElementById('search-info-bar');
+  const query = document.getElementById('search-box')?.value.toLowerCase().trim() || '';
   
-  if (!searchQuery && !activeTag) {
-    if (infoBar) infoBar.remove();
-    return;
+  if (activeTab === 'blog') {
+    if (!searchQuery && !activeTag) {
+      if (infoBar) infoBar.remove();
+      return;
+    }
+  } else {
+    if (!query) {
+      if (infoBar) infoBar.remove();
+      return;
+    }
   }
 
   if (!infoBar) {
@@ -173,12 +293,18 @@ function updateSearchInfoBar(totalResults) {
     filterSection.insertAdjacentElement('afterend', infoBar);
   }
 
-  let text = `Found <strong>${totalResults}</strong> article${totalResults === 1 ? '' : 's'}`;
-  if (searchQuery) {
-    text += ` matching "<strong>${escapeHtml(searchQuery)}</strong>"`;
-  }
-  if (activeTag) {
-    text += ` in tag "<strong>${escapeHtml(activeTag)}</strong>"`;
+  let text = `Found <strong>${totalResults}</strong> result${totalResults === 1 ? '' : 's'}`;
+  if (activeTab === 'blog') {
+    if (searchQuery) {
+      text += ` matching "<strong>${escapeHtml(searchQuery)}</strong>"`;
+    }
+    if (activeTag) {
+      text += ` in tag "<strong>${escapeHtml(activeTag)}</strong>"`;
+    }
+  } else {
+    if (query) {
+      text += ` matching "<strong>${escapeHtml(query)}</strong>"`;
+    }
   }
 
   infoBar.innerHTML = `
@@ -194,26 +320,30 @@ function escapeHtml(str) {
 function resetFilters() {
   const searchBox = document.getElementById('search-box');
   if (searchBox) searchBox.value = '';
-  searchQuery = '';
-  activeTag = null;
-  currentPage = 1;
   
-  const tagsWrapper = document.getElementById('tags-wrapper');
-  if (tagsWrapper) {
-    const buttons = tagsWrapper.querySelectorAll('.filter-tag');
-    buttons.forEach(btn => {
-      if (btn.textContent.includes('All Posts')) {
-        btn.classList.add('active');
-      } else {
-        btn.classList.remove('active');
-      }
-    });
-  }
-
   const clearIcon = document.getElementById('clear-search-icon');
   if (clearIcon) clearIcon.style.display = 'none';
 
-  applyFilters();
+  if (activeTab === 'blog') {
+    searchQuery = '';
+    activeTag = null;
+    currentPage = 1;
+    
+    const tagsWrapper = document.getElementById('tags-wrapper');
+    if (tagsWrapper) {
+      const buttons = tagsWrapper.querySelectorAll('.filter-tag');
+      buttons.forEach(btn => {
+        if (btn.textContent.includes('All Posts')) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+    }
+    applyFilters();
+  } else {
+    applyVideoFilters();
+  }
 }
 
 function renderPostsGrid() {
@@ -498,7 +628,6 @@ function initImageLightbox() {
       
       e.preventDefault();
       
-      // Ensure we display an image element in the lightbox rather than an iframe
       let mediaContainer = lightbox.querySelector('.lightbox-video-container');
       if (mediaContainer) {
         mediaContainer.remove();
@@ -579,14 +708,14 @@ function initCodeBlockCopyButtons() {
   });
 }
 
-// Videos Page Initialization
+// Videos Page Initialization (Standalone fallback)
 function initVideosPage() {
   const videosGrid = document.getElementById('videos-grid');
   if (!videosGrid) return;
   
   const allVideos = window.videosData || [];
   if (allVideos.length === 0) {
-    videosGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 40px 0;">No videos found. Click back later!</p>';
+    videosGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 40px 0;">No videos found. Check back later!</p>';
     return;
   }
   
@@ -674,3 +803,4 @@ window.changePage = changePage;
 window.sharePost = sharePost;
 window.resetFilters = resetFilters;
 window.playVideo = playVideo;
+window.switchTab = switchTab;

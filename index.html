@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./style.css">
   <script src="./posts-metadata.js"></script>
+  <script src="./videos-metadata.js"></script>
   <script src="./main.js" defer></script>
 </head>
 <body>
@@ -28,11 +29,11 @@
         Puru's Blog
       </div>
       <nav class="nav-links">
-        <a href="./index.html" class="nav-link">Home</a>
-        <a href="./p/videos.html" class="nav-link">Videos</a>
+        <a href="./index.html" class="nav-link" onclick="event.preventDefault(); switchTab('blog')">Home</a>
+        <a href="./index.html?tab=videos" class="nav-link" onclick="event.preventDefault(); switchTab('videos')">Videos</a>
         <a href="./p/subscribe-today.html" class="nav-link">Subscribe</a>
         <button class="theme-toggle-btn" aria-label="Toggle dark mode" id="theme-toggle">
-          <svg class="moon-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293a8 8 0 01-10.586-10.586 8.001 8.001 0 1010.586 10.586z"></path></svg>
+          <svg class="moon-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
           <svg class="sun-icon" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path></svg>
         </button>
       </nav>
@@ -59,6 +60,17 @@
       </div>
     </section>
 
+    <div class="tabs-container">
+      <button class="tab-btn active" id="tab-blog" onclick="switchTab('blog')">
+        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+        Blog Articles
+      </button>
+      <button class="tab-btn" id="tab-videos" onclick="switchTab('videos')">
+        <svg viewBox="0 0 24 24"><path d="M23 12c0 6.07-4.93 11-11 11S1 18.07 1 12 5.93 1 12 1s11 4.93 11 11zm-11-9c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9zm-2 13V8l6 4-6 4z"/></svg>
+        Video Library
+      </button>
+    </div>
+
     <section class="search-filter-section" id="search-filter-section">
       <div class="search-box-wrapper">
         <span class="search-icon">
@@ -75,6 +87,10 @@
 
     <div class="posts-grid" id="posts-grid">
       <!-- Posts will render dynamically -->
+    </div>
+
+    <div class="posts-grid" id="videos-grid" style="display: none;">
+      <!-- Videos will render dynamically -->
     </div>
 
     <div class="pagination" id="pagination">
