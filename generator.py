@@ -113,57 +113,159 @@ def sanitize_blogger_html(content):
     content = re.sub(r'<img\s+[^>]+>', clean_standalone_img, content, flags=re.IGNORECASE)
     return content
 
-def fetch_youtube_videos(channel_id):
-    url = f"https://www.youtube.com/feeds/videos.xml?channel_id={channel_id}"
-    print(f"Fetching YouTube feed from: {url}")
-    try:
-        req = urllib.request.Request(
-            url, 
-            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
-        )
-        with urllib.request.urlopen(req, timeout=8) as response:
-            xml_data = response.read()
-        
-        ns = {
-            'atom': 'http://www.w3.org/2005/Atom',
-            'yt': 'http://www.youtube.com/xml/schemas/2015',
-            'media': 'http://search.yahoo.com/mrss/'
-        }
-        
-        root = ET.fromstring(xml_data)
-        entries = root.findall('atom:entry', ns)
-        
-        videos = []
-        for entry in entries:
-            video_id_el = entry.find('yt:videoId', ns)
-            video_id = video_id_el.text if video_id_el is not None else ''
+def classify_video(title):
+    t_lower = title.lower()
+    
+    # Gaming keywords
+    gaming_keywords = [
+        "match", "gameplay", "wukong", "level devil", "cod", "pubg", 
+        "free fire", "ranked", "boss", "ending", "gaming", "troll", 
+        "moye moye", "clutch", "gta", "survival", "minecraft", "counter strike",
+        "csgo", "valorant", "bgmi", "gamer", "fighting"
+    ]
+    # Coding & Tech keywords
+    tech_keywords = [
+        "java", "tutorial", "code", "command prompt", "star wars", 
+        "programming", "python", "developer", "c++", "cmd", "setup",
+        "star wars in cmd", "hack", "scripts"
+    ]
+    
+    if any(k in t_lower for k in gaming_keywords):
+        return "Gaming"
+    elif any(k in t_lower for k in tech_keywords):
+        return "Coding & Tech"
+    else:
+        return "Others"
+
+def parse_videos_from_contents(contents):
+    videos = []
+    continuation_token = None
+    
+    for item in contents:
+        # Check for video item
+        rich_item = item.get('richItemRenderer', {})
+        lockup = rich_item.get('content', {}).get('lockupViewModel', {})
+        if lockup:
+            video_id = lockup.get('contentId')
+            metadata = lockup.get('metadata', {}).get('lockupMetadataViewModel', {})
+            title = metadata.get('title', {}).get('content')
             
-            title_el = entry.find('atom:title', ns)
-            title = title_el.text if title_el is not None else ''
-            
-            published_el = entry.find('atom:published', ns)
-            published = published_el.text if published_el is not None else ''
-            formatted_date = format_date(published)
-            
-            media_group = entry.find('media:group', ns)
-            desc_el = media_group.find('media:description', ns) if media_group is not None else None
-            desc = desc_el.text if desc_el is not None else ''
-            desc_clean = clean_excerpt(desc, 130)
-            
-            thumb_el = media_group.find('media:thumbnail', ns) if media_group is not None else None
-            thumb = thumb_el.get('url') if thumb_el is not None else f"https://img.youtube.com/vi/{video_id}/hqdefault.jpg"
+            meta_rows = metadata.get('metadata', {}).get('contentMetadataViewModel', {}).get('metadataRows', [])
+            views = ""
+            time_ago = ""
+            if meta_rows:
+                parts = meta_rows[0].get('metadataParts', [])
+                if len(parts) > 0:
+                    views = parts[0].get('text', {}).get('content', '')
+                if len(parts) > 1:
+                    time_ago = parts[1].get('text', {}).get('content', '')
+                    
+            category = classify_video(title)
             
             videos.append({
                 'id': video_id,
                 'title': title,
-                'date': published,
-                'formattedDate': formatted_date,
-                'description': desc_clean,
-                'thumbnail': thumb
+                'views': views,
+                'timeAgo': time_ago,
+                'thumbnail': f"https://i.ytimg.com/vi/{video_id}/hqdefault.jpg",
+                'category': category
             })
-        return videos
+            
+        # Check for continuation item
+        cont_item = item.get('continuationItemRenderer', {})
+        if cont_item:
+            continuation_token = cont_item.get('continuationEndpoint', {}).get('continuationCommand', {}).get('token')
+            
+    return videos, continuation_token
+
+def fetch_youtube_videos(channel_id):
+    # Fetch all video items programmatically using continuation tokens
+    url = f"https://www.youtube.com/@PuruWorld/videos"
+    print(f"Ingesting all videos from: {url}")
+    try:
+        req = urllib.request.Request(
+            url, 
+            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'}
+        )
+        with urllib.request.urlopen(req, timeout=10) as response:
+            html = response.read().decode('utf-8')
+            
+        # Extract INNERTUBE API Key
+        api_key_match = re.search(r'"innertubeApiKey":"([^"]+)"', html)
+        if not api_key_match:
+            api_key_match = re.search(r'"apiKey":"([^"]+)"', html)
+        api_key = api_key_match.group(1) if api_key_match else None
+        
+        # Parse initial page JSON
+        pattern = r'var ytInitialData\s*=\s*({.*?});'
+        match = re.search(pattern, html)
+        if not match:
+            print("Warning: ytInitialData not found on YouTube page.")
+            return []
+            
+        data = json.loads(match.group(1))
+        tabs = data['contents']['twoColumnBrowseResultsRenderer']['tabs']
+        videos_tab = None
+        for tab in tabs:
+            tab_r = tab.get('tabRenderer', {})
+            if tab_r.get('title') == 'Videos' or tab_r.get('selected'):
+                videos_tab = tab_r
+                break
+                
+        if not videos_tab:
+            print("Warning: Videos tab not found in YouTube layout.")
+            return []
+            
+        contents = videos_tab['content']['richGridRenderer']['contents']
+        all_videos, continuation_token = parse_videos_from_contents(contents)
+        print(f"  Scraped page 0: Extracted {len(all_videos)} videos. Continuation token: {continuation_token is not None}")
+        
+        # Loop pagination pages using tokens
+        page = 1
+        while continuation_token and api_key:
+            api_url = f"https://www.youtube.com/youtubei/v1/browse?key={api_key}"
+            payload = {
+                "continuation": continuation_token,
+                "context": {
+                    "client": {
+                        "clientName": "WEB",
+                        "clientVersion": "2.20240101.00.00",
+                        "originalUrl": "https://www.youtube.com/@PuruWorld/videos",
+                        "visitorData": "CgtWRmNYcEkySV9udyjAy4etBg%3D%3D"
+                    }
+                }
+            }
+            
+            req_data = json.dumps(payload).encode('utf-8')
+            api_req = urllib.request.Request(
+                api_url,
+                data=req_data,
+                headers={
+                    'Content-Type': 'application/json',
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+                }
+            )
+            
+            with urllib.request.urlopen(api_req, timeout=10) as response:
+                res_data = json.loads(response.read().decode('utf-8'))
+                
+            actions = res_data.get('onResponseReceivedActions', [])
+            if not actions:
+                break
+                
+            items = actions[0].get('appendContinuationItemsAction', {}).get('continuationItems', [])
+            if not items:
+                break
+                
+            videos, continuation_token = parse_videos_from_contents(items)
+            all_videos.extend(videos)
+            print(f"  Scraped page {page}: Extracted {len(videos)} videos. Next token: {continuation_token is not None}")
+            page += 1
+            
+        print(f"Scrape successful. Ingested total {len(all_videos)} YouTube videos.")
+        return all_videos
     except Exception as e:
-        print(f"Warning: Could not fetch YouTube videos: {e}")
+        print(f"Warning: Failed to fetch videos scraper: {e}. Falling back to default list.")
         return []
 
 # --- SHARED STYLESHEET ---
@@ -837,6 +939,98 @@ header .header-content {
   transform: translate(-50%, -50%) scale(1.1);
 }
 
+/* Videos Page Layout (Left sidebar navigation & right grid) */
+.videos-page-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+  margin-top: 20px;
+}
+
+@media (min-width: 992px) {
+  .videos-page-layout {
+    grid-template-columns: 240px 1fr;
+  }
+}
+
+.videos-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: sticky;
+  top: calc(var(--header-height) + 20px);
+  height: fit-content;
+}
+
+.video-category-btn {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+  width: 100%;
+  text-align: left;
+}
+
+.video-category-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+.video-category-btn:hover {
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+}
+
+.video-category-btn.active {
+  background: var(--accent-gradient);
+  border-color: transparent;
+  color: white;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+}
+
+.video-category-btn .category-count {
+  font-size: 0.75rem;
+  background-color: var(--border-color);
+  color: var(--text-muted);
+  padding: 2px 8px;
+  border-radius: 20px;
+  transition: all 0.2s;
+}
+
+.video-category-btn.active .category-count {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+@media (max-width: 991px) {
+  .videos-sidebar {
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    position: static;
+    scrollbar-width: none;
+  }
+  .videos-sidebar::-webkit-scrollbar {
+    display: none;
+  }
+  .video-category-btn {
+    flex-shrink: 0;
+    width: auto;
+  }
+}
+
 /* Pagination */
 .pagination {
   display: flex;
@@ -1358,12 +1552,21 @@ let activeTag = null;
 let searchQuery = '';
 let currentPage = 1;
 const postsPerPage = 12;
+
+let allVideos = [];
+let filteredVideos = [];
+let currentVideoPage = 1;
+const videosPerPage = 12;
+let activeVideoCategory = 'All';
 let activeTab = 'blog';
 
 function initHomePage() {
   try {
     allPosts = window.postsData || [];
     filteredPosts = [...allPosts];
+    
+    allVideos = window.videosData || [];
+    filteredVideos = [...allVideos];
     
     // Bind search and filter events
     const searchBox = document.getElementById('search-box');
@@ -1377,6 +1580,7 @@ function initHomePage() {
           currentPage = 1;
           applyFilters();
         } else {
+          currentVideoPage = 1;
           applyVideoFilters();
         }
 
@@ -1388,6 +1592,7 @@ function initHomePage() {
     }
 
     renderTags();
+    renderVideoCategories();
     
     // Check URL parameters for active tab
     const urlParams = new URLSearchParams(window.location.search);
@@ -1397,8 +1602,7 @@ function initHomePage() {
       switchTab('blog');
     }
   } catch (error) {
-    console.error('Failed to load posts database:', error);
-    document.getElementById('posts-grid').innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">Failed to load posts.</p>';
+    console.error('Failed to load databases:', error);
   }
 }
 
@@ -1408,8 +1612,9 @@ function switchTab(tab) {
   const tabBlog = document.getElementById('tab-blog');
   const tabVideos = document.getElementById('tab-videos');
   const postsGrid = document.getElementById('posts-grid');
-  const videosGrid = document.getElementById('videos-grid');
+  const videosPageLayout = document.getElementById('videos-page-layout');
   const pagination = document.getElementById('pagination');
+  const videosPagination = document.getElementById('videos-pagination');
   const tagsWrapper = document.getElementById('tags-wrapper');
   const searchBox = document.getElementById('search-box');
   
@@ -1419,8 +1624,9 @@ function switchTab(tab) {
     tabBlog.classList.add('active');
     tabVideos.classList.remove('active');
     if (postsGrid) postsGrid.style.display = 'grid';
-    if (videosGrid) videosGrid.style.display = 'none';
+    if (videosPageLayout) videosPageLayout.style.display = 'none';
     if (pagination) pagination.style.display = 'flex';
+    if (videosPagination) videosPagination.style.display = 'none';
     if (tagsWrapper) tagsWrapper.style.display = 'flex';
     if (searchBox) {
       searchBox.placeholder = 'Search across 1,500+ blog articles...';
@@ -1431,8 +1637,9 @@ function switchTab(tab) {
     tabBlog.classList.remove('active');
     tabVideos.classList.add('active');
     if (postsGrid) postsGrid.style.display = 'none';
-    if (videosGrid) videosGrid.style.display = 'grid';
+    if (videosPageLayout) videosPageLayout.style.display = 'grid';
     if (pagination) pagination.style.display = 'none';
+    if (videosPagination) videosPagination.style.display = 'flex';
     if (tagsWrapper) tagsWrapper.style.display = 'none';
     if (searchBox) {
       searchBox.placeholder = 'Search YouTube video library...';
@@ -1497,6 +1704,49 @@ function selectTag(tag) {
   applyFilters();
 }
 
+function renderVideoCategories() {
+  const sidebar = document.getElementById('videos-sidebar');
+  if (!sidebar) return;
+
+  const counts = { All: allVideos.length, Gaming: 0, 'Coding & Tech': 0, Others: 0 };
+  allVideos.forEach(v => {
+    const cat = v.category || 'Others';
+    if (counts[cat] !== undefined) {
+      counts[cat]++;
+    } else {
+      counts.Others++;
+    }
+  });
+
+  const categories = [
+    { name: 'All', icon: '<svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>' },
+    { name: 'Gaming', icon: '<svg viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5S19.67 10 20.5 10s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>' },
+    { name: 'Coding & Tech', icon: '<svg viewBox="0 0 24 24"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>' },
+    { name: 'Others', icon: '<svg viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>' }
+  ];
+
+  sidebar.innerHTML = categories.map(cat => {
+    const count = counts[cat.name] || 0;
+    const isActive = activeVideoCategory === cat.name;
+    return `
+      <button class="video-category-btn ${isActive ? 'active' : ''}" onclick="selectVideoCategory('${cat.name}')">
+        <span style="display:flex; align-items:center; gap:8px;">
+          ${cat.icon}
+          ${cat.name}
+        </span>
+        <span class="category-count">${count}</span>
+      </button>
+    `;
+  }).join('');
+}
+
+function selectVideoCategory(cat) {
+  activeVideoCategory = cat;
+  currentVideoPage = 1;
+  renderVideoCategories();
+  applyVideoFilters();
+}
+
 function applyFilters() {
   filteredPosts = allPosts.filter(post => {
     const matchesTag = !activeTag || (post.tags && post.tags.includes(activeTag));
@@ -1512,28 +1762,36 @@ function applyFilters() {
 
 function applyVideoFilters() {
   const videosGrid = document.getElementById('videos-grid');
+  const videosPagination = document.getElementById('videos-pagination');
   if (!videosGrid) return;
 
-  const allVideos = window.videosData || [];
   const query = document.getElementById('search-box')?.value.toLowerCase().trim() || '';
 
-  const filteredVideos = allVideos.filter(video => {
-    return !query || 
-           video.title.toLowerCase().includes(query) ||
-           video.description.toLowerCase().includes(query);
+  filteredVideos = allVideos.filter(video => {
+    const matchesCategory = activeVideoCategory === 'All' || video.category === activeVideoCategory;
+    const matchesSearch = !query || 
+                          video.title.toLowerCase().includes(query) ||
+                          (video.views && video.views.toLowerCase().includes(query)) ||
+                          (video.timeAgo && video.timeAgo.toLowerCase().includes(query));
+    return matchesCategory && matchesSearch;
   });
 
   if (filteredVideos.length === 0) {
     videosGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 40px 0;">No videos found matching your search.</p>';
     updateSearchInfoBar(0);
+    if (videosPagination) videosPagination.innerHTML = '';
     return;
   }
 
   updateSearchInfoBar(filteredVideos.length);
 
-  videosGrid.innerHTML = filteredVideos.map(video => {
+  // Paginated videos grid
+  const startIndex = (currentVideoPage - 1) * videosPerPage;
+  const endIndex = startIndex + videosPerPage;
+  const pageVideos = filteredVideos.slice(startIndex, endIndex);
+
+  videosGrid.innerHTML = pageVideos.map(video => {
     const displayTitle = query ? highlightText(video.title, query) : video.title;
-    const displayExcerpt = query ? highlightText(video.description, query) : video.description;
 
     return `
       <article class="post-card video-card" onclick="playVideo('${video.id}')" style="cursor: pointer;">
@@ -1548,16 +1806,71 @@ function applyVideoFilters() {
         <div class="card-content">
           <div class="card-meta">
             <span>
-              <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
-              ${video.formattedDate}
+              <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+              ${video.views || '0 views'}
+            </span>
+            <span>
+              <svg fill="currentColor" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 2 22 6.48 22 12s-4.48-10-10-10zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+              ${video.timeAgo || 'recent'}
             </span>
           </div>
           <h2 class="card-title" style="font-size: 1.15rem; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${displayTitle}</h2>
-          <p class="card-excerpt" style="font-size: 0.85rem; margin-bottom: 0;">${displayExcerpt}</p>
         </div>
       </article>
     `;
   }).join('');
+
+  renderVideoPagination(filteredVideos.length);
+}
+
+function renderVideoPagination(totalCount) {
+  const paginationWrapper = document.getElementById('videos-pagination');
+  if (!paginationWrapper) return;
+
+  const totalPages = Math.ceil(totalCount / videosPerPage);
+  if (totalPages <= 1) {
+    paginationWrapper.innerHTML = '';
+    return;
+  }
+
+  let html = `
+    <button class="page-btn" onclick="changeVideoPage(${currentVideoPage - 1})" ${currentVideoPage === 1 ? 'disabled' : ''}>&lt;</button>
+  `;
+
+  const startPage = Math.max(1, currentVideoPage - 2);
+  const endPage = Math.min(totalPages, currentVideoPage + 2);
+
+  if (startPage > 1) {
+    html += `<button class="page-btn" onclick="changeVideoPage(1)">1</button>`;
+    if (startPage > 2) html += `<span style="color: var(--text-muted)">...</span>`;
+  }
+
+  for (let i = startPage; i <= endPage; i++) {
+    html += `
+      <button class="page-btn ${i === currentVideoPage ? 'active' : ''}" onclick="changeVideoPage(${i})">${i}</button>
+    `;
+  }
+
+  if (endPage < totalPages) {
+    if (endPage < totalPages - 1) html += `<span style="color: var(--text-muted)">...</span>`;
+    html += `<button class="page-btn" onclick="changeVideoPage(${totalPages})">${totalPages}</button>`;
+  }
+
+  html += `
+    <button class="page-btn" onclick="changeVideoPage(${currentVideoPage + 1})" ${currentVideoPage === totalPages ? 'disabled' : ''}>&gt;</button>
+  `;
+
+  paginationWrapper.innerHTML = html;
+}
+
+function changeVideoPage(page) {
+  currentVideoPage = page;
+  applyVideoFilters();
+  
+  const targetElement = document.getElementById('search-filter-section');
+  if (targetElement) {
+    window.scrollTo({ top: targetElement.offsetTop - 100, behavior: 'smooth' });
+  }
 }
 
 function highlightText(text, query) {
@@ -1585,7 +1898,7 @@ function updateSearchInfoBar(totalResults) {
       return;
     }
   } else {
-    if (!query) {
+    if (!query && activeVideoCategory === 'All') {
       if (infoBar) infoBar.remove();
       return;
     }
@@ -1609,6 +1922,9 @@ function updateSearchInfoBar(totalResults) {
   } else {
     if (query) {
       text += ` matching "<strong>${escapeHtml(query)}</strong>"`;
+    }
+    if (activeVideoCategory !== 'All') {
+      text += ` in category "<strong>${escapeHtml(activeVideoCategory)}</strong>"`;
     }
   }
 
@@ -1647,6 +1963,9 @@ function resetFilters() {
     }
     applyFilters();
   } else {
+    activeVideoCategory = 'All';
+    currentVideoPage = 1;
+    renderVideoCategories();
     applyVideoFilters();
   }
 }
@@ -2013,41 +2332,32 @@ function initCodeBlockCopyButtons() {
   });
 }
 
-// Videos Page Initialization (Standalone fallback)
+// Videos Page Initialization (Standalone page loader)
 function initVideosPage() {
-  const videosGrid = document.getElementById('videos-grid');
-  if (!videosGrid) return;
-  
-  const allVideos = window.videosData || [];
-  if (allVideos.length === 0) {
-    videosGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 40px 0;">No videos found. Check back later!</p>';
-    return;
+  try {
+    allVideos = window.videosData || [];
+    filteredVideos = [...allVideos];
+    
+    const searchBox = document.getElementById('search-box');
+    if (searchBox) {
+      searchBox.value = '';
+      searchBox.addEventListener('input', (e) => {
+        currentVideoPage = 1;
+        applyVideoFilters();
+        
+        const clearIcon = document.getElementById('clear-search-icon');
+        if (clearIcon) {
+          const query = e.target.value.toLowerCase().trim();
+          clearIcon.style.display = query ? 'block' : 'none';
+        }
+      });
+    }
+    
+    renderVideoCategories();
+    applyVideoFilters();
+  } catch (error) {
+    console.error('Failed to load videos database:', error);
   }
-  
-  videosGrid.innerHTML = allVideos.map(video => {
-    return `
-      <article class="post-card video-card" onclick="playVideo('${video.id}')" style="cursor: pointer;">
-        <div class="card-image-wrapper">
-          <img class="card-image" src="${video.thumbnail}" alt="${video.title}" loading="lazy">
-          <div class="play-overlay">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M8 5v14l11-7z"/>
-            </svg>
-          </div>
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <span>
-              <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
-              ${video.formattedDate}
-            </span>
-          </div>
-          <h2 class="card-title" style="font-size: 1.15rem; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${video.title}</h2>
-          <p class="card-excerpt" style="font-size: 0.85rem; margin-bottom: 0;">${video.description}</p>
-        </div>
-      </article>
-    `;
-  }).join('');
 }
 
 function playVideo(videoId) {
@@ -2109,6 +2419,8 @@ window.sharePost = sharePost;
 window.resetFilters = resetFilters;
 window.playVideo = playVideo;
 window.switchTab = switchTab;
+window.selectVideoCategory = selectVideoCategory;
+window.changeVideoPage = changeVideoPage;
 """
 
 INDEX_HTML_TEMPLATE = """<!DOCTYPE html>
@@ -2202,12 +2514,21 @@ INDEX_HTML_TEMPLATE = """<!DOCTYPE html>
       <!-- Posts will render dynamically -->
     </div>
 
-    <div class="posts-grid" id="videos-grid" style="display: none;">
-      <!-- Videos will render dynamically -->
+    <div class="videos-page-layout" id="videos-page-layout" style="display: none;">
+      <aside class="videos-sidebar" id="videos-sidebar">
+        <!-- Sidebar categories will render dynamically -->
+      </aside>
+      <div class="posts-grid" id="videos-grid" style="margin-bottom: 0;">
+        <!-- Videos will render dynamically -->
+      </div>
     </div>
 
     <div class="pagination" id="pagination">
       <!-- Pagination will render dynamically -->
+    </div>
+
+    <div class="pagination" id="videos-pagination" style="display: none; margin-top: 40px;">
+      <!-- Video pagination will render dynamically -->
     </div>
   </main>
 
@@ -2274,8 +2595,27 @@ VIDEOS_HTML_TEMPLATE = """<!DOCTYPE html>
       <p>Explore the latest gameplay uploads, livestreams, guides, and walkthroughs from Puru World.</p>
     </section>
 
-    <div class="posts-grid" id="videos-grid">
-      <!-- Videos will load dynamically -->
+    <section class="search-filter-section" id="search-filter-section" style="margin-bottom: 30px;">
+      <div class="search-box-wrapper">
+        <span class="search-icon">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </span>
+        <input type="text" id="search-box" class="search-box" placeholder="Search YouTube video library...">
+        <span class="clear-icon" id="clear-search-icon" onclick="resetFilters()">&times;</span>
+      </div>
+    </section>
+
+    <div class="videos-page-layout" id="videos-page-layout">
+      <aside class="videos-sidebar" id="videos-sidebar">
+        <!-- Sidebar categories will render dynamically -->
+      </aside>
+      <div class="posts-grid" id="videos-grid" style="margin-bottom: 0;">
+        <!-- Videos will render dynamically -->
+      </div>
+    </div>
+    
+    <div class="pagination" id="videos-pagination" style="margin-top: 40px;">
+      <!-- Video pagination will render dynamically -->
     </div>
   </main>
 
@@ -2399,7 +2739,7 @@ def make_post_html(post_title, post_date, post_tags, post_content, read_time, co
                 LinkedIn
               </button>
               <button class="share-btn" onclick="sharePost('copy', '{post_title}')">
-                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 002-2M8 5a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
                 Copy Link
               </button>
             </div>
@@ -2619,7 +2959,7 @@ def main():
     f.write(INDEX_HTML_TEMPLATE)
   print("Generated index.html")
   
-  # Fetch YouTube videos and write metadata
+  # Fetch all YouTube videos programmatically
   print("Fetching YouTube videos...")
   videos = fetch_youtube_videos("UCFoVp5Va975oQQpevpQErQQ")
   with open(os.path.join(output_dir, 'videos-metadata.js'), 'w', encoding='utf-8') as f:

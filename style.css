@@ -668,6 +668,98 @@ header .header-content {
   transform: translate(-50%, -50%) scale(1.1);
 }
 
+/* Videos Page Layout (Left sidebar navigation & right grid) */
+.videos-page-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+  margin-top: 20px;
+}
+
+@media (min-width: 992px) {
+  .videos-page-layout {
+    grid-template-columns: 240px 1fr;
+  }
+}
+
+.videos-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: sticky;
+  top: calc(var(--header-height) + 20px);
+  height: fit-content;
+}
+
+.video-category-btn {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+  width: 100%;
+  text-align: left;
+}
+
+.video-category-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+.video-category-btn:hover {
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+}
+
+.video-category-btn.active {
+  background: var(--accent-gradient);
+  border-color: transparent;
+  color: white;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+}
+
+.video-category-btn .category-count {
+  font-size: 0.75rem;
+  background-color: var(--border-color);
+  color: var(--text-muted);
+  padding: 2px 8px;
+  border-radius: 20px;
+  transition: all 0.2s;
+}
+
+.video-category-btn.active .category-count {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+@media (max-width: 991px) {
+  .videos-sidebar {
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    position: static;
+    scrollbar-width: none;
+  }
+  .videos-sidebar::-webkit-scrollbar {
+    display: none;
+  }
+  .video-category-btn {
+    flex-shrink: 0;
+    width: auto;
+  }
+}
+
 /* Pagination */
 .pagination {
   display: flex;

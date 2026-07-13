@@ -51,8 +51,27 @@
       <p>Explore the latest gameplay uploads, livestreams, guides, and walkthroughs from Puru World.</p>
     </section>
 
-    <div class="posts-grid" id="videos-grid">
-      <!-- Videos will load dynamically -->
+    <section class="search-filter-section" id="search-filter-section" style="margin-bottom: 30px;">
+      <div class="search-box-wrapper">
+        <span class="search-icon">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </span>
+        <input type="text" id="search-box" class="search-box" placeholder="Search YouTube video library...">
+        <span class="clear-icon" id="clear-search-icon" onclick="resetFilters()">&times;</span>
+      </div>
+    </section>
+
+    <div class="videos-page-layout" id="videos-page-layout">
+      <aside class="videos-sidebar" id="videos-sidebar">
+        <!-- Sidebar categories will render dynamically -->
+      </aside>
+      <div class="posts-grid" id="videos-grid" style="margin-bottom: 0;">
+        <!-- Videos will render dynamically -->
+      </div>
+    </div>
+    
+    <div class="pagination" id="videos-pagination" style="margin-top: 40px;">
+      <!-- Video pagination will render dynamically -->
     </div>
   </main>
 

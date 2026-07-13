@@ -53,12 +53,21 @@ let activeTag = null;
 let searchQuery = '';
 let currentPage = 1;
 const postsPerPage = 12;
+
+let allVideos = [];
+let filteredVideos = [];
+let currentVideoPage = 1;
+const videosPerPage = 12;
+let activeVideoCategory = 'All';
 let activeTab = 'blog';
 
 function initHomePage() {
   try {
     allPosts = window.postsData || [];
     filteredPosts = [...allPosts];
+    
+    allVideos = window.videosData || [];
+    filteredVideos = [...allVideos];
     
     // Bind search and filter events
     const searchBox = document.getElementById('search-box');
@@ -72,6 +81,7 @@ function initHomePage() {
           currentPage = 1;
           applyFilters();
         } else {
+          currentVideoPage = 1;
           applyVideoFilters();
         }
 
@@ -83,6 +93,7 @@ function initHomePage() {
     }
 
     renderTags();
+    renderVideoCategories();
     
     // Check URL parameters for active tab
     const urlParams = new URLSearchParams(window.location.search);
@@ -92,8 +103,7 @@ function initHomePage() {
       switchTab('blog');
     }
   } catch (error) {
-    console.error('Failed to load posts database:', error);
-    document.getElementById('posts-grid').innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">Failed to load posts.</p>';
+    console.error('Failed to load databases:', error);
   }
 }
 
@@ -103,8 +113,9 @@ function switchTab(tab) {
   const tabBlog = document.getElementById('tab-blog');
   const tabVideos = document.getElementById('tab-videos');
   const postsGrid = document.getElementById('posts-grid');
-  const videosGrid = document.getElementById('videos-grid');
+  const videosPageLayout = document.getElementById('videos-page-layout');
   const pagination = document.getElementById('pagination');
+  const videosPagination = document.getElementById('videos-pagination');
   const tagsWrapper = document.getElementById('tags-wrapper');
   const searchBox = document.getElementById('search-box');
   
@@ -114,8 +125,9 @@ function switchTab(tab) {
     tabBlog.classList.add('active');
     tabVideos.classList.remove('active');
     if (postsGrid) postsGrid.style.display = 'grid';
-    if (videosGrid) videosGrid.style.display = 'none';
+    if (videosPageLayout) videosPageLayout.style.display = 'none';
     if (pagination) pagination.style.display = 'flex';
+    if (videosPagination) videosPagination.style.display = 'none';
     if (tagsWrapper) tagsWrapper.style.display = 'flex';
     if (searchBox) {
       searchBox.placeholder = 'Search across 1,500+ blog articles...';
@@ -126,8 +138,9 @@ function switchTab(tab) {
     tabBlog.classList.remove('active');
     tabVideos.classList.add('active');
     if (postsGrid) postsGrid.style.display = 'none';
-    if (videosGrid) videosGrid.style.display = 'grid';
+    if (videosPageLayout) videosPageLayout.style.display = 'grid';
     if (pagination) pagination.style.display = 'none';
+    if (videosPagination) videosPagination.style.display = 'flex';
     if (tagsWrapper) tagsWrapper.style.display = 'none';
     if (searchBox) {
       searchBox.placeholder = 'Search YouTube video library...';
@@ -192,6 +205,49 @@ function selectTag(tag) {
   applyFilters();
 }
 
+function renderVideoCategories() {
+  const sidebar = document.getElementById('videos-sidebar');
+  if (!sidebar) return;
+
+  const counts = { All: allVideos.length, Gaming: 0, 'Coding & Tech': 0, Others: 0 };
+  allVideos.forEach(v => {
+    const cat = v.category || 'Others';
+    if (counts[cat] !== undefined) {
+      counts[cat]++;
+    } else {
+      counts.Others++;
+    }
+  });
+
+  const categories = [
+    { name: 'All', icon: '<svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>' },
+    { name: 'Gaming', icon: '<svg viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5S19.67 10 20.5 10s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>' },
+    { name: 'Coding & Tech', icon: '<svg viewBox="0 0 24 24"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>' },
+    { name: 'Others', icon: '<svg viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>' }
+  ];
+
+  sidebar.innerHTML = categories.map(cat => {
+    const count = counts[cat.name] || 0;
+    const isActive = activeVideoCategory === cat.name;
+    return `
+      <button class="video-category-btn ${isActive ? 'active' : ''}" onclick="selectVideoCategory('${cat.name}')">
+        <span style="display:flex; align-items:center; gap:8px;">
+          ${cat.icon}
+          ${cat.name}
+        </span>
+        <span class="category-count">${count}</span>
+      </button>
+    `;
+  }).join('');
+}
+
+function selectVideoCategory(cat) {
+  activeVideoCategory = cat;
+  currentVideoPage = 1;
+  renderVideoCategories();
+  applyVideoFilters();
+}
+
 function applyFilters() {
   filteredPosts = allPosts.filter(post => {
     const matchesTag = !activeTag || (post.tags && post.tags.includes(activeTag));
@@ -207,28 +263,36 @@ function applyFilters() {
 
 function applyVideoFilters() {
   const videosGrid = document.getElementById('videos-grid');
+  const videosPagination = document.getElementById('videos-pagination');
   if (!videosGrid) return;
 
-  const allVideos = window.videosData || [];
   const query = document.getElementById('search-box')?.value.toLowerCase().trim() || '';
 
-  const filteredVideos = allVideos.filter(video => {
-    return !query || 
-           video.title.toLowerCase().includes(query) ||
-           video.description.toLowerCase().includes(query);
+  filteredVideos = allVideos.filter(video => {
+    const matchesCategory = activeVideoCategory === 'All' || video.category === activeVideoCategory;
+    const matchesSearch = !query || 
+                          video.title.toLowerCase().includes(query) ||
+                          (video.views && video.views.toLowerCase().includes(query)) ||
+                          (video.timeAgo && video.timeAgo.toLowerCase().includes(query));
+    return matchesCategory && matchesSearch;
   });
 
   if (filteredVideos.length === 0) {
     videosGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 40px 0;">No videos found matching your search.</p>';
     updateSearchInfoBar(0);
+    if (videosPagination) videosPagination.innerHTML = '';
     return;
   }
 
   updateSearchInfoBar(filteredVideos.length);
 
-  videosGrid.innerHTML = filteredVideos.map(video => {
+  // Paginated videos grid
+  const startIndex = (currentVideoPage - 1) * videosPerPage;
+  const endIndex = startIndex + videosPerPage;
+  const pageVideos = filteredVideos.slice(startIndex, endIndex);
+
+  videosGrid.innerHTML = pageVideos.map(video => {
     const displayTitle = query ? highlightText(video.title, query) : video.title;
-    const displayExcerpt = query ? highlightText(video.description, query) : video.description;
 
     return `
       <article class="post-card video-card" onclick="playVideo('${video.id}')" style="cursor: pointer;">
@@ -243,16 +307,71 @@ function applyVideoFilters() {
         <div class="card-content">
           <div class="card-meta">
             <span>
-              <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
-              ${video.formattedDate}
+              <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+              ${video.views || '0 views'}
+            </span>
+            <span>
+              <svg fill="currentColor" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 2 22 6.48 22 12s-4.48-10-10-10zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+              ${video.timeAgo || 'recent'}
             </span>
           </div>
           <h2 class="card-title" style="font-size: 1.15rem; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${displayTitle}</h2>
-          <p class="card-excerpt" style="font-size: 0.85rem; margin-bottom: 0;">${displayExcerpt}</p>
         </div>
       </article>
     `;
   }).join('');
+
+  renderVideoPagination(filteredVideos.length);
+}
+
+function renderVideoPagination(totalCount) {
+  const paginationWrapper = document.getElementById('videos-pagination');
+  if (!paginationWrapper) return;
+
+  const totalPages = Math.ceil(totalCount / videosPerPage);
+  if (totalPages <= 1) {
+    paginationWrapper.innerHTML = '';
+    return;
+  }
+
+  let html = `
+    <button class="page-btn" onclick="changeVideoPage(${currentVideoPage - 1})" ${currentVideoPage === 1 ? 'disabled' : ''}>&lt;</button>
+  `;
+
+  const startPage = Math.max(1, currentVideoPage - 2);
+  const endPage = Math.min(totalPages, currentVideoPage + 2);
+
+  if (startPage > 1) {
+    html += `<button class="page-btn" onclick="changeVideoPage(1)">1</button>`;
+    if (startPage > 2) html += `<span style="color: var(--text-muted)">...</span>`;
+  }
+
+  for (let i = startPage; i <= endPage; i++) {
+    html += `
+      <button class="page-btn ${i === currentVideoPage ? 'active' : ''}" onclick="changeVideoPage(${i})">${i}</button>
+    `;
+  }
+
+  if (endPage < totalPages) {
+    if (endPage < totalPages - 1) html += `<span style="color: var(--text-muted)">...</span>`;
+    html += `<button class="page-btn" onclick="changeVideoPage(${totalPages})">${totalPages}</button>`;
+  }
+
+  html += `
+    <button class="page-btn" onclick="changeVideoPage(${currentVideoPage + 1})" ${currentVideoPage === totalPages ? 'disabled' : ''}>&gt;</button>
+  `;
+
+  paginationWrapper.innerHTML = html;
+}
+
+function changeVideoPage(page) {
+  currentVideoPage = page;
+  applyVideoFilters();
+  
+  const targetElement = document.getElementById('search-filter-section');
+  if (targetElement) {
+    window.scrollTo({ top: targetElement.offsetTop - 100, behavior: 'smooth' });
+  }
 }
 
 function highlightText(text, query) {
@@ -280,7 +399,7 @@ function updateSearchInfoBar(totalResults) {
       return;
     }
   } else {
-    if (!query) {
+    if (!query && activeVideoCategory === 'All') {
       if (infoBar) infoBar.remove();
       return;
     }
@@ -304,6 +423,9 @@ function updateSearchInfoBar(totalResults) {
   } else {
     if (query) {
       text += ` matching "<strong>${escapeHtml(query)}</strong>"`;
+    }
+    if (activeVideoCategory !== 'All') {
+      text += ` in category "<strong>${escapeHtml(activeVideoCategory)}</strong>"`;
     }
   }
 
@@ -342,6 +464,9 @@ function resetFilters() {
     }
     applyFilters();
   } else {
+    activeVideoCategory = 'All';
+    currentVideoPage = 1;
+    renderVideoCategories();
     applyVideoFilters();
   }
 }
@@ -708,41 +833,32 @@ function initCodeBlockCopyButtons() {
   });
 }
 
-// Videos Page Initialization (Standalone fallback)
+// Videos Page Initialization (Standalone page loader)
 function initVideosPage() {
-  const videosGrid = document.getElementById('videos-grid');
-  if (!videosGrid) return;
-  
-  const allVideos = window.videosData || [];
-  if (allVideos.length === 0) {
-    videosGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 40px 0;">No videos found. Check back later!</p>';
-    return;
+  try {
+    allVideos = window.videosData || [];
+    filteredVideos = [...allVideos];
+    
+    const searchBox = document.getElementById('search-box');
+    if (searchBox) {
+      searchBox.value = '';
+      searchBox.addEventListener('input', (e) => {
+        currentVideoPage = 1;
+        applyVideoFilters();
+        
+        const clearIcon = document.getElementById('clear-search-icon');
+        if (clearIcon) {
+          const query = e.target.value.toLowerCase().trim();
+          clearIcon.style.display = query ? 'block' : 'none';
+        }
+      });
+    }
+    
+    renderVideoCategories();
+    applyVideoFilters();
+  } catch (error) {
+    console.error('Failed to load videos database:', error);
   }
-  
-  videosGrid.innerHTML = allVideos.map(video => {
-    return `
-      <article class="post-card video-card" onclick="playVideo('${video.id}')" style="cursor: pointer;">
-        <div class="card-image-wrapper">
-          <img class="card-image" src="${video.thumbnail}" alt="${video.title}" loading="lazy">
-          <div class="play-overlay">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M8 5v14l11-7z"/>
-            </svg>
-          </div>
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <span>
-              <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
-              ${video.formattedDate}
-            </span>
-          </div>
-          <h2 class="card-title" style="font-size: 1.15rem; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${video.title}</h2>
-          <p class="card-excerpt" style="font-size: 0.85rem; margin-bottom: 0;">${video.description}</p>
-        </div>
-      </article>
-    `;
-  }).join('');
 }
 
 function playVideo(videoId) {
@@ -804,3 +920,5 @@ window.sharePost = sharePost;
 window.resetFilters = resetFilters;
 window.playVideo = playVideo;
 window.switchTab = switchTab;
+window.selectVideoCategory = selectVideoCategory;
+window.changeVideoPage = changeVideoPage;
