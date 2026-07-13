@@ -3,6 +3,7 @@ import os
 import json
 import re
 import glob
+import urllib.request
 from html import unescape
 
 def find_feed_file():
@@ -111,6 +112,59 @@ def sanitize_blogger_html(content):
 
     content = re.sub(r'<img\s+[^>]+>', clean_standalone_img, content, flags=re.IGNORECASE)
     return content
+
+def fetch_youtube_videos(channel_id):
+    url = f"https://www.youtube.com/feeds/videos.xml?channel_id={channel_id}"
+    print(f"Fetching YouTube feed from: {url}")
+    try:
+        req = urllib.request.Request(
+            url, 
+            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+        )
+        with urllib.request.urlopen(req, timeout=8) as response:
+            xml_data = response.read()
+        
+        ns = {
+            'atom': 'http://www.w3.org/2005/Atom',
+            'yt': 'http://www.youtube.com/xml/schemas/2015',
+            'media': 'http://search.yahoo.com/mrss/'
+        }
+        
+        root = ET.fromstring(xml_data)
+        entries = root.findall('atom:entry', ns)
+        
+        videos = []
+        for entry in entries:
+            video_id_el = entry.find('yt:videoId', ns)
+            video_id = video_id_el.text if video_id_el is not None else ''
+            
+            title_el = entry.find('atom:title', ns)
+            title = title_el.text if title_el is not None else ''
+            
+            published_el = entry.find('atom:published', ns)
+            published = published_el.text if published_el is not None else ''
+            formatted_date = format_date(published)
+            
+            media_group = entry.find('media:group', ns)
+            desc_el = media_group.find('media:description', ns) if media_group is not None else None
+            desc = desc_el.text if desc_el is not None else ''
+            desc_clean = clean_excerpt(desc, 130)
+            
+            thumb_el = media_group.find('media:thumbnail', ns) if media_group is not None else None
+            thumb = thumb_el.get('url') if thumb_el is not None else f"https://img.youtube.com/vi/{video_id}/hqdefault.jpg"
+            
+            videos.append({
+                'id': video_id,
+                'title': title,
+                'date': published,
+                'formattedDate': formatted_date,
+                'description': desc_clean,
+                'thumbnail': thumb
+            })
+        return videos
+    except Exception as e:
+        print(f"Warning: Could not fetch YouTube videos: {e}")
+        return []
 
 # --- SHARED STYLESHEET ---
 SHARED_CSS = """/* Modern Variables & Colors */
@@ -713,6 +767,34 @@ header .header-content {
   font-weight: 500;
 }
 
+/* Play button overlay on Video Card */
+.play-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 54px;
+  height: 54px;
+  background-color: rgba(99, 102, 241, 0.9);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+}
+.play-overlay svg {
+  width: 22px;
+  height: 22px;
+  margin-left: 3px;
+}
+.video-card:hover .play-overlay {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
 /* Pagination */
 .pagination {
   display: flex;
@@ -1104,6 +1186,33 @@ header .header-content {
   opacity: 1;
 }
 
+/* Embedded Video Player Styles */
+.lightbox-video-container {
+  width: 85%;
+  max-width: 800px;
+  aspect-ratio: 16/9;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.55);
+  background-color: #000;
+  transform: scale(0.95);
+  transition: transform 0.3s ease;
+}
+.lightbox-overlay.active .lightbox-video-container {
+  transform: scale(1);
+}
+.lightbox-video {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+@media (max-width: 768px) {
+  .lightbox-video-container {
+    width: 95%;
+  }
+}
+
 /* Related Posts Section */
 .related-posts-section {
   margin-top: 60px;
@@ -1177,6 +1286,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const postsGrid = document.getElementById('posts-grid');
   if (postsGrid) {
     initHomePage();
+  }
+
+  // Videos Grid logic
+  const videosGrid = document.getElementById('videos-grid');
+  if (videosGrid) {
+    initVideosPage();
   }
 
   // Post Detail Page widgets
@@ -1636,8 +1751,22 @@ function initImageLightbox() {
       if (img.naturalWidth < 120 && img.naturalWidth !== 0) return;
       
       e.preventDefault();
-      lightboxImg.src = img.src;
-      lightboxImg.alt = img.alt || 'Zoomed view';
+      
+      // Ensure we display an image element in the lightbox rather than an iframe
+      let mediaContainer = lightbox.querySelector('.lightbox-video-container');
+      if (mediaContainer) {
+        mediaContainer.remove();
+      }
+      
+      let imgTag = lightbox.querySelector('.lightbox-img');
+      if (!imgTag) {
+        imgTag = document.createElement('img');
+        imgTag.className = 'lightbox-img';
+        lightbox.appendChild(imgTag);
+      }
+      
+      imgTag.src = img.src;
+      imgTag.alt = img.alt || 'Zoomed view';
       lightbox.style.display = 'flex';
       
       setTimeout(() => {
@@ -1704,11 +1833,101 @@ function initCodeBlockCopyButtons() {
   });
 }
 
+// Videos Page Initialization
+function initVideosPage() {
+  const videosGrid = document.getElementById('videos-grid');
+  if (!videosGrid) return;
+  
+  const allVideos = window.videosData || [];
+  if (allVideos.length === 0) {
+    videosGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 40px 0;">No videos found. Click back later!</p>';
+    return;
+  }
+  
+  videosGrid.innerHTML = allVideos.map(video => {
+    return `
+      <article class="post-card video-card" onclick="playVideo('${video.id}')" style="cursor: pointer;">
+        <div class="card-image-wrapper">
+          <img class="card-image" src="${video.thumbnail}" alt="${video.title}" loading="lazy">
+          <div class="play-overlay">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+          </div>
+        </div>
+        <div class="card-content">
+          <div class="card-meta">
+            <span>
+              <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
+              ${video.formattedDate}
+            </span>
+          </div>
+          <h2 class="card-title" style="font-size: 1.15rem; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${video.title}</h2>
+          <p class="card-excerpt" style="font-size: 0.85rem; margin-bottom: 0;">${video.description}</p>
+        </div>
+      </article>
+    `;
+  }).join('');
+}
+
+function playVideo(videoId) {
+  let lightbox = document.getElementById('lightbox-overlay');
+  if (!lightbox) {
+    lightbox = document.createElement('div');
+    lightbox.id = 'lightbox-overlay';
+    lightbox.className = 'lightbox-overlay';
+    lightbox.style.display = 'none';
+    document.body.appendChild(lightbox);
+  }
+
+  // Clear previous lightbox elements to display video
+  lightbox.innerHTML = `
+    <button class="lightbox-close" aria-label="Close lightbox">&times;</button>
+    <div class="lightbox-video-container">
+      <iframe class="lightbox-video" src="https://www.youtube.com/embed/${videoId}?autoplay=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+    </div>
+  `;
+
+  const iframe = lightbox.querySelector('.lightbox-video');
+  const closeBtn = lightbox.querySelector('.lightbox-close');
+  lightbox.style.display = 'flex';
+  
+  setTimeout(() => {
+    lightbox.classList.add('active');
+  }, 10);
+  document.body.style.overflow = 'hidden';
+
+  const closeVideo = () => {
+    lightbox.classList.remove('active');
+    if (iframe) iframe.src = ''; // Halt video playback
+    setTimeout(() => {
+      lightbox.style.display = 'none';
+      lightbox.innerHTML = ''; // Clear elements
+    }, 300);
+    document.body.style.overflow = '';
+  };
+
+  lightbox.onclick = (e) => {
+    if (e.target === lightbox || e.target === closeBtn) {
+      closeVideo();
+    }
+  };
+
+  const handleKey = (e) => {
+    if (e.key === 'Escape' && lightbox.classList.contains('active')) {
+      closeVideo();
+      window.removeEventListener('keydown', handleKey);
+    }
+  };
+  window.addEventListener('keydown', handleKey);
+}
+
 // Expose handlers globally
 window.selectTag = selectTag;
 window.changePage = changePage;
 window.sharePost = sharePost;
 window.resetFilters = resetFilters;
+window.playVideo = playVideo;
 """
 
 INDEX_HTML_TEMPLATE = """<!DOCTYPE html>
@@ -1742,9 +1961,10 @@ INDEX_HTML_TEMPLATE = """<!DOCTYPE html>
       </div>
       <nav class="nav-links">
         <a href="./index.html" class="nav-link">Home</a>
+        <a href="./p/videos.html" class="nav-link">Videos</a>
         <a href="./p/subscribe-today.html" class="nav-link">Subscribe</a>
         <button class="theme-toggle-btn" aria-label="Toggle dark mode" id="theme-toggle">
-          <svg class="moon-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+          <svg class="moon-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293a8 8 0 01-10.586-10.586 8.001 8.001 0 1010.586 10.586z"></path></svg>
           <svg class="sun-icon" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path></svg>
         </button>
       </nav>
@@ -1804,6 +2024,74 @@ INDEX_HTML_TEMPLATE = """<!DOCTYPE html>
 </html>
 """
 
+VIDEOS_HTML_TEMPLATE = """<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Watch my latest video updates, gaming livestreams, and tutorials from Puru World.">
+  <title>Videos - puru world official</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+  <script src="../videos-metadata.js"></script>
+  <script src="../main.js" defer></script>
+</head>
+<body>
+  <header>
+    <div class="container header-content">
+      <div class="logo">
+        <a href="../index.html" style="background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 8px; font-weight: 800;">
+          <svg style="width: 28px; height: 28px; fill: url(#accentGradientVideos);" viewBox="0 0 24 24">
+            <defs>
+              <linearGradient id="accentGradientVideos" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#8b5cf6" />
+                <stop offset="100%" stop-color="#6366f1" />
+              </linearGradient>
+            </defs>
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/>
+          </svg>
+          Puru's Blog
+        </a>
+      </div>
+      <nav class="nav-links">
+        <a href="../index.html" class="nav-link">Home</a>
+        <a href="../p/videos.html" class="nav-link">Videos</a>
+        <a href="../p/subscribe-today.html" class="nav-link">Subscribe</a>
+        <button class="theme-toggle-btn" aria-label="Toggle dark mode" id="theme-toggle">
+          <svg class="moon-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293a8 8 0 01-10.586-10.586 8.001 8.001 0 1010.586 10.586z"></path></svg>
+          <svg class="sun-icon" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path></svg>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container" style="padding-top: 40px; padding-bottom: 80px;">
+    <section class="hero" style="padding: 40px 0;">
+      <div class="hero-bg-blobs">
+        <div class="hero-blob hero-blob-1"></div>
+        <div class="hero-blob hero-blob-2"></div>
+      </div>
+      <h1>YouTube Video Library</h1>
+      <p>Explore the latest gameplay uploads, livestreams, guides, and walkthroughs from Puru World.</p>
+    </section>
+
+    <div class="posts-grid" id="videos-grid">
+      <!-- Videos will load dynamically -->
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 puru world official. All rights reserved.</p>
+      <p>Migrated from Blogger to Static HTML Site.</p>
+    </div>
+  </footer>
+</body>
+</html>
+"""
+
 def make_post_html(post_title, post_date, post_tags, post_content, read_time, cover_image, rel_path, related_posts_html):
   tags_html = "".join([f'<span class="card-tag">{t}</span>' for t in post_tags])
   header_tags_html = "".join([f'<span class="filter-tag" style="cursor:default">{t}</span>' for t in post_tags])
@@ -1844,9 +2132,10 @@ def make_post_html(post_title, post_date, post_tags, post_content, read_time, co
       </div>
       <nav class="nav-links">
         <a href="{rel_path}index.html" class="nav-link">Home</a>
+        <a href="{rel_path}p/videos.html" class="nav-link">Videos</a>
         <a href="{rel_path}p/subscribe-today.html" class="nav-link">Subscribe</a>
         <button class="theme-toggle-btn" aria-label="Toggle dark mode" id="theme-toggle">
-          <svg class="moon-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+          <svg class="moon-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293a8 8 0 01-10.586-10.586 8.001 8.001 0 1010.586 10.586z"></path></svg>
           <svg class="sun-icon" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path></svg>
         </button>
       </nav>
@@ -2133,6 +2422,22 @@ def main():
     f.write(INDEX_HTML_TEMPLATE)
   print("Generated index.html")
   
+  # Fetch YouTube videos and write metadata
+  print("Fetching YouTube videos...")
+  videos = fetch_youtube_videos("UCFoVp5Va975oQQpevpQErQQ")
+  with open(os.path.join(output_dir, 'videos-metadata.js'), 'w', encoding='utf-8') as f:
+    f.write("window.videosData = ")
+    json.dump(videos, f, ensure_ascii=False, indent=2)
+    f.write(";")
+  print(f"Generated {len(videos)} videos in videos-metadata.js")
+  
+  # Write p/videos.html page
+  videos_page_dir = os.path.join(output_dir, 'p')
+  os.makedirs(videos_page_dir, exist_ok=True)
+  with open(os.path.join(videos_page_dir, 'videos.html'), 'w', encoding='utf-8') as f:
+    f.write(VIDEOS_HTML_TEMPLATE)
+  print("Generated p/videos.html")
+  
   print("Writing post HTML files...")
   for i, post in enumerate(raw_posts):
     content_rewritten = rewrite_internal_links(post['content'], post['depth'])
@@ -2195,6 +2500,7 @@ def main():
       </div>
       <nav class="nav-links">
         <a href="{page['rel_path']}index.html" class="nav-link">Home</a>
+        <a href="{page['rel_path']}p/videos.html" class="nav-link">Videos</a>
         <a href="{page['rel_path']}p/subscribe-today.html" class="nav-link">Subscribe</a>
         <button class="theme-toggle-btn" aria-label="Toggle dark mode" id="theme-toggle">
           <svg class="moon-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293a8 8 0 01-10.586-10.586 8.001 8.001 0 1010.586 10.586z"></path></svg>

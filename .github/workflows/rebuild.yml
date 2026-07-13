@@ -1,0 +1,41 @@
+name: Auto Fetch YouTube & Rebuild
+
+on:
+  schedule:
+    # Run every 12 hours to fetch any new uploads
+    - cron: '0 */12 * * *'
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+      with:
+        ref: master
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+
+    - name: Run Generator Script
+      run: python generator.py
+
+    - name: Check for Changes & Deploy
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        
+        if [ -n "$(git status --porcelain)" ]; then
+          echo "Changes detected! Committing and pushing..."
+          git add -A
+          git commit -m "Auto-rebuild: Synchronize latest posts and YouTube video uploads"
+          git push origin master
+        else
+          echo "No new updates found. Skipping push."
+        fi

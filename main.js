@@ -34,6 +34,12 @@ document.addEventListener('DOMContentLoaded', () => {
     initHomePage();
   }
 
+  // Videos Grid logic
+  const videosGrid = document.getElementById('videos-grid');
+  if (videosGrid) {
+    initVideosPage();
+  }
+
   // Post Detail Page widgets
   initTableOfContents();
   initImageLightbox();
@@ -491,8 +497,22 @@ function initImageLightbox() {
       if (img.naturalWidth < 120 && img.naturalWidth !== 0) return;
       
       e.preventDefault();
-      lightboxImg.src = img.src;
-      lightboxImg.alt = img.alt || 'Zoomed view';
+      
+      // Ensure we display an image element in the lightbox rather than an iframe
+      let mediaContainer = lightbox.querySelector('.lightbox-video-container');
+      if (mediaContainer) {
+        mediaContainer.remove();
+      }
+      
+      let imgTag = lightbox.querySelector('.lightbox-img');
+      if (!imgTag) {
+        imgTag = document.createElement('img');
+        imgTag.className = 'lightbox-img';
+        lightbox.appendChild(imgTag);
+      }
+      
+      imgTag.src = img.src;
+      imgTag.alt = img.alt || 'Zoomed view';
       lightbox.style.display = 'flex';
       
       setTimeout(() => {
@@ -559,8 +579,98 @@ function initCodeBlockCopyButtons() {
   });
 }
 
+// Videos Page Initialization
+function initVideosPage() {
+  const videosGrid = document.getElementById('videos-grid');
+  if (!videosGrid) return;
+  
+  const allVideos = window.videosData || [];
+  if (allVideos.length === 0) {
+    videosGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 40px 0;">No videos found. Click back later!</p>';
+    return;
+  }
+  
+  videosGrid.innerHTML = allVideos.map(video => {
+    return `
+      <article class="post-card video-card" onclick="playVideo('${video.id}')" style="cursor: pointer;">
+        <div class="card-image-wrapper">
+          <img class="card-image" src="${video.thumbnail}" alt="${video.title}" loading="lazy">
+          <div class="play-overlay">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+          </div>
+        </div>
+        <div class="card-content">
+          <div class="card-meta">
+            <span>
+              <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
+              ${video.formattedDate}
+            </span>
+          </div>
+          <h2 class="card-title" style="font-size: 1.15rem; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${video.title}</h2>
+          <p class="card-excerpt" style="font-size: 0.85rem; margin-bottom: 0;">${video.description}</p>
+        </div>
+      </article>
+    `;
+  }).join('');
+}
+
+function playVideo(videoId) {
+  let lightbox = document.getElementById('lightbox-overlay');
+  if (!lightbox) {
+    lightbox = document.createElement('div');
+    lightbox.id = 'lightbox-overlay';
+    lightbox.className = 'lightbox-overlay';
+    lightbox.style.display = 'none';
+    document.body.appendChild(lightbox);
+  }
+
+  // Clear previous lightbox elements to display video
+  lightbox.innerHTML = `
+    <button class="lightbox-close" aria-label="Close lightbox">&times;</button>
+    <div class="lightbox-video-container">
+      <iframe class="lightbox-video" src="https://www.youtube.com/embed/${videoId}?autoplay=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+    </div>
+  `;
+
+  const iframe = lightbox.querySelector('.lightbox-video');
+  const closeBtn = lightbox.querySelector('.lightbox-close');
+  lightbox.style.display = 'flex';
+  
+  setTimeout(() => {
+    lightbox.classList.add('active');
+  }, 10);
+  document.body.style.overflow = 'hidden';
+
+  const closeVideo = () => {
+    lightbox.classList.remove('active');
+    if (iframe) iframe.src = ''; // Halt video playback
+    setTimeout(() => {
+      lightbox.style.display = 'none';
+      lightbox.innerHTML = ''; // Clear elements
+    }, 300);
+    document.body.style.overflow = '';
+  };
+
+  lightbox.onclick = (e) => {
+    if (e.target === lightbox || e.target === closeBtn) {
+      closeVideo();
+    }
+  };
+
+  const handleKey = (e) => {
+    if (e.key === 'Escape' && lightbox.classList.contains('active')) {
+      closeVideo();
+      window.removeEventListener('keydown', handleKey);
+    }
+  };
+  window.addEventListener('keydown', handleKey);
+}
+
 // Expose handlers globally
 window.selectTag = selectTag;
 window.changePage = changePage;
 window.sharePost = sharePost;
 window.resetFilters = resetFilters;
+window.playVideo = playVideo;
