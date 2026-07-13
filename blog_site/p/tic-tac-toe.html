@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="#tictactoe-game * { margin: 0; padding: 0; box-sizing: border-box; } #tictactoe-game { font-family: 'Roboto', sans-serif; background-color: #f5f5f5; d...">
+  <title>Tic Tac Toe - puru world official</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+  <script src="../main.js" defer></script>
+</head>
+<body>
+  <header>
+    <div class="container header-content">
+      <div class="logo">
+        <a href="../index.html" style="background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 8px; font-weight: 800;">
+          <svg style="width: 28px; height: 28px; fill: url(#accentGradientPage);" viewBox="0 0 24 24">
+            <defs>
+              <linearGradient id="accentGradientPage" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#8b5cf6" />
+                <stop offset="100%" stop-color="#6366f1" />
+              </linearGradient>
+            </defs>
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/>
+          </svg>
+          Puru's Blog
+        </a>
+      </div>
+      <nav class="nav-links">
+        <a href="../index.html" class="nav-link">Home</a>
+        <a href="../p/subscribe-today.html" class="nav-link">Subscribe</a>
+        <button class="theme-toggle-btn" aria-label="Toggle dark mode" id="theme-toggle">
+          <svg class="moon-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293a8 8 0 01-10.586-10.586 8.001 8.001 0 1010.586 10.586z"></path></svg>
+          <svg class="sun-icon" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path></svg>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container post-layout">
+    <div class="back-btn-wrapper">
+      <a href="../index.html" class="back-btn">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        Back to Home
+      </a>
+    </div>
+
+    <article>
+      <div class="post-header">
+        <h1 class="post-header-title">Tic Tac Toe</h1>
+      </div>
+
+      <div class="post-main-content" style="max-width: 800px; margin: 0 auto;">
+        <div id="tictactoe-game">
+    <style>
+        #tictactoe-game * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        #tictactoe-game {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        #tictactoe-game > .container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 24px;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        #tictactoe-game h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 24px;
+            font-weight: 300;
+        }
+
+        #tictactoe-game .mode-selection {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 24px;
+        }
+
+        #tictactoe-game .mode-btn {
+            background: #e0e0e0;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+            transition: background 0.2s;
+        }
+
+        #tictactoe-game .mode-btn:hover {
+            background: #d0d0d0;
+        }
+
+        #tictactoe-game .mode-btn.active {
+            background: #2196f3;
+            color: white;
+        }
+
+        #tictactoe-game .status {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 16px;
+            min-height: 24px;
+            padding: 8px;
+            border-radius: 4px;
+            background: #f0f0f0;
+        }
+
+        #tictactoe-game .board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        #tictactoe-game .cell {
+            aspect-ratio: 1;
+            background: #fafafa;
+            border: 2px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: 300;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-radius: 4px;
+        }
+
+        #tictactoe-game .cell:hover {
+            background: #f0f0f0;
+        }
+
+        #tictactoe-game .cell.x {
+            color: #f44336;
+        }
+
+        #tictactoe-game .cell.o {
+            color: #2196f3;
+        }
+
+        #tictactoe-game .controls {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        #tictactoe-game .reset-btn {
+            background: #ff9800;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        #tictactoe-game .reset-btn:hover {
+            background: #f57c00;
+        }
+
+        #tictactoe-game .winner {
+            color: #4caf50;
+            font-weight: bold;
+            background: #e8f5e8;
+        }
+
+        #tictactoe-game .draw {
+            color: #ff9800;
+            background: #fff3e0;
+        }
+
+        #tictactoe-game .idle {
+            color: #666;
+            background: #f0f0f0;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <div class="container">
+        <h1>Tic-Tac-Toe</h1>
+        
+        <div class="mode-selection">
+            <button class="mode-btn active" id="pnp">Pass N Play</button>
+            <button class="mode-btn" id="pvcpu">Player vs CPU</button>
+        </div>
+
+        <div class="status idle" id="status">Select a mode to start playing!</div>
+
+        <div class="board" id="board">
+            <div class="cell" data-index="0"></div>
+            <div class="cell" data-index="1"></div>
+            <div class="cell" data-index="2"></div>
+            <div class="cell" data-index="3"></div>
+            <div class="cell" data-index="4"></div>
+            <div class="cell" data-index="5"></div>
+            <div class="cell" data-index="6"></div>
+            <div class="cell" data-index="7"></div>
+            <div class="cell" data-index="8"></div>
+        </div>
+
+        <div class="controls">
+            <div></div> <!-- Spacer -->
+            <button class="reset-btn" id="reset">Reset</button>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // Scope the script to the game container
+            const gameContainer = document.getElementById('tictactoe-game');
+            if (!gameContainer) return;
+
+            class TicTacToe {
+                constructor() {
+                    this.board = Array(9).fill(null);
+                    this.currentPlayer = 'X';
+                    this.gameMode = null;
+                    this.gameActive = false;
+                    this.init();
+                }
+
+                init() {
+                    this.bindEvents();
+                    this.updateStatus();
+                }
+
+                bindEvents() {
+                    const pnpBtn = gameContainer.querySelector('#pnp');
+                    const pvcpuBtn = gameContainer.querySelector('#pvcpu');
+                    const cells = gameContainer.querySelectorAll('.cell');
+                    const resetBtn = gameContainer.querySelector('#reset');
+
+                    pnpBtn.addEventListener('click', () => this.setMode('pnp'));
+                    pvcpuBtn.addEventListener('click', () => this.setMode('pvcpu'));
+
+                    cells.forEach(cell => {
+                        cell.addEventListener('click', (e) => this.handleCellClick(e));
+                    });
+
+                    resetBtn.addEventListener('click', () => this.reset());
+                }
+
+                setMode(mode) {
+                    this.gameMode = mode;
+                    gameContainer.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+                    gameContainer.querySelector(`#${mode}`).classList.add('active');
+                    this.startGame();
+                }
+
+                handleCellClick(e) {
+                    if (!this.gameActive || !this.gameMode) {
+                        return;
+                    }
+
+                    const cell = e.target;
+                    const index = parseInt(cell.dataset.index);
+
+                    if (this.board[index] !== null) return;
+
+                    this.makeMove(index, this.currentPlayer);
+                    cell.classList.add(this.currentPlayer.toLowerCase());
+                    cell.textContent = this.currentPlayer;
+
+                    if (this.checkWinner()) {
+                        this.endGame(`Player ${this.currentPlayer} wins!`);
+                        return;
+                    }
+
+                    if (this.isDraw()) {
+                        this.endGame("It's a draw!");
+                        return;
+                    }
+
+                    this.switchPlayer();
+
+                    if (this.gameMode === 'pvcpu' && this.currentPlayer === 'O' && this.gameActive) {
+                        setTimeout(() => this.cpuMove(), 500);
+                    }
+
+                    this.updateStatus();
+                }
+
+                makeMove(index, player) {
+                    this.board[index] = player;
+                }
+
+                switchPlayer() {
+                    this.currentPlayer = this.currentPlayer === 'X' ? 'O' : 'X';
+                }
+
+                cpuMove() {
+                    const bestMove = this.findBestMove();
+                    if (bestMove === -1) return;
+
+                    this.makeMove(bestMove, 'O');
+
+                    const cell = gameContainer.querySelector(`[data-index="${bestMove}"]`);
+                    cell.classList.add('o');
+                    cell.textContent = 'O';
+
+                    if (this.checkWinner()) {
+                        this.endGame('CPU wins!');
+                        return;
+                    }
+
+                    if (this.isDraw()) {
+                        this.endGame("It's a draw!");
+                        return;
+                    }
+
+                    this.switchPlayer();
+                    this.updateStatus();
+                }
+
+                findBestMove() {
+                    let bestScore = -Infinity;
+                    let move = -1;
+
+                    for (let i = 0; i < 9; i++) {
+                        if (this.board[i] === null) {
+                            this.board[i] = 'O';
+                            let score = this.minimax(false);
+                            this.board[i] = null;
+
+                            if (score > bestScore) {
+                                bestScore = score;
+                                move = i;
+                            }
+                        }
+                    }
+                    return move;
+                }
+
+                minimax(isMaximizing) {
+                    let winner = this.getWinner();
+                    if (winner) {
+                        return winner === 'O' ? 10 : -10;
+                    }
+
+                    if (this.isDraw()) {
+                        return 0;
+                    }
+
+                    let bestScore = isMaximizing ? -Infinity : Infinity;
+
+                    for (let i = 0; i < 9; i++) {
+                        if (this.board[i] === null) {
+                            this.board[i] = isMaximizing ? 'O' : 'X';
+                            let score = this.minimax(!isMaximizing);
+                            this.board[i] = null;
+
+                            if (isMaximizing) {
+                                bestScore = Math.max(score, bestScore);
+                            } else {
+                                bestScore = Math.min(score, bestScore);
+                            }
+                        }
+                    }
+
+                    return bestScore;
+                }
+
+                getWinner() {
+                    const winPatterns = [
+                        [0, 1, 2], [3, 4, 5], [6, 7, 8],
+                        [0, 3, 6], [1, 4, 7], [2, 5, 8],
+                        [0, 4, 8], [2, 4, 6]
+                    ];
+
+                    for (let pattern of winPatterns) {
+                        const [a, b, c] = pattern;
+                        if (this.board[a] && this.board[a] === this.board[b] && this.board[a] === this.board[c]) {
+                            return this.board[a];
+                        }
+                    }
+                    return null;
+                }
+
+                checkWinner() {
+                    return this.getWinner() !== null;
+                }
+
+                isDraw() {
+                    return this.board.every(cell => cell !== null);
+                }
+
+                updateStatus() {
+                    const statusEl = gameContainer.querySelector('#status');
+                    statusEl.classList.remove('winner', 'draw', 'idle');
+
+                    if (!this.gameActive || !this.gameMode) {
+                        statusEl.textContent = 'Select a mode to start playing!';
+                        statusEl.classList.add('idle');
+                        return;
+                    }
+
+                    let message;
+                    if (this.currentPlayer === 'X') {
+                        message = this.gameMode === 'pnp' ? "Player X's turn" : "Your turn (X)";
+                    } else {
+                        message = this.gameMode === 'pnp' ? "Player O's turn" : "CPU's turn (O)";
+                    }
+
+                    statusEl.textContent = message;
+                }
+
+                endGame(message) {
+                    this.gameActive = false;
+                    const statusEl = gameContainer.querySelector('#status');
+                    statusEl.textContent = message;
+                    if (message.includes('wins')) {
+                        statusEl.classList.add('winner');
+                    } else {
+                        statusEl.classList.add('draw');
+                    }
+                }
+
+                startGame() {
+                    this.gameActive = true;
+                    this.currentPlayer = 'X';
+                    this.board.fill(null);
+                    gameContainer.querySelectorAll('.cell').forEach(cell => {
+                        cell.textContent = '';
+                        cell.classList.remove('x', 'o');
+                    });
+                    this.updateStatus();
+                }
+
+                reset() {
+                    gameContainer.querySelector('#status').classList.remove('winner', 'draw', 'idle');
+                    this.startGame();
+                }
+            }
+
+            // Initialize only if the container exists
+            new TicTacToe();
+        })();
+    </script>
+</div>
+      </div>
+    </article>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 puru world official. All rights reserved.</p>
+      <p>Migrated from Blogger to Static HTML Site.</p>
+    </div>
+  </footer>
+</body>
+</html>
