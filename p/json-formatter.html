@@ -70,6 +70,16 @@
     <style>
         /* Scoped styles to avoid impacting external CSS */
         .json-formatter-container {
+            font-family: 'Inter', sans-serif !important;
+            display: flex !important;
+            gap: 20px !important;
+            height: 550px !important;
+            margin: 0 auto !important;
+            padding: 0 !important;
+            box-sizing: border-box !important;
+            background-color: transparent !important;
+        }
+        .json-formatter-container-old {
             font-family: Arial, sans-serif;
             display: flex;
             height: 100vh;
@@ -81,6 +91,16 @@
         }
 
         .json-formatter-container .pane {
+            flex: 1 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            background-color: var(--bg-secondary) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 12px !important;
+            padding: 20px !important;
+            box-shadow: var(--shadow-sm) !important;
+        }
+        .json-formatter-container .pane-old {
             flex: 1;
             display: flex;
             flex-direction: column;
@@ -91,6 +111,19 @@
         }
 
         .json-formatter-container textarea {
+            width: 100% !important;
+            height: 80% !important;
+            resize: none !important;
+            font-family: 'Courier New', monospace !important;
+            font-size: 13px !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 8px !important;
+            padding: 12px !important;
+            box-sizing: border-box !important;
+            background: var(--bg-primary) !important;
+            color: var(--text-primary) !important;
+        }
+        .json-formatter-container textarea-old {
             width: 100%;
             height: 80%;
             resize: none;
@@ -112,6 +145,20 @@
         }
 
         .json-formatter-container button {
+            padding: 8px 16px !important;
+            border: none !important;
+            border-radius: 6px !important;
+            background: var(--accent-gradient) !important;
+            color: #fff !important;
+            cursor: pointer !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            transition: all 0.2s !important;
+        }
+        .json-formatter-container button-old {
             padding: 6px 8px;
             margin: 0 2px;
             border: none;
@@ -131,6 +178,18 @@
         }
 
         .json-formatter-container #output {
+            height: 70% !important;
+            overflow-y: auto !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 8px !important;
+            padding: 12px !important;
+            font-family: 'Courier New', monospace !important;
+            font-size: 13px !important;
+            background: var(--bg-primary) !important;
+            color: var(--text-primary) !important;
+            white-space: pre-wrap !important;
+        }
+        .json-formatter-container #output-old {
             height: 70%;
             overflow-y: auto;
             border: 1px solid #ddd;

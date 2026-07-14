@@ -324,14 +324,47 @@ function selectVideoCategory(cat) {
 }
 
 function applyFilters() {
-  filteredPosts = allPosts.filter(post => {
+  if (!searchQuery) {
+    filteredPosts = allPosts.filter(post => !activeTag || (post.tags && post.tags.includes(activeTag)));
+    renderPostsGrid();
+    return;
+  }
+
+  const queryWords = searchQuery.toLowerCase().split(/\s+/).filter(w => w.length > 1);
+  
+  const scoredPosts = allPosts.map(post => {
+    let score = 0;
+    
+    // Check active tag filter
     const matchesTag = !activeTag || (post.tags && post.tags.includes(activeTag));
-    const matchesSearch = !searchQuery || 
-                          post.title.toLowerCase().includes(searchQuery) ||
-                          post.excerpt.toLowerCase().includes(searchQuery) ||
-                          (post.tags && post.tags.some(t => t.toLowerCase().includes(searchQuery)));
-    return matchesTag && matchesSearch;
+    if (!matchesTag) return { post, score: -1 };
+
+    const titleLower = post.title.toLowerCase();
+    const excerptLower = post.excerpt.toLowerCase();
+
+    // 1. Exact phrase matching
+    if (titleLower.includes(searchQuery)) score += 15;
+    if (excerptLower.includes(searchQuery)) score += 6;
+
+    // 2. Keyword relevance weights
+    if (queryWords.length > 0) {
+      queryWords.forEach(word => {
+        if (titleLower.includes(word)) score += 6;
+        if (excerptLower.includes(word)) score += 2;
+        if (post.tags && post.tags.some(t => t.toLowerCase().includes(word))) score += 10;
+      });
+    } else {
+      // Fallback for very short queries
+      if (titleLower.includes(searchQuery)) score += 1;
+    }
+
+    return { post, score };
   });
+
+  filteredPosts = scoredPosts
+    .filter(item => item.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .map(item => item.post);
 
   renderPostsGrid();
 }
@@ -343,14 +376,38 @@ function applyVideoFilters() {
 
   const query = document.getElementById('search-box')?.value.toLowerCase().trim() || '';
 
-  filteredVideos = allVideos.filter(video => {
-    const matchesCategory = activeVideoCategory === 'All' || video.category === activeVideoCategory;
-    const matchesSearch = !query || 
-                          video.title.toLowerCase().includes(query) ||
-                          (video.views && video.views.toLowerCase().includes(query)) ||
-                          (video.timeAgo && video.timeAgo.toLowerCase().includes(query));
-    return matchesCategory && matchesSearch;
-  });
+  if (!query) {
+    filteredVideos = allVideos.filter(video => activeVideoCategory === 'All' || video.category === activeVideoCategory);
+  } else {
+    const queryWords = query.split(/\s+/).filter(w => w.length > 1);
+    
+    const scoredVideos = allVideos.map(video => {
+      let score = 0;
+      
+      const matchesCategory = activeVideoCategory === 'All' || video.category === activeVideoCategory;
+      if (!matchesCategory) return { video, score: -1 };
+
+      const titleLower = video.title.toLowerCase();
+
+      // Exact phrase match
+      if (titleLower.includes(query)) score += 12;
+      
+      if (queryWords.length > 0) {
+        queryWords.forEach(word => {
+          if (titleLower.includes(word)) score += 6;
+        });
+      } else {
+        if (titleLower.includes(query)) score += 1;
+      }
+
+      return { video, score };
+    });
+
+    filteredVideos = scoredVideos
+      .filter(item => item.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .map(item => item.video);
+  }
 
   if (filteredVideos.length === 0) {
     videosGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 40px 0;">No videos found matching your search.</p>';

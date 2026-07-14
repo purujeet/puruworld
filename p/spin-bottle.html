@@ -68,7 +68,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
-        body {
+        body-old {
             margin: 0;
             padding: 0;
             height: 100vh;
@@ -97,7 +97,7 @@
             transition: transform 2s ease-out;
         }
 
-        .bottle-body {
+        .bottle-body-old {
             position: absolute;
             width: 100%;
             height: 100%;
@@ -124,6 +124,21 @@
         }
 
         .spin-button {
+            background: var(--accent-gradient) !important;
+            color: white !important;
+            padding: 10px 24px !important;
+            border: none !important;
+            border-radius: 8px !important;
+            font-size: 0.95rem !important;
+            font-weight: 600 !important;
+            cursor: pointer !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+            box-shadow: var(--shadow-sm) !important;
+            transition: all 0.2s !important;
+        }
+        .spin-button-old {
             background: #d81b60;
             color: white;
             padding: 1rem 2rem;
@@ -172,6 +187,21 @@
             }
 
             .spin-button {
+            background: var(--accent-gradient) !important;
+            color: white !important;
+            padding: 10px 24px !important;
+            border: none !important;
+            border-radius: 8px !important;
+            font-size: 0.95rem !important;
+            font-weight: 600 !important;
+            cursor: pointer !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+            box-shadow: var(--shadow-sm) !important;
+            transition: all 0.2s !important;
+        }
+        .spin-button-old {
                 padding: 0.75rem 1.5rem;
                 font-size: 1rem;
             }
@@ -184,17 +214,42 @@
 </head>
 <body>
   <center>
-    <div class="bottle-container" onclick="spinBottle()">
-        <div class="bottle" id="bottle">
-            <div class="bottle-body">
-                <div class="bottle-neck" id="bottleNeck"></div>
-                <div class="bottle-main" id="bottleMain"></div>
-            </div>
+    <div class="bottle-container" onclick="spinBottle()" style="display: inline-block; cursor: pointer; transition: transform 0.2s;">
+        <div class="bottle" id="bottle" style="transition: transform 2.5s cubic-bezier(0.25, 0.1, 0.25, 1);">
+            <svg class="bottle-svg" viewBox="0 0 100 240" style="width: 100px; height: 240px; filter: drop-shadow(0 8px 16px rgba(0,0,0,0.3));">
+                <defs>
+                    <linearGradient id="glassGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#1b5e20" />
+                        <stop offset="25%" stop-color="#4caf50" />
+                        <stop offset="50%" stop-color="#81c784" />
+                        <stop offset="75%" stop-color="#2e7d32" />
+                        <stop offset="100%" stop-color="#1b5e20" />
+                    </linearGradient>
+                    <linearGradient id="labelGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#ffd700" />
+                        <stop offset="50%" stop-color="#fff" />
+                        <stop offset="100%" stop-color="#ffaa00" />
+                    </linearGradient>
+                    <linearGradient id="capGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#d4af37" />
+                        <stop offset="50%" stop-color="#fff" />
+                        <stop offset="100%" stop-color="#aa7c11" />
+                    </linearGradient>
+                </defs>
+                <rect x="42" y="10" width="16" height="15" rx="3" fill="url(#capGrad)" />
+                <path d="M44 25 L44 80 Q40 100 25 110 L25 210 Q25 230 40 230 L60 230 Q75 230 75 210 L75 110 Q60 100 56 80 L56 25 Z" fill="url(#glassGrad)" />
+                <path d="M30 115 Q40 105 50 105" stroke="rgba(255, 255, 255, 0.4)" stroke-width="4" fill="none" stroke-linecap="round" />
+                <path d="M30 125 L30 200" stroke="rgba(255, 255, 255, 0.3)" stroke-width="3" fill="none" stroke-linecap="round" />
+                <rect x="29" y="130" width="42" height="50" rx="4" fill="url(#labelGrad)" />
+                <text x="50" y="160" font-family="'Outfit', sans-serif" font-size="9" font-weight="bold" fill="#333" text-anchor="middle">puruworld</text>
+            </svg>
         </div>
     </div>
-    <button class="spin-button" onclick="spinBottle()">
-        <span class="material-icons">refresh</span> Spin Again
-    </button>
+    <div style="margin-top: 20px;">
+        <button class="spin-button" onclick="spinBottle()">
+            <span class="material-icons">refresh</span> Spin Bottle
+        </button>
+    </div>
 </center>
     <script>
         const colorSets = [
@@ -220,20 +275,9 @@
 
         function spinBottle() {
             const bottle = document.getElementById('bottle');
-            const bottleNeck = document.getElementById('bottleNeck');
-            const bottleMain = document.getElementById('bottleMain');
-            
-            // Increment rotation angle (multiple full spins plus a random angle)
-            const randomAngle = 1080 + Math.floor(Math.random() * 360);
+            const randomAngle = 1440 + Math.floor(Math.random() * 360);
             currentAngle += randomAngle;
             bottle.style.transform = `rotate(${currentAngle}deg)`;
-            
-            // Randomly select a color set
-            const randomColorSet = colorSets[Math.floor(Math.random() * colorSets.length)];
-            bottleNeck.style.background = randomColorSet.neck.gradient;
-            bottleNeck.style.borderColor = randomColorSet.neck.border;
-            bottleMain.style.background = randomColorSet.main.gradient;
-            bottleMain.style.borderColor = randomColorSet.main.border;
         }
     </script>
 </body>

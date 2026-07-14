@@ -1867,14 +1867,47 @@ function selectVideoCategory(cat) {
 }
 
 function applyFilters() {
-  filteredPosts = allPosts.filter(post => {
+  if (!searchQuery) {
+    filteredPosts = allPosts.filter(post => !activeTag || (post.tags && post.tags.includes(activeTag)));
+    renderPostsGrid();
+    return;
+  }
+
+  const queryWords = searchQuery.toLowerCase().split(/\s+/).filter(w => w.length > 1);
+  
+  const scoredPosts = allPosts.map(post => {
+    let score = 0;
+    
+    // Check active tag filter
     const matchesTag = !activeTag || (post.tags && post.tags.includes(activeTag));
-    const matchesSearch = !searchQuery || 
-                          post.title.toLowerCase().includes(searchQuery) ||
-                          post.excerpt.toLowerCase().includes(searchQuery) ||
-                          (post.tags && post.tags.some(t => t.toLowerCase().includes(searchQuery)));
-    return matchesTag && matchesSearch;
+    if (!matchesTag) return { post, score: -1 };
+
+    const titleLower = post.title.toLowerCase();
+    const excerptLower = post.excerpt.toLowerCase();
+
+    // 1. Exact phrase matching
+    if (titleLower.includes(searchQuery)) score += 15;
+    if (excerptLower.includes(searchQuery)) score += 6;
+
+    // 2. Keyword relevance weights
+    if (queryWords.length > 0) {
+      queryWords.forEach(word => {
+        if (titleLower.includes(word)) score += 6;
+        if (excerptLower.includes(word)) score += 2;
+        if (post.tags && post.tags.some(t => t.toLowerCase().includes(word))) score += 10;
+      });
+    } else {
+      // Fallback for very short queries
+      if (titleLower.includes(searchQuery)) score += 1;
+    }
+
+    return { post, score };
   });
+
+  filteredPosts = scoredPosts
+    .filter(item => item.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .map(item => item.post);
 
   renderPostsGrid();
 }
@@ -1886,14 +1919,38 @@ function applyVideoFilters() {
 
   const query = document.getElementById('search-box')?.value.toLowerCase().trim() || '';
 
-  filteredVideos = allVideos.filter(video => {
-    const matchesCategory = activeVideoCategory === 'All' || video.category === activeVideoCategory;
-    const matchesSearch = !query || 
-                          video.title.toLowerCase().includes(query) ||
-                          (video.views && video.views.toLowerCase().includes(query)) ||
-                          (video.timeAgo && video.timeAgo.toLowerCase().includes(query));
-    return matchesCategory && matchesSearch;
-  });
+  if (!query) {
+    filteredVideos = allVideos.filter(video => activeVideoCategory === 'All' || video.category === activeVideoCategory);
+  } else {
+    const queryWords = query.split(/\s+/).filter(w => w.length > 1);
+    
+    const scoredVideos = allVideos.map(video => {
+      let score = 0;
+      
+      const matchesCategory = activeVideoCategory === 'All' || video.category === activeVideoCategory;
+      if (!matchesCategory) return { video, score: -1 };
+
+      const titleLower = video.title.toLowerCase();
+
+      // Exact phrase match
+      if (titleLower.includes(query)) score += 12;
+      
+      if (queryWords.length > 0) {
+        queryWords.forEach(word => {
+          if (titleLower.includes(word)) score += 6;
+        });
+      } else {
+        if (titleLower.includes(query)) score += 1;
+      }
+
+      return { video, score };
+    });
+
+    filteredVideos = scoredVideos
+      .filter(item => item.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .map(item => item.video);
+  }
 
   if (filteredVideos.length === 0) {
     videosGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 40px 0;">No videos found matching your search.</p>';
@@ -2920,6 +2977,361 @@ def main():
                 btn.disabled = false;
             }, 1200);
         }'''
+      )
+    
+    if 'tic-tac-toe' in page['filename']:
+      content_sanitized = content_sanitized.replace(
+        '#tictactoe-game * {',
+        '#tictactoe-game-old-star {'
+      ).replace(
+        '#tictactoe-game {',
+        '''#tictactoe-game {
+            font-family: \'Outfit\', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 0;
+        }
+        #tictactoe-game .container {
+            background: var(--bg-secondary) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 16px !important;
+            box-shadow: var(--shadow-sm) !important;
+            padding: 24px !important;
+            max-width: 400px !important;
+            width: 100% !important;
+        }
+        #tictactoe-game h1 {
+            text-align: center !important;
+            color: var(--text-primary) !important;
+            margin-bottom: 24px !important;
+            font-weight: 700 !important;
+            font-size: 1.8rem !important;
+        }
+        #tictactoe-game .mode-selection {
+            display: flex !important;
+            justify-content: space-between !important;
+            gap: 10px !important;
+            margin-bottom: 24px !important;
+        }
+        #tictactoe-game .mode-btn {
+            flex: 1 !important;
+            background: rgba(0, 0, 0, 0.05) !important;
+            border: 1px solid var(--border-color) !important;
+            padding: 10px !important;
+            border-radius: 8px !important;
+            cursor: pointer !important;
+            font-size: 0.9rem !important;
+            font-weight: 600 !important;
+            color: var(--text-secondary) !important;
+            transition: all 0.2s !important;
+        }
+        [data-theme="dark"] #tictactoe-game .mode-btn {
+            background: rgba(255, 255, 255, 0.05) !important;
+        }
+        #tictactoe-game .mode-btn:hover {
+            border-color: var(--accent-color) !important;
+            color: var(--accent-color) !important;
+        }
+        #tictactoe-game .mode-btn.active {
+            background: var(--accent-gradient) !important;
+            color: white !important;
+            border-color: transparent !important;
+        }
+        #tictactoe-game .status {
+            text-align: center !important;
+            font-size: 1rem !important;
+            font-weight: 600 !important;
+            color: var(--text-primary) !important;
+            margin-bottom: 20px !important;
+            min-height: 24px !important;
+            padding: 12px !important;
+            border-radius: 8px !important;
+            background: rgba(0, 0, 0, 0.02) !important;
+            border: 1px solid var(--border-color) !important;
+            transition: all 0.3s !important;
+        }
+        [data-theme="dark"] #tictactoe-game .status {
+            background: rgba(255, 255, 255, 0.02) !important;
+        }
+        #tictactoe-game .board {
+            display: grid !important;
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 10px !important;
+            margin-bottom: 24px !important;
+        }
+        #tictactoe-game .cell {
+            aspect-ratio: 1 !important;
+            background: rgba(0, 0, 0, 0.01) !important;
+            border: 1px solid var(--border-color) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-size: 2.5rem !important;
+            font-weight: 800 !important;
+            cursor: pointer !important;
+            transition: all 0.2s !important;
+            border-radius: 12px !important;
+            user-select: none !important;
+            color: var(--text-primary) !important;
+        }
+        [data-theme="dark"] #tictactoe-game .cell {
+            background: rgba(255, 255, 255, 0.01) !important;
+        }
+        #tictactoe-game .cell:hover {
+            background: rgba(0, 0, 0, 0.03) !important;
+            border-color: var(--accent-color) !important;
+        }
+        [data-theme="dark"] #tictactoe-game .cell:hover {
+            background: rgba(255, 255, 255, 0.03) !important;
+        }
+        #tictactoe-game .cell.x {
+            color: #8b5cf6 !important;
+            text-shadow: 0 0 10px rgba(139, 92, 246, 0.3) !important;
+        }
+        #tictactoe-game .cell.o {
+            color: #6366f1 !important;
+            text-shadow: 0 0 10px rgba(99, 102, 241, 0.3) !important;
+        }
+        #tictactoe-game .cell.winning-cell {
+            background: rgba(34, 197, 94, 0.15) !important;
+            border-color: #22c55e !important;
+            color: #22c55e !important;
+            animation: pulse-win 1s infinite alternate !important;
+        }
+        @keyframes pulse-win {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.03); }
+        }
+        #tictactoe-game .controls {
+            display: flex !important;
+            justify-content: center !important;
+        }
+        #tictactoe-game .reset-btn {
+            background: var(--accent-gradient) !important;
+            color: white !important;
+            border: none !important;
+            padding: 10px 24px !important;
+            border-radius: 8px !important;
+            cursor: pointer !important;
+            font-size: 0.9rem !important;
+            font-weight: 600 !important;
+            transition: all 0.2s !important;
+            width: 100% !important;
+        }
+        #tictactoe-game .reset-btn:hover {
+            opacity: 0.9 !important;
+            transform: translateY(-1px) !important;
+        }
+        #tictactoe-game .winner {
+            color: #22c55e !important;
+            background: rgba(34, 197, 94, 0.1) !important;
+            border-color: rgba(34, 197, 94, 0.2) !important;
+        }
+        #tictactoe-game .draw {
+            color: #eab308 !important;
+            background: rgba(234, 179, 8, 0.1) !important;
+            border-color: rgba(234, 179, 8, 0.2) !important;
+        }
+        #tictactoe-game-old {'''
+      ).replace(
+        'cell.classList.remove(\'x\', \'o\');',
+        'cell.classList.remove(\'x\', \'o\', \'winning-cell\');'
+      ).replace(
+        '''                checkWinner() {
+                    return this.getWinner() !== null;
+                }''',
+        '''                checkWinner() {
+                    const winPatterns = [
+                        [0, 1, 2], [3, 4, 5], [6, 7, 8],
+                        [0, 3, 6], [1, 4, 7], [2, 5, 8],
+                        [0, 4, 8], [2, 4, 6]
+                    ];
+                    for (let pattern of winPatterns) {
+                        const [a, b, c] = pattern;
+                        if (this.board[a] && this.board[a] === this.board[b] && this.board[a] === this.board[c]) {
+                            [a, b, c].forEach(idx => {
+                                const cell = gameContainer.querySelector(`[data-index="${idx}"]`);
+                                if (cell) cell.classList.add(\'winning-cell\');
+                            });
+                            return true;
+                        }
+                    }
+                    return false;
+                }'''
+      )
+
+    if 'spin-bottle' in page['filename']:
+      content_sanitized = content_sanitized.replace(
+        'body {',
+        'body-old {'
+      ).replace(
+        '.spin-button {',
+        '''.spin-button {
+            background: var(--accent-gradient) !important;
+            color: white !important;
+            padding: 10px 24px !important;
+            border: none !important;
+            border-radius: 8px !important;
+            font-size: 0.95rem !important;
+            font-weight: 600 !important;
+            cursor: pointer !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+            box-shadow: var(--shadow-sm) !important;
+            transition: all 0.2s !important;
+        }
+        .spin-button-old {'''
+      ).replace(
+        '''    <div class="bottle-container" onclick="spinBottle()">
+        <div class="bottle" id="bottle">
+            <div class="bottle-body">
+                <div class="bottle-neck" id="bottleNeck"></div>
+                <div class="bottle-main" id="bottleMain"></div>
+            </div>
+        </div>
+    </div>
+    <button class="spin-button" onclick="spinBottle()">
+        <span class="material-icons">refresh</span> Spin Again
+    </button>''',
+        '''    <div class="bottle-container" onclick="spinBottle()" style="display: inline-block; cursor: pointer; transition: transform 0.2s;">
+        <div class="bottle" id="bottle" style="transition: transform 2.5s cubic-bezier(0.25, 0.1, 0.25, 1);">
+            <svg class="bottle-svg" viewBox="0 0 100 240" style="width: 100px; height: 240px; filter: drop-shadow(0 8px 16px rgba(0,0,0,0.3));">
+                <defs>
+                    <linearGradient id="glassGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#1b5e20" />
+                        <stop offset="25%" stop-color="#4caf50" />
+                        <stop offset="50%" stop-color="#81c784" />
+                        <stop offset="75%" stop-color="#2e7d32" />
+                        <stop offset="100%" stop-color="#1b5e20" />
+                    </linearGradient>
+                    <linearGradient id="labelGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#ffd700" />
+                        <stop offset="50%" stop-color="#fff" />
+                        <stop offset="100%" stop-color="#ffaa00" />
+                    </linearGradient>
+                    <linearGradient id="capGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#d4af37" />
+                        <stop offset="50%" stop-color="#fff" />
+                        <stop offset="100%" stop-color="#aa7c11" />
+                    </linearGradient>
+                </defs>
+                <rect x="42" y="10" width="16" height="15" rx="3" fill="url(#capGrad)" />
+                <path d="M44 25 L44 80 Q40 100 25 110 L25 210 Q25 230 40 230 L60 230 Q75 230 75 210 L75 110 Q60 100 56 80 L56 25 Z" fill="url(#glassGrad)" />
+                <path d="M30 115 Q40 105 50 105" stroke="rgba(255, 255, 255, 0.4)" stroke-width="4" fill="none" stroke-linecap="round" />
+                <path d="M30 125 L30 200" stroke="rgba(255, 255, 255, 0.3)" stroke-width="3" fill="none" stroke-linecap="round" />
+                <rect x="29" y="130" width="42" height="50" rx="4" fill="url(#labelGrad)" />
+                <text x="50" y="160" font-family="\'Outfit\', sans-serif" font-size="9" font-weight="bold" fill="#333" text-anchor="middle">puruworld</text>
+            </svg>
+        </div>
+    </div>
+    <div style="margin-top: 20px;">
+        <button class="spin-button" onclick="spinBottle()">
+            <span class="material-icons">refresh</span> Spin Bottle
+        </button>
+    </div>'''
+      ).replace(
+        '''        function spinBottle() {
+            const bottle = document.getElementById('bottle');
+            const bottleNeck = document.getElementById('bottleNeck');
+            const bottleMain = document.getElementById('bottleMain');
+            
+            // Increment rotation angle (multiple full spins plus a random angle)
+            const randomAngle = 1080 + Math.floor(Math.random() * 360);
+            currentAngle += randomAngle;
+            bottle.style.transform = `rotate(${currentAngle}deg)`;
+            
+            // Randomly select a color set
+            const randomColorSet = colorSets[Math.floor(Math.random() * colorSets.length)];
+            bottleNeck.style.background = randomColorSet.neck.gradient;
+            bottleNeck.style.borderColor = randomColorSet.neck.border;
+            bottleMain.style.background = randomColorSet.main.gradient;
+            bottleMain.style.borderColor = randomColorSet.main.border;
+        }''',
+        '''        function spinBottle() {
+            const bottle = document.getElementById('bottle');
+            const randomAngle = 1440 + Math.floor(Math.random() * 360);
+            currentAngle += randomAngle;
+            bottle.style.transform = `rotate(${currentAngle}deg)`;
+        }'''
+      )
+
+    if 'json-formatter' in page['filename']:
+      content_sanitized = content_sanitized.replace(
+        '.json-formatter-container {',
+        '''.json-formatter-container {
+            font-family: \'Inter\', sans-serif !important;
+            display: flex !important;
+            gap: 20px !important;
+            height: 550px !important;
+            margin: 0 auto !important;
+            padding: 0 !important;
+            box-sizing: border-box !important;
+            background-color: transparent !important;
+        }
+        .json-formatter-container-old {'''
+      ).replace(
+        '.json-formatter-container .pane {',
+        '''.json-formatter-container .pane {
+            flex: 1 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            background-color: var(--bg-secondary) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 12px !important;
+            padding: 20px !important;
+            box-shadow: var(--shadow-sm) !important;
+        }
+        .json-formatter-container .pane-old {'''
+      ).replace(
+        '.json-formatter-container button {',
+        '''.json-formatter-container button {
+            padding: 8px 16px !important;
+            border: none !important;
+            border-radius: 6px !important;
+            background: var(--accent-gradient) !important;
+            color: #fff !important;
+            cursor: pointer !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            transition: all 0.2s !important;
+        }
+        .json-formatter-container button-old {'''
+      ).replace(
+        '.json-formatter-container textarea {',
+        '''.json-formatter-container textarea {
+            width: 100% !important;
+            height: 80% !important;
+            resize: none !important;
+            font-family: \'Courier New\', monospace !important;
+            font-size: 13px !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 8px !important;
+            padding: 12px !important;
+            box-sizing: border-box !important;
+            background: var(--bg-primary) !important;
+            color: var(--text-primary) !important;
+        }
+        .json-formatter-container textarea-old {'''
+      ).replace(
+        '.json-formatter-container #output {',
+        '''.json-formatter-container #output {
+            height: 70% !important;
+            overflow-y: auto !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 8px !important;
+            padding: 12px !important;
+            font-family: \'Courier New\', monospace !important;
+            font-size: 13px !important;
+            background: var(--bg-primary) !important;
+            color: var(--text-primary) !important;
+            white-space: pre-wrap !important;
+        }
+        .json-formatter-container #output-old {'''
       )
     
     page_tmpl = load_template('page.html')
