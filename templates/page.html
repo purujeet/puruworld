@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+{{HEAD}}
+<body>
+  {{HEADER}}
+
+  <main class="container post-layout">
+    <div class="back-btn-wrapper">
+      <a href="{{REL_PATH}}index.html" class="back-btn">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        Back to Home
+      </a>
+    </div>
+
+    <article>
+      <div class="post-header">
+        <h1 class="post-header-title">{{PAGE_TITLE}}</h1>
+      </div>
+
+      <div class="post-main-content" style="max-width: 800px; margin: 0 auto;">
+        {{PAGE_CONTENT}}
+      </div>
+    </article>
+  </main>
+
+  {{FOOTER}}
+</body>
+</html>

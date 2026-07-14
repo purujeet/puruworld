@@ -2423,341 +2423,52 @@ window.selectVideoCategory = selectVideoCategory;
 window.changeVideoPage = changeVideoPage;
 """
 
-INDEX_HTML_TEMPLATE = """<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="puru world official - A blog on everyday need daily. Exploring technology, lifeskills, travel, and more.">
-  <title>puru world official</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./style.css?v=1.2">
-  <script src="./posts-metadata.js"></script>
-  <script src="./videos-metadata.js"></script>
-  <script src="./main.js?v=1.2" defer></script>
-</head>
-<body>
-  <header>
-    <div class="container header-content">
-      <div class="logo">
-        <svg style="width: 28px; height: 28px; fill: url(#accentGradient);" viewBox="0 0 24 24">
-          <defs>
-            <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#8b5cf6" />
-              <stop offset="100%" stop-color="#6366f1" />
-            </linearGradient>
-          </defs>
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/>
-        </svg>
-        Puru's Blog
-      </div>
-      <nav class="nav-links">
-        <a href="./index.html" class="nav-link" onclick="event.preventDefault(); switchTab('blog')">Home</a>
-        <a href="./index.html?tab=videos" class="nav-link" onclick="event.preventDefault(); switchTab('videos')">Videos</a>
-        <button class="theme-toggle-btn" aria-label="Toggle dark mode" id="theme-toggle">
-          <svg class="moon-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
-          <svg class="sun-icon" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path></svg>
-        </button>
-      </nav>
-    </div>
-  </header>
+def load_template(name):
+  path = os.path.join('templates', name)
+  with open(path, 'r', encoding='utf-8') as f:
+    return f.read()
 
-  <main class="container">
-    <section class="hero">
-      <div class="hero-bg-blobs">
-        <div class="hero-blob hero-blob-1"></div>
-        <div class="hero-blob hero-blob-2"></div>
-      </div>
-      <h1>puru world official</h1>
-      <p>A beautiful destination for regular updates, lifestyle guides, technical tutorials, and emotional intelligence strategies.</p>
-      <div class="blog-stats">
-        <span>
-          <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-          1,500+ Articles
-        </span>
-        <span>
-          <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/></svg>
-          5+ Categories
-        </span>
-      </div>
-    </section>
+def get_head(title, description, rel_path, additional_scripts=""):
+  head_tmpl = load_template('head.html')
+  return head_tmpl.replace('{{TITLE}}', title)\
+                  .replace('{{DESCRIPTION}}', description)\
+                  .replace('{{REL_PATH}}', rel_path)\
+                  .replace('{{ADDITIONAL_SCRIPTS}}', additional_scripts)
 
-    <div class="tabs-container">
-      <button class="tab-btn active" id="tab-blog" onclick="switchTab('blog')">
-        <svg viewBox="0 0 24 24" width="18" height="18" style="width: 18px; height: 18px; flex-shrink: 0;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-        Blog Articles
-      </button>
-      <button class="tab-btn" id="tab-videos" onclick="switchTab('videos')">
-        <svg viewBox="0 0 24 24" width="18" height="18" style="width: 18px; height: 18px; flex-shrink: 0;"><path d="M23 12c0 6.07-4.93 11-11 11S1 18.07 1 12 5.93 1 12 1s11 4.93 11 11zm-11-9c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9zm-2 13V8l6 4-6 4z"/></svg>
-        Video Library
-      </button>
-    </div>
+def get_header(rel_path, has_progress=False, id_val="Index"):
+  header_tmpl = load_template('header.html')
+  progress_bar = '<div class="scroll-progress-container"><div class="scroll-progress-bar"></div></div>' if has_progress else ''
+  return header_tmpl.replace('{{REL_PATH}}', rel_path)\
+                    .replace('{{SCROLL_PROGRESS}}', progress_bar)\
+                    .replace('{{ID}}', id_val)
 
-    <section class="search-filter-section" id="search-filter-section">
-      <div class="search-box-wrapper">
-        <span class="search-icon">
-          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-        </span>
-        <input type="text" id="search-box" class="search-box" placeholder="Search across 1,500+ blog articles...">
-        <span class="clear-icon" id="clear-search-icon" onclick="resetFilters()">&times;</span>
-      </div>
-    </section>
-
-    <div class="blog-page-layout" id="blog-page-layout">
-      <aside class="blog-sidebar" id="blog-sidebar">
-        <!-- Blog tags sidebar will load dynamically -->
-      </aside>
-      <div class="posts-grid" id="posts-grid" style="margin-bottom: 0;">
-        <!-- Posts will render dynamically -->
-      </div>
-    </div>
-
-    <div class="videos-page-layout" id="videos-page-layout" style="display: none;">
-      <aside class="videos-sidebar" id="videos-sidebar">
-        <!-- Sidebar categories will render dynamically -->
-      </aside>
-      <div class="posts-grid" id="videos-grid" style="margin-bottom: 0;">
-        <!-- Videos will render dynamically -->
-      </div>
-    </div>
-
-    <div class="pagination" id="pagination">
-      <!-- Pagination will render dynamically -->
-    </div>
-
-    <div class="pagination" id="videos-pagination" style="display: none; margin-top: 40px;">
-      <!-- Video pagination will render dynamically -->
-    </div>
-  </main>
-
-  <footer>
-    <div class="container">
-      <p>&copy; 2026 puru world official. All rights reserved.</p>
-      <p>Migrated from Blogger to Static HTML Site.</p>
-    </div>
-  </footer>
-</body>
-</html>
-"""
-
-VIDEOS_HTML_TEMPLATE = """<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Watch my latest video updates, gaming livestreams, and tutorials from Puru World.">
-  <title>Videos - puru world official</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../style.css?v=1.2">
-  <script src="../videos-metadata.js"></script>
-  <script src="../main.js?v=1.2" defer></script>
-</head>
-<body>
-  <header>
-    <div class="container header-content">
-      <div class="logo">
-        <a href="../index.html" style="background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 8px; font-weight: 800;">
-          <svg style="width: 28px; height: 28px; fill: url(#accentGradientVideos);" viewBox="0 0 24 24">
-            <defs>
-              <linearGradient id="accentGradientVideos" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#8b5cf6" />
-                <stop offset="100%" stop-color="#6366f1" />
-              </linearGradient>
-            </defs>
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/>
-          </svg>
-          Puru's Blog
-        </a>
-      </div>
-      <nav class="nav-links">
-        <a href="../index.html" class="nav-link">Home</a>
-        <a href="../index.html?tab=videos" class="nav-link">Videos</a>
-        <button class="theme-toggle-btn" aria-label="Toggle dark mode" id="theme-toggle">
-          <svg class="moon-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
-          <svg class="sun-icon" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path></svg>
-        </button>
-      </nav>
-    </div>
-  </header>
-
-  <main class="container" style="padding-top: 40px; padding-bottom: 80px;">
-    <section class="hero" style="padding: 40px 0;">
-      <div class="hero-bg-blobs">
-        <div class="hero-blob hero-blob-1"></div>
-        <div class="hero-blob hero-blob-2"></div>
-      </div>
-      <h1>YouTube Video Library</h1>
-      <p>Explore the latest gameplay uploads, livestreams, guides, and walkthroughs from Puru World.</p>
-    </section>
-
-    <section class="search-filter-section" id="search-filter-section" style="margin-bottom: 30px;">
-      <div class="search-box-wrapper">
-        <span class="search-icon">
-          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-        </span>
-        <input type="text" id="search-box" class="search-box" placeholder="Search YouTube video library...">
-        <span class="clear-icon" id="clear-search-icon" onclick="resetFilters()">&times;</span>
-      </div>
-    </section>
-
-    <div class="videos-page-layout" id="videos-page-layout">
-      <aside class="videos-sidebar" id="videos-sidebar">
-        <!-- Sidebar categories will render dynamically -->
-      </aside>
-      <div class="posts-grid" id="videos-grid" style="margin-bottom: 0;">
-        <!-- Videos will render dynamically -->
-      </div>
-    </div>
-    
-    <div class="pagination" id="videos-pagination" style="margin-top: 40px;">
-      <!-- Video pagination will render dynamically -->
-    </div>
-  </main>
-
-  <footer>
-    <div class="container">
-      <p>&copy; 2026 puru world official. All rights reserved.</p>
-      <p>Migrated from Blogger to Static HTML Site.</p>
-    </div>
-  </footer>
-</body>
-</html>
-"""
+def get_footer():
+  return load_template('footer.html')
 
 def make_post_html(post_title, post_date, post_tags, post_content, read_time, cover_image, rel_path, related_posts_html):
-  tags_html = "".join([f'<span class="card-tag">{t}</span>' for t in post_tags])
-  header_tags_html = "".join([f'<span class="filter-tag" style="cursor:default">{t}</span>' for t in post_tags])
+  post_tmpl = load_template('post.html')
   
-  cover_image_html = ""
-  if cover_image:
-    cover_image_html = f'<img class="post-hero-image" src="{cover_image}" alt="{post_title}" loading="eager" decoding="async">'
-
-  return f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="{clean_excerpt(post_content, 150)}">
-  <title>{post_title} - puru world official</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{rel_path}style.css?v=1.2">
-  <script src="{rel_path}main.js?v=1.2" defer></script>
-</head>
-<body>
-  <header>
-    <div class="container header-content">
-      <div class="logo">
-        <a href="{rel_path}index.html" style="background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 8px; font-weight: 800;">
-          <svg style="width: 28px; height: 28px; fill: url(#accentGradientDetail);" viewBox="0 0 24 24">
-            <defs>
-              <linearGradient id="accentGradientDetail" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#8b5cf6" />
-                <stop offset="100%" stop-color="#6366f1" />
-              </linearGradient>
-            </defs>
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/>
-          </svg>
-          Puru's Blog
-        </a>
-      </div>
-      <nav class="nav-links">
-        <a href="{rel_path}index.html" class="nav-link">Home</a>
-        <a href="{rel_path}index.html?tab=videos" class="nav-link">Videos</a>
-        <button class="theme-toggle-btn" aria-label="Toggle dark mode" id="theme-toggle">
-          <svg class="moon-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
-          <svg class="sun-icon" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path></svg>
-        </button>
-      </nav>
-      <div class="scroll-progress-container">
-        <div class="scroll-progress-bar"></div>
-      </div>
-    </div>
-  </header>
-
-  <main class="container post-layout">
-    <div class="back-btn-wrapper">
-      <a href="{rel_path}index.html" class="back-btn">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-        Back to Home
-      </a>
-    </div>
-
-    <article>
-      <div class="post-header">
-        <h1 class="post-header-title">{post_title}</h1>
-        <div class="post-header-meta">
-          <span>
-            <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
-            {post_date}
-          </span>
-          <span>
-            <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
-            {read_time} min read
-          </span>
-        </div>
-        <div class="post-header-tags">
-          {header_tags_html}
-        </div>
-      </div>
-
-      {cover_image_html}
-
-      <div class="post-content-container">
-        <div class="post-main-content">
-          {post_content}
-        </div>
-        
-        <aside class="post-sidebar">
-          <div class="sidebar-widget" id="toc-widget" style="display: none;">
-            <h3>Table of Contents</h3>
-            <nav class="toc-links" id="toc-links">
-              <!-- TOC links will load dynamically -->
-            </nav>
-          </div>
-          
-          <div class="sidebar-widget">
-            <h3>Share this Article</h3>
-            <div class="share-links">
-              <button class="share-btn" onclick="sharePost('twitter', '{post_title}')">
-                <svg fill="currentColor" viewBox="0 0 24 24"><path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.03c0 2.08 1.48 3.82 3.44 4.21a4.2 4.2 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.52 8.52 0 0 1-5.3 1.83c-.35 0-.69-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21 16 21 20.33 14.5 20.33 8.8c0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.24z"/></svg>
-                Twitter / X
-              </button>
-              <button class="share-btn" onclick="sharePost('facebook', '{post_title}')">
-                <svg fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c4.56-.93 8-4.96 8-9.75z"/></svg>
-                Facebook
-              </button>
-              <button class="share-btn" onclick="sharePost('linkedin', '{post_title}')">
-                <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
-                LinkedIn
-              </button>
-              <button class="share-btn" onclick="sharePost('copy', '{post_title}')">
-                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
-                Copy Link
-              </button>
-            </div>
-          </div>
-        </aside>
-      </div>
-    </article>
-
-    {related_posts_html}
-  </main>
-
-  <footer>
-    <div class="container">
-      <p>&copy; 2026 puru world official. All rights reserved.</p>
-      <p>Migrated from Blogger to Static HTML Site.</p>
-    </div>
-  </footer>
-</body>
-</html>
-"""
+  head = get_head(f"{post_title} - puru world official", clean_excerpt(post_content, 150), rel_path)
+  header = get_header(rel_path, has_progress=True, id_val="Detail")
+  footer = get_footer()
+  
+  header_tags_html = "".join([f'<span class="filter-tag" style="cursor:default">{t}</span>' for t in post_tags])
+  cover_image_html = f'<img class="post-hero-image" src="{cover_image}" alt="{post_title}" loading="eager" decoding="async">' if cover_image else ''
+  
+  title_escaped = post_title.replace("'", "\\'")
+  
+  post_html = post_tmpl.replace('{{HEAD}}', head)\
+                       .replace('{{HEADER}}', header)\
+                       .replace('{{FOOTER}}', footer)\
+                       .replace('{{POST_TITLE}}', post_title)\
+                       .replace('{{POST_TITLE_JS}}', title_escaped)\
+                       .replace('{{POST_DATE}}', post_date)\
+                       .replace('{{READ_TIME}}', str(read_time))\
+                       .replace('{{HEADER_TAGS}}', header_tags_html)\
+                       .replace('{{COVER_IMAGE}}', cover_image_html)\
+                       .replace('{{POST_CONTENT}}', post_content)\
+                       .replace('{{RELATED_POSTS}}', related_posts_html)
+  return post_html
 
 def generate_related_posts_section(post, all_posts_metadata, rel_path):
   tags_set = set(post['tags'])
@@ -2953,8 +2664,15 @@ def main():
     f.write(SHARED_JS)
   print("Generated style.css and main.js")
   
+  # Load Index HTML modularly
+  index_tmpl = load_template('index.html')
+  head = get_head("puru world official", "puru world official - A blog on everyday need daily. Exploring technology, lifeskills, travel, and more.", "./", '<script src="./posts-metadata.js"></script><script src="./videos-metadata.js"></script>')
+  header = get_header("./", has_progress=False, id_val="Index")
+  footer = get_footer()
+  index_html = index_tmpl.replace('{{HEAD}}', head).replace('{{HEADER}}', header).replace('{{FOOTER}}', footer)
+  
   with open(os.path.join(output_dir, 'index.html'), 'w', encoding='utf-8') as f:
-    f.write(INDEX_HTML_TEMPLATE)
+    f.write(index_html)
   print("Generated index.html")
   
   # Fetch all YouTube videos programmatically
@@ -2966,11 +2684,17 @@ def main():
     f.write(";")
   print(f"Generated {len(videos)} videos in videos-metadata.js")
   
-  # Write p/videos.html page
+  # Write p/videos.html page modularly
+  videos_tmpl = load_template('videos.html')
+  head = get_head("Videos - puru world official", "Watch my latest video updates, gaming livestreams, and tutorials from Puru World.", "../", '<script src="../videos-metadata.js"></script>')
+  header = get_header("../", has_progress=False, id_val="Videos")
+  footer = get_footer()
+  videos_html = videos_tmpl.replace('{{HEAD}}', head).replace('{{HEADER}}', header).replace('{{FOOTER}}', footer)
+  
   videos_page_dir = os.path.join(output_dir, 'p')
   os.makedirs(videos_page_dir, exist_ok=True)
   with open(os.path.join(videos_page_dir, 'videos.html'), 'w', encoding='utf-8') as f:
-    f.write(VIDEOS_HTML_TEMPLATE)
+    f.write(videos_html)
   print("Generated p/videos.html")
   
   print("Writing post HTML files...")
@@ -3003,75 +2727,12 @@ def main():
     content_rewritten = rewrite_internal_links(page['content'], page['depth'])
     content_sanitized = sanitize_blogger_html(content_rewritten)
     
-    page_html = f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="{clean_excerpt(page['content'], 150)}">
-  <title>{page['title']} - puru world official</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{page['rel_path']}style.css?v=1.2">
-  <script src="{page['rel_path']}main.js?v=1.2" defer></script>
-</head>
-<body>
-  <header>
-    <div class="container header-content">
-      <div class="logo">
-        <a href="{page['rel_path']}index.html" style="background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 8px; font-weight: 800;">
-          <svg style="width: 28px; height: 28px; fill: url(#accentGradientPage);" viewBox="0 0 24 24">
-            <defs>
-              <linearGradient id="accentGradientPage" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#8b5cf6" />
-                <stop offset="100%" stop-color="#6366f1" />
-              </linearGradient>
-            </defs>
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/>
-          </svg>
-          Puru's Blog
-        </a>
-      </div>
-      <nav class="nav-links">
-        <a href="{page['rel_path']}index.html" class="nav-link">Home</a>
-        <a href="{page['rel_path']}index.html?tab=videos" class="nav-link">Videos</a>
-        <button class="theme-toggle-btn" aria-label="Toggle dark mode" id="theme-toggle">
-          <svg class="moon-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
-          <svg class="sun-icon" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path></svg>
-        </button>
-      </nav>
-    </div>
-  </header>
-
-  <main class="container post-layout">
-    <div class="back-btn-wrapper">
-      <a href="{page['rel_path']}index.html" class="back-btn">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-        Back to Home
-      </a>
-    </div>
-
-    <article>
-      <div class="post-header">
-        <h1 class="post-header-title">{page['title']}</h1>
-      </div>
-
-      <div class="post-main-content" style="max-width: 800px; margin: 0 auto;">
-        {content_sanitized}
-      </div>
-    </article>
-  </main>
-
-  <footer>
-    <div class="container">
-      <p>&copy; 2026 puru world official. All rights reserved.</p>
-      <p>Migrated from Blogger to Static HTML Site.</p>
-    </div>
-  </footer>
-</body>
-</html>
-"""
+    page_tmpl = load_template('page.html')
+    head = get_head(f"{page['title']} - puru world official", clean_excerpt(page['content'], 150), page['rel_path'])
+    header = get_header(page['rel_path'], has_progress=False, id_val="Page")
+    footer = get_footer()
+    page_html = page_tmpl.replace('{{HEAD}}', head).replace('{{HEADER}}', header).replace('{{FOOTER}}', footer).replace('{{PAGE_TITLE}}', page['title']).replace('{{PAGE_CONTENT}}', content_sanitized)
+    
     dest_path = os.path.join(output_dir, page['filename'].lstrip('/'))
     os.makedirs(os.path.dirname(dest_path), exist_ok=True)
     with open(dest_path, 'w', encoding='utf-8') as f:
