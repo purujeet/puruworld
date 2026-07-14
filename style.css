@@ -1262,6 +1262,43 @@ footer p {
 .page-content li {
   margin-bottom: 0.5rem;
 }
+
+/* Compact Scroll-free view for Interactive Tools/Games */
+.game-page.page-layout {
+  padding: 10px 0 30px !important;
+}
+.game-page .page-header {
+  margin-bottom: 12px !important;
+}
+.game-page .page-title {
+  font-size: 1.6rem !important;
+}
+
+/* Top line search display configurations */
+#header-search-container {
+  display: none !important;
+}
+.header-Index #header-search-container {
+  display: block !important;
+}
+
+/* Premium Glowing Borders */
+.post-card, .sidebar-widget, .search-box, .tab-btn, .cell, .mode-btn, .reset-btn, .spin-button {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+.post-card:hover, .sidebar-widget:hover, .search-box:focus, .tab-btn.active, .cell:hover, .mode-btn.active {
+  border-color: #8b5cf6 !important;
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.25) !important;
+}
+[data-theme="dark"] .post-card:hover,
+[data-theme="dark"] .sidebar-widget:hover,
+[data-theme="dark"] .search-box:focus,
+[data-theme="dark"] .tab-btn.active,
+[data-theme="dark"] .cell:hover,
+[data-theme="dark"] .mode-btn.active {
+  box-shadow: 0 0 16px rgba(139, 92, 246, 0.45) !important;
+}
+
 @media (max-width: 768px) {
   .page-title {
     font-size: 2rem;

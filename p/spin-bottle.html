@@ -6,6 +6,9 @@
   <meta name="description" content="body { margin: 0; padding: 0; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background: linear-g...">
   <title>Spin The bottle - puru world official</title>
   
+  <!-- data-URI SVG favicon as 'P' -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 font-family=%22sans-serif%22 font-weight=%22bold%22 fill=%22%238b5cf6%22>P</text></svg>">
+
   <!-- Google AdSense Verification Tag -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
 
@@ -25,24 +28,26 @@
 </head>
 
 <body>
-  <header>
-  <div class="container header-content">
-    <div class="logo">
-      <a href="../index.html" style="background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 8px; font-weight: 800; text-decoration: none; font-family: 'Outfit', sans-serif; font-size: 1.4rem; letter-spacing: -0.5px;">
-        <svg style="width: 26px; height: 26px; fill: url(#accentGradientPage); flex-shrink: 0;" viewBox="0 0 24 24">
-          <defs>
-            <linearGradient id="accentGradientPage" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#8b5cf6" />
-              <stop offset="100%" stop-color="#6366f1" />
-            </linearGradient>
-          </defs>
-          <!-- Globe / World Icon -->
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.53c-.26-.81-1-1.4-1.9-1.4h-1v-3c0-.55-.45-1-1-1h-6v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.4z"/>
-        </svg>
-        puruworld
-      </a>
+  <header class="header-Page">
+  <div class="container header-content" style="display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 20px;">
+    <div class="logo-search-wrapper" style="display: flex; align-items: center; gap: 20px; flex-grow: 1; max-width: 600px;">
+      <div class="logo">
+        <a href="../index.html" style="background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; font-weight: 800; text-decoration: none; font-family: 'Outfit', sans-serif; font-size: 1.4rem; letter-spacing: -0.5px;">
+          puruworld
+        </a>
+      </div>
+      
+      <!-- Top Line Search Box -->
+      <div class="header-search-box-wrapper" id="header-search-container" style="position: relative; flex-grow: 1; display: none;">
+        <span class="search-icon" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; display: flex; align-items: center;">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width: 16px; height: 16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </span>
+        <input type="text" id="search-box" class="search-box" placeholder="Search articles & videos..." style="width: 100%; padding: 8px 36px 8px 36px; border: 1px solid var(--border-color); border-radius: 20px; background-color: var(--bg-secondary); color: var(--text-primary); font-size: 0.88rem; outline: none; transition: all 0.2s;">
+        <span class="clear-icon" id="clear-search-icon" onclick="resetFilters()" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); cursor: pointer; display: none; font-size: 16px; font-weight: bold;">&times;</span>
+      </div>
     </div>
-    <nav class="nav-links">
+    
+    <nav class="nav-links" style="display: flex; align-items: center; gap: 20px; flex-shrink: 0;">
       <a href="../index.html" class="nav-link" onclick="if(typeof switchTab === 'function' && window.location.pathname.includes('index.html')) { event.preventDefault(); switchTab('blog'); }">Home</a>
       <a href="../index.html?tab=videos" class="nav-link" onclick="if(typeof switchTab === 'function' && window.location.pathname.includes('index.html')) { event.preventDefault(); switchTab('videos'); }">Videos</a>
       <button class="theme-toggle-btn" aria-label="Toggle dark mode" id="theme-toggle">
@@ -55,7 +60,7 @@
 </header>
 
 
-  <main class="container page-layout">
+  <main class="container page-layout game-page">
     <div class="page-header">
       <h1 class="page-title">Spin The bottle</h1>
     </div>
@@ -214,7 +219,13 @@
 </head>
 <body>
   <center>
-    <div class="bottle-container" onclick="spinBottle()" style="display: inline-block; cursor: pointer; transition: transform 0.2s;">
+    <div class="bottle-selector" style="display: flex; gap: 8px; margin-bottom: 24px; justify-content: center; flex-wrap: wrap;">
+        <button onclick="changeBottleTheme('green')" class="theme-btn active" style="padding: 6px 12px; border: 1px solid var(--border-color); border-radius: 20px; background: rgba(0,0,0,0.03); color: var(--text-secondary); font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">Green Glass</button>
+        <button onclick="changeBottleTheme('gold')" class="theme-btn" style="padding: 6px 12px; border: 1px solid var(--border-color); border-radius: 20px; background: rgba(0,0,0,0.03); color: var(--text-secondary); font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">Champagne</button>
+        <button onclick="changeBottleTheme('neon')" class="theme-btn" style="padding: 6px 12px; border: 1px solid var(--border-color); border-radius: 20px; background: rgba(0,0,0,0.03); color: var(--text-secondary); font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">Neon Cyber</button>
+        <button onclick="changeBottleTheme('ruby')" class="theme-btn" style="padding: 6px 12px; border: 1px solid var(--border-color); border-radius: 20px; background: rgba(0,0,0,0.03); color: var(--text-secondary); font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">Ruby Decanter</button>
+    </div>
+    <div class="bottle-container" onclick="spinBottle()" style="display: inline-block; cursor: pointer; transition: transform 0.2s; margin-top: 10px;">
         <div class="bottle" id="bottle" style="transition: transform 2.5s cubic-bezier(0.25, 0.1, 0.25, 1);">
             <svg class="bottle-svg" viewBox="0 0 100 240" style="width: 100px; height: 240px; filter: drop-shadow(0 8px 16px rgba(0,0,0,0.3));">
                 <defs>
@@ -235,17 +246,53 @@
                         <stop offset="50%" stop-color="#fff" />
                         <stop offset="100%" stop-color="#aa7c11" />
                     </linearGradient>
+                    <linearGradient id="goldGlass" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#b7950b" />
+                        <stop offset="25%" stop-color="#f1c40f" />
+                        <stop offset="50%" stop-color="#f9e79f" />
+                        <stop offset="75%" stop-color="#d4ac0d" />
+                        <stop offset="100%" stop-color="#9a7d0a" />
+                    </linearGradient>
+                    <linearGradient id="goldCap" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#fff" />
+                        <stop offset="50%" stop-color="#e5e7eb" />
+                        <stop offset="100%" stop-color="#9ca3af" />
+                    </linearGradient>
+                    <linearGradient id="neonGlass" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#4a0e4e" />
+                        <stop offset="25%" stop-color="#9c27b0" />
+                        <stop offset="50%" stop-color="#e040fb" />
+                        <stop offset="75%" stop-color="#7b1fa2" />
+                        <stop offset="100%" stop-color="#4a0e4e" />
+                    </linearGradient>
+                    <linearGradient id="neonCap" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#00ffff" />
+                        <stop offset="50%" stop-color="#fff" />
+                        <stop offset="100%" stop-color="#008080" />
+                    </linearGradient>
+                    <linearGradient id="rubyGlass" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#78281f" />
+                        <stop offset="25%" stop-color="#c0392b" />
+                        <stop offset="50%" stop-color="#f1948a" />
+                        <stop offset="75%" stop-color="#922b21" />
+                        <stop offset="100%" stop-color="#641e16" />
+                    </linearGradient>
+                    <linearGradient id="rubyCap" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#d4af37" />
+                        <stop offset="50%" stop-color="#fff" />
+                        <stop offset="100%" stop-color="#aa7c11" />
+                    </linearGradient>
                 </defs>
-                <rect x="42" y="10" width="16" height="15" rx="3" fill="url(#capGrad)" />
-                <path d="M44 25 L44 80 Q40 100 25 110 L25 210 Q25 230 40 230 L60 230 Q75 230 75 210 L75 110 Q60 100 56 80 L56 25 Z" fill="url(#glassGrad)" />
+                <rect id="bottle-cap-rect" x="42" y="10" width="16" height="15" rx="3" fill="url(#capGrad)" />
+                <path id="bottle-body-path" d="M44 25 L44 80 Q40 100 25 110 L25 210 Q25 230 40 230 L60 230 Q75 230 75 210 L75 110 Q60 100 56 80 L56 25 Z" fill="url(#glassGrad)" />
                 <path d="M30 115 Q40 105 50 105" stroke="rgba(255, 255, 255, 0.4)" stroke-width="4" fill="none" stroke-linecap="round" />
                 <path d="M30 125 L30 200" stroke="rgba(255, 255, 255, 0.3)" stroke-width="3" fill="none" stroke-linecap="round" />
                 <rect x="29" y="130" width="42" height="50" rx="4" fill="url(#labelGrad)" />
-                <text x="50" y="160" font-family="'Outfit', sans-serif" font-size="9" font-weight="bold" fill="#333" text-anchor="middle">puruworld</text>
+                <text id="bottle-label-text" x="50" y="160" font-family="'Outfit', sans-serif" font-size="9" font-weight="bold" fill="#333" text-anchor="middle">puruworld</text>
             </svg>
         </div>
     </div>
-    <div style="margin-top: 20px;">
+    <div style="margin-top: 15px;">
         <button class="spin-button" onclick="spinBottle()">
             <span class="material-icons">refresh</span> Spin Bottle
         </button>
@@ -272,6 +319,27 @@
         ];
 
         let currentAngle = 0;
+
+        const bottleThemes = {
+            green: { cap: 'url(#capGrad)', body: 'url(#glassGrad)', text: 'puruworld' },
+            gold: { cap: 'url(#goldCap)', body: 'url(#goldGlass)', text: 'CELEBRATE' },
+            neon: { cap: 'url(#neonCap)', body: 'url(#neonGlass)', text: 'CYBER' },
+            ruby: { cap: 'url(#rubyCap)', body: 'url(#rubyGlass)', text: 'ROYAL' }
+        };
+        window.changeBottleTheme = function(theme) {
+            const data = bottleThemes[theme];
+            document.getElementById('bottle-cap-rect').setAttribute('fill', data.cap);
+            document.getElementById('bottle-body-path').setAttribute('fill', data.body);
+            document.getElementById('bottle-label-text').textContent = data.text;
+            
+            const container = document.querySelector('.bottle-selector');
+            if (container) {
+                container.querySelectorAll('.theme-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+            }
+            event.currentTarget.classList.add('active');
+        };
 
         function spinBottle() {
             const bottle = document.getElementById('bottle');

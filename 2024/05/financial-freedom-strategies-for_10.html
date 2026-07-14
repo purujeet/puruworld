@@ -6,6 +6,9 @@
   <meta name="description" content="In today's fast-paced world, financial stability and freedom have become a top priority for many individuals. Whether you are just starting out in you...">
   <title>Financial Freedom: Strategies for Securing Your Financial Future - puru world official</title>
   
+  <!-- data-URI SVG favicon as 'P' -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 font-family=%22sans-serif%22 font-weight=%22bold%22 fill=%22%238b5cf6%22>P</text></svg>">
+
   <!-- Google AdSense Verification Tag -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
 
@@ -25,24 +28,26 @@
 </head>
 
 <body>
-  <header>
-  <div class="container header-content">
-    <div class="logo">
-      <a href="../../index.html" style="background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 8px; font-weight: 800; text-decoration: none; font-family: 'Outfit', sans-serif; font-size: 1.4rem; letter-spacing: -0.5px;">
-        <svg style="width: 26px; height: 26px; fill: url(#accentGradientDetail); flex-shrink: 0;" viewBox="0 0 24 24">
-          <defs>
-            <linearGradient id="accentGradientDetail" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#8b5cf6" />
-              <stop offset="100%" stop-color="#6366f1" />
-            </linearGradient>
-          </defs>
-          <!-- Globe / World Icon -->
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.53c-.26-.81-1-1.4-1.9-1.4h-1v-3c0-.55-.45-1-1-1h-6v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.4z"/>
-        </svg>
-        puruworld
-      </a>
+  <header class="header-Detail">
+  <div class="container header-content" style="display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 20px;">
+    <div class="logo-search-wrapper" style="display: flex; align-items: center; gap: 20px; flex-grow: 1; max-width: 600px;">
+      <div class="logo">
+        <a href="../../index.html" style="background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; font-weight: 800; text-decoration: none; font-family: 'Outfit', sans-serif; font-size: 1.4rem; letter-spacing: -0.5px;">
+          puruworld
+        </a>
+      </div>
+      
+      <!-- Top Line Search Box -->
+      <div class="header-search-box-wrapper" id="header-search-container" style="position: relative; flex-grow: 1; display: none;">
+        <span class="search-icon" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; display: flex; align-items: center;">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width: 16px; height: 16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </span>
+        <input type="text" id="search-box" class="search-box" placeholder="Search articles & videos..." style="width: 100%; padding: 8px 36px 8px 36px; border: 1px solid var(--border-color); border-radius: 20px; background-color: var(--bg-secondary); color: var(--text-primary); font-size: 0.88rem; outline: none; transition: all 0.2s;">
+        <span class="clear-icon" id="clear-search-icon" onclick="resetFilters()" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); cursor: pointer; display: none; font-size: 16px; font-weight: bold;">&times;</span>
+      </div>
     </div>
-    <nav class="nav-links">
+    
+    <nav class="nav-links" style="display: flex; align-items: center; gap: 20px; flex-shrink: 0;">
       <a href="../../index.html" class="nav-link" onclick="if(typeof switchTab === 'function' && window.location.pathname.includes('index.html')) { event.preventDefault(); switchTab('blog'); }">Home</a>
       <a href="../../index.html?tab=videos" class="nav-link" onclick="if(typeof switchTab === 'function' && window.location.pathname.includes('index.html')) { event.preventDefault(); switchTab('videos'); }">Videos</a>
       <button class="theme-toggle-btn" aria-label="Toggle dark mode" id="theme-toggle">

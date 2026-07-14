@@ -1533,6 +1533,43 @@ footer p {
 .page-content li {
   margin-bottom: 0.5rem;
 }
+
+/* Compact Scroll-free view for Interactive Tools/Games */
+.game-page.page-layout {
+  padding: 10px 0 30px !important;
+}
+.game-page .page-header {
+  margin-bottom: 12px !important;
+}
+.game-page .page-title {
+  font-size: 1.6rem !important;
+}
+
+/* Top line search display configurations */
+#header-search-container {
+  display: none !important;
+}
+.header-Index #header-search-container {
+  display: block !important;
+}
+
+/* Premium Glowing Borders */
+.post-card, .sidebar-widget, .search-box, .tab-btn, .cell, .mode-btn, .reset-btn, .spin-button {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+.post-card:hover, .sidebar-widget:hover, .search-box:focus, .tab-btn.active, .cell:hover, .mode-btn.active {
+  border-color: #8b5cf6 !important;
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.25) !important;
+}
+[data-theme="dark"] .post-card:hover,
+[data-theme="dark"] .sidebar-widget:hover,
+[data-theme="dark"] .search-box:focus,
+[data-theme="dark"] .tab-btn.active,
+[data-theme="dark"] .cell:hover,
+[data-theme="dark"] .mode-btn.active {
+  box-shadow: 0 0 16px rgba(139, 92, 246, 0.45) !important;
+}
+
 @media (max-width: 768px) {
   .page-title {
     font-size: 2rem;
@@ -2593,6 +2630,161 @@ window.switchTab = switchTab;
 window.selectVideoCategory = selectVideoCategory;
 window.changeVideoPage = changeVideoPage;
 window.renderAppsGrid = renderAppsGrid;
+
+// Floating AI Search Agent Chat Widget
+function initAIAgentWidget() {
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes slideUpWidget {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .widget-glowing-btn:hover {
+      box-shadow: 0 0 20px rgba(139, 92, 246, 0.6) !important;
+      transform: scale(1.05);
+    }
+  `;
+  document.head.appendChild(style);
+
+  const widget = document.createElement('div');
+  widget.id = 'ai-agent-widget';
+  widget.style.cssText = 'position: fixed; bottom: 24px; right: 24px; z-index: 10000; font-family: "Outfit", sans-serif;';
+  
+  widget.innerHTML = `
+    <!-- Floating Circular Button -->
+    <button id="ai-agent-btn" class="widget-glowing-btn" style="width: 56px; height: 56px; border-radius: 50%; background: var(--accent-gradient); border: none; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 16px rgba(139, 92, 246, 0.4); transition: all 0.2s;">
+      <span class="material-icons" style="font-size: 28px;">smart_toy</span>
+    </button>
+    <!-- Chat Window -->
+    <div id="ai-agent-panel" style="display: none; position: absolute; bottom: 70px; right: 0; width: 345px; height: 440px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.2); flex-direction: column; overflow: hidden; animation: slideUpWidget 0.25s cubic-bezier(0.4, 0, 0.2, 1); box-sizing: border-box;">
+      <!-- Header -->
+      <div style="background: var(--accent-gradient); color: white; padding: 16px; display: flex; align-items: center; gap: 10px; font-weight: bold; border-bottom: 1px solid var(--border-color);">
+        <span class="material-icons" style="font-size: 20px;">smart_toy</span>
+        <span>puruworld AI Agent</span>
+        <button id="ai-agent-close" style="background: none; border: none; color: white; margin-left: auto; cursor: pointer; display: flex; align-items: center;">
+          <span class="material-icons" style="font-size: 20px;">close</span>
+        </button>
+      </div>
+      <!-- Chat Area -->
+      <div id="ai-agent-messages" style="flex-grow: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; font-size: 0.88rem; line-height: 1.4; color: var(--text-primary); max-height: 310px;">
+        <div style="background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.15); padding: 10px 12px; border-radius: 12px 12px 12px 0; align-self: flex-start; max-width: 85%;">
+          Hello! I'm your AI Agent. Ask me to find articles, gaming tools, or search any topics on puruworld!
+        </div>
+      </div>
+      <!-- Input Area -->
+      <div style="padding: 12px; border-top: 1px solid var(--border-color); display: flex; gap: 8px; align-items: center; background: var(--bg-secondary);">
+        <input type="text" id="ai-agent-input" placeholder="Search or ask me anything..." style="flex-grow: 1; padding: 8px 14px; border-radius: 20px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); outline: none; font-size: 0.88rem; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);">
+        <button id="ai-agent-send" style="background: var(--accent-gradient); border: none; color: white; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;">
+          <span class="material-icons" style="font-size: 18px;">send</span>
+        </button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(widget);
+
+  const btn = widget.querySelector('#ai-agent-btn');
+  const panel = widget.querySelector('#ai-agent-panel');
+  const closeBtn = widget.querySelector('#ai-agent-close');
+  const input = widget.querySelector('#ai-agent-input');
+  const sendBtn = widget.querySelector('#ai-agent-send');
+  const messagesContainer = widget.querySelector('#ai-agent-messages');
+
+  btn.onclick = () => {
+    const isHidden = panel.style.display === 'none';
+    panel.style.display = isHidden ? 'flex' : 'none';
+    if (isHidden) input.focus();
+  };
+
+  closeBtn.onclick = () => {
+    panel.style.display = 'none';
+  };
+
+  const addMessage = (text, isUser = false) => {
+    const msg = document.createElement('div');
+    if (isUser) {
+      msg.style.cssText = 'background: var(--accent-gradient); color: white; padding: 10px 12px; border-radius: 12px 12px 0 12px; align-self: flex-end; max-width: 85%; word-break: break-word;';
+    } else {
+      msg.style.cssText = 'background: rgba(139, 92, 246, 0.08); border: 1px solid var(--border-color); padding: 10px 12px; border-radius: 12px 12px 12px 0; align-self: flex-start; max-width: 85%; word-break: break-word;';
+    }
+    msg.innerHTML = text;
+    messagesContainer.appendChild(msg);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  };
+
+  const handleSearch = (query) => {
+    addMessage(query, true);
+    input.value = '';
+    
+    setTimeout(() => {
+      const q = query.toLowerCase().trim();
+      const queryWords = q.split(/\s+/).filter(w => w.length > 1);
+      if (queryWords.length === 0 && q.length > 0) queryWords.push(q);
+
+      let matchedPosts = [];
+      if (window.postsData) {
+        matchedPosts = window.postsData.map(post => {
+          let score = 0;
+          const titleLower = post.title.toLowerCase();
+          const excerptLower = post.excerpt ? post.excerpt.toLowerCase() : '';
+          
+          if (titleLower.includes(q)) score += 10;
+          queryWords.forEach(word => {
+            if (titleLower.includes(word)) score += 5;
+            if (excerptLower.includes(word)) score += 2;
+          });
+          return { post, score };
+        }).filter(item => item.score > 0).sort((a,b) => b.score - a.score).slice(0, 3);
+      }
+
+      let matchedVideos = [];
+      if (window.videosData) {
+        matchedVideos = window.videosData.map(video => {
+          let score = 0;
+          const titleLower = video.title.toLowerCase();
+          if (titleLower.includes(q)) score += 10;
+          queryWords.forEach(word => {
+            if (titleLower.includes(word)) score += 5;
+          });
+          return { video, score };
+        }).filter(item => item.score > 0).sort((a,b) => b.score - a.score).slice(0, 3);
+      }
+
+      let replyHtml = "";
+      if (matchedPosts.length === 0 && matchedVideos.length === 0) {
+        replyHtml = "I searched puruworld but couldn't find matches for '" + query + "'. Try asking about 'python', 'salesforce', 'games', or 'tax'!";
+      } else {
+        replyHtml = "I found these relevant resources for you:<ul style='margin: 8px 0 0 16px; padding: 0;'>";
+        matchedPosts.forEach(item => {
+          const prefix = window.location.pathname.includes('/p/') ? '../' : './';
+          replyHtml += "<li style='margin-bottom: 6px;'><a href='" + prefix + item.post.url.replace(/^\//, '') + "' style='color: #8b5cf6; text-decoration: none; font-weight: 600;'>[Article] " + item.post.title + "</a></li>";
+        });
+        matchedVideos.forEach(item => {
+          const prefix = window.location.pathname.includes('/p/') ? '../' : './';
+          replyHtml += "<li style='margin-bottom: 6px;'><a href='" + prefix + "p/videos.html?search=" + encodeURIComponent(item.video.title) + "' style='color: #6366f1; text-decoration: none; font-weight: 600;'>[Video] " + item.video.title + "</a></li>";
+        });
+        replyHtml += "</ul>";
+      }
+      addMessage(replyHtml);
+    }, 400);
+  };
+
+  sendBtn.onclick = () => {
+    const val = input.value.trim();
+    if (val) handleSearch(val);
+  };
+
+  input.onkeydown = (e) => {
+    if (e.key === 'Enter') {
+      const val = input.value.trim();
+      if (val) handleSearch(val);
+    }
+  };
+}
+
+// Ingest script initialization
+document.addEventListener('DOMContentLoaded', () => {
+  initAIAgentWidget();
+});
 """
 
 def load_template(name):
@@ -2928,6 +3120,9 @@ def main():
     
     if 'flip-coin' in page['filename']:
       content_sanitized = content_sanitized.replace(
+        'body {',
+        'body-old {'
+      ).replace(
         '.coin.flipping {\n            animation: flip 1s ease-in-out;\n        }',
         '/* removed flipping animation class */'
       ).replace(
@@ -2939,6 +3134,46 @@ def main():
       ).replace(
         'transition: transform 1s ease-in-out;',
         'transition: transform 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.15);'
+      ).replace(
+        '''        <div class="coin" id="coin">
+            <div class="heads">Heads</div>
+            <div class="tails">Tails</div>
+        </div>''',
+        '''        <div class="coin" id="coin">
+            <!-- Heads Face (Gold Custom P Brand) -->
+            <div class="heads" style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 50%; display: flex; justify-content: center; align-items: center; background: radial-gradient(circle, #ffe066 0%, #f5b041 70%, #d35400 100%) !important; border: 5px double #f39c12 !important; box-shadow: inset 0 0 20px rgba(0,0,0,0.2), 0 8px 16px rgba(0,0,0,0.3) !important;">
+              <svg viewBox="0 0 100 100" style="width: 80%; height: 80%;">
+                <path d="M50 15 L59 38 L83 38 L64 53 L71 77 L50 62 L29 77 L36 53 L17 38 L41 38 Z" fill="#fff" opacity="0.25" />
+                <text x="50%" y="62%" font-family="\'Outfit\', sans-serif" font-size="36" font-weight="900" fill="#fff" text-anchor="middle" style="text-shadow: 0 2px 4px rgba(0,0,0,0.3); font-style: italic;">P</text>
+                <circle cx="50" cy="50" r="41" stroke="#f39c12" stroke-width="1.5" stroke-dasharray="3,3" fill="none" />
+              </svg>
+            </div>
+            <!-- Tails Face (Silver Custom 1 Value) -->
+            <div class="tails" style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 50%; display: flex; justify-content: center; align-items: center; background: radial-gradient(circle, #e5e8e8 0%, #bdc3c7 70%, #7f8c8d 100%) !important; border: 5px double #95a5a6 !important; box-shadow: inset 0 0 20px rgba(0,0,0,0.2), 0 8px 16px rgba(0,0,0,0.3) !important; transform: rotateX(180deg) !important;">
+              <svg viewBox="0 0 100 100" style="width: 80%; height: 80%;">
+                <path d="M25 50 Q25 75 50 75 Q75 75 75 50" fill="none" stroke="#7f8c8d" stroke-width="3" stroke-linecap="round" opacity="0.3" />
+                <text x="50%" y="58%" font-family="\'Outfit\', sans-serif" font-size="38" font-weight="900" fill="#fff" text-anchor="middle" style="text-shadow: 0 2px 4px rgba(0,0,0,0.3);">1</text>
+                <circle cx="50" cy="50" r="41" stroke="#7f8c8d" stroke-width="1.5" stroke-dasharray="3,3" fill="none" />
+              </svg>
+            </div>
+        </div>'''
+      ).replace(
+        '.flip-button {\n            background: #6200ea;\n            color: white;\n            padding: 0.75rem 1.5rem;\n            border: none;\n            border-radius: 4px;\n            font-size: 1rem;\n            cursor: pointer;\n            display: flex;\n            align-items: center;\n            gap: 0.5rem;\n            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);\n            transition: background 0.3s, transform 0.2s;\n        }',
+        '''.flip-button {
+            background: var(--accent-gradient) !important;
+            color: white !important;
+            padding: 10px 24px !important;
+            border: none !important;
+            border-radius: 8px !important;
+            font-size: 0.95rem !important;
+            font-weight: 600 !important;
+            cursor: pointer !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+            box-shadow: var(--shadow-sm) !important;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }'''
       ).replace(
         '''        function flipCoin() {
             const coin = document.getElementById('coin');
@@ -3086,12 +3321,12 @@ def main():
             background: rgba(255, 255, 255, 0.03) !important;
         }
         #tictactoe-game .cell.x {
-            color: #8b5cf6 !important;
-            text-shadow: 0 0 10px rgba(139, 92, 246, 0.3) !important;
+            color: #ef4444 !important;
+            text-shadow: 0 0 12px rgba(239, 68, 68, 0.45) !important;
         }
         #tictactoe-game .cell.o {
-            color: #6366f1 !important;
-            text-shadow: 0 0 10px rgba(99, 102, 241, 0.3) !important;
+            color: #06b6d4 !important;
+            text-shadow: 0 0 12px rgba(6, 182, 212, 0.45) !important;
         }
         #tictactoe-game .cell.winning-cell {
             background: rgba(34, 197, 94, 0.15) !important;
@@ -3195,7 +3430,13 @@ def main():
     <button class="spin-button" onclick="spinBottle()">
         <span class="material-icons">refresh</span> Spin Again
     </button>''',
-        '''    <div class="bottle-container" onclick="spinBottle()" style="display: inline-block; cursor: pointer; transition: transform 0.2s;">
+        '''    <div class="bottle-selector" style="display: flex; gap: 8px; margin-bottom: 24px; justify-content: center; flex-wrap: wrap;">
+        <button onclick="changeBottleTheme(\'green\')" class="theme-btn active" style="padding: 6px 12px; border: 1px solid var(--border-color); border-radius: 20px; background: rgba(0,0,0,0.03); color: var(--text-secondary); font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">Green Glass</button>
+        <button onclick="changeBottleTheme(\'gold\')" class="theme-btn" style="padding: 6px 12px; border: 1px solid var(--border-color); border-radius: 20px; background: rgba(0,0,0,0.03); color: var(--text-secondary); font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">Champagne</button>
+        <button onclick="changeBottleTheme(\'neon\')" class="theme-btn" style="padding: 6px 12px; border: 1px solid var(--border-color); border-radius: 20px; background: rgba(0,0,0,0.03); color: var(--text-secondary); font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">Neon Cyber</button>
+        <button onclick="changeBottleTheme(\'ruby\')" class="theme-btn" style="padding: 6px 12px; border: 1px solid var(--border-color); border-radius: 20px; background: rgba(0,0,0,0.03); color: var(--text-secondary); font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">Ruby Decanter</button>
+    </div>
+    <div class="bottle-container" onclick="spinBottle()" style="display: inline-block; cursor: pointer; transition: transform 0.2s; margin-top: 10px;">
         <div class="bottle" id="bottle" style="transition: transform 2.5s cubic-bezier(0.25, 0.1, 0.25, 1);">
             <svg class="bottle-svg" viewBox="0 0 100 240" style="width: 100px; height: 240px; filter: drop-shadow(0 8px 16px rgba(0,0,0,0.3));">
                 <defs>
@@ -3216,17 +3457,53 @@ def main():
                         <stop offset="50%" stop-color="#fff" />
                         <stop offset="100%" stop-color="#aa7c11" />
                     </linearGradient>
+                    <linearGradient id="goldGlass" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#b7950b" />
+                        <stop offset="25%" stop-color="#f1c40f" />
+                        <stop offset="50%" stop-color="#f9e79f" />
+                        <stop offset="75%" stop-color="#d4ac0d" />
+                        <stop offset="100%" stop-color="#9a7d0a" />
+                    </linearGradient>
+                    <linearGradient id="goldCap" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#fff" />
+                        <stop offset="50%" stop-color="#e5e7eb" />
+                        <stop offset="100%" stop-color="#9ca3af" />
+                    </linearGradient>
+                    <linearGradient id="neonGlass" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#4a0e4e" />
+                        <stop offset="25%" stop-color="#9c27b0" />
+                        <stop offset="50%" stop-color="#e040fb" />
+                        <stop offset="75%" stop-color="#7b1fa2" />
+                        <stop offset="100%" stop-color="#4a0e4e" />
+                    </linearGradient>
+                    <linearGradient id="neonCap" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#00ffff" />
+                        <stop offset="50%" stop-color="#fff" />
+                        <stop offset="100%" stop-color="#008080" />
+                    </linearGradient>
+                    <linearGradient id="rubyGlass" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#78281f" />
+                        <stop offset="25%" stop-color="#c0392b" />
+                        <stop offset="50%" stop-color="#f1948a" />
+                        <stop offset="75%" stop-color="#922b21" />
+                        <stop offset="100%" stop-color="#641e16" />
+                    </linearGradient>
+                    <linearGradient id="rubyCap" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#d4af37" />
+                        <stop offset="50%" stop-color="#fff" />
+                        <stop offset="100%" stop-color="#aa7c11" />
+                    </linearGradient>
                 </defs>
-                <rect x="42" y="10" width="16" height="15" rx="3" fill="url(#capGrad)" />
-                <path d="M44 25 L44 80 Q40 100 25 110 L25 210 Q25 230 40 230 L60 230 Q75 230 75 210 L75 110 Q60 100 56 80 L56 25 Z" fill="url(#glassGrad)" />
+                <rect id="bottle-cap-rect" x="42" y="10" width="16" height="15" rx="3" fill="url(#capGrad)" />
+                <path id="bottle-body-path" d="M44 25 L44 80 Q40 100 25 110 L25 210 Q25 230 40 230 L60 230 Q75 230 75 210 L75 110 Q60 100 56 80 L56 25 Z" fill="url(#glassGrad)" />
                 <path d="M30 115 Q40 105 50 105" stroke="rgba(255, 255, 255, 0.4)" stroke-width="4" fill="none" stroke-linecap="round" />
                 <path d="M30 125 L30 200" stroke="rgba(255, 255, 255, 0.3)" stroke-width="3" fill="none" stroke-linecap="round" />
                 <rect x="29" y="130" width="42" height="50" rx="4" fill="url(#labelGrad)" />
-                <text x="50" y="160" font-family="\'Outfit\', sans-serif" font-size="9" font-weight="bold" fill="#333" text-anchor="middle">puruworld</text>
+                <text id="bottle-label-text" x="50" y="160" font-family="\'Outfit\', sans-serif" font-size="9" font-weight="bold" fill="#333" text-anchor="middle">puruworld</text>
             </svg>
         </div>
     </div>
-    <div style="margin-top: 20px;">
+    <div style="margin-top: 15px;">
         <button class="spin-button" onclick="spinBottle()">
             <span class="material-icons">refresh</span> Spin Bottle
         </button>
@@ -3249,7 +3526,28 @@ def main():
             bottleMain.style.background = randomColorSet.main.gradient;
             bottleMain.style.borderColor = randomColorSet.main.border;
         }''',
-        '''        function spinBottle() {
+        '''        const bottleThemes = {
+            green: { cap: 'url(#capGrad)', body: 'url(#glassGrad)', text: 'puruworld' },
+            gold: { cap: 'url(#goldCap)', body: 'url(#goldGlass)', text: 'CELEBRATE' },
+            neon: { cap: 'url(#neonCap)', body: 'url(#neonGlass)', text: 'CYBER' },
+            ruby: { cap: 'url(#rubyCap)', body: 'url(#rubyGlass)', text: 'ROYAL' }
+        };
+        window.changeBottleTheme = function(theme) {
+            const data = bottleThemes[theme];
+            document.getElementById('bottle-cap-rect').setAttribute('fill', data.cap);
+            document.getElementById('bottle-body-path').setAttribute('fill', data.body);
+            document.getElementById('bottle-label-text').textContent = data.text;
+            
+            const container = document.querySelector('.bottle-selector');
+            if (container) {
+                container.querySelectorAll('.theme-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+            }
+            event.currentTarget.classList.add('active');
+        };
+
+        function spinBottle() {
             const bottle = document.getElementById('bottle');
             const randomAngle = 1440 + Math.floor(Math.random() * 360);
             currentAngle += randomAngle;
@@ -3338,7 +3636,12 @@ def main():
     head = get_head(f"{page['title']} - puru world official", clean_excerpt(page['content'], 150), page['rel_path'])
     header = get_header(page['rel_path'], has_progress=False, id_val="Page")
     footer = get_footer(page['rel_path'])
-    page_html = page_tmpl.replace('{{HEAD}}', head).replace('{{HEADER}}', header).replace('{{FOOTER}}', footer).replace('{{PAGE_TITLE}}', page['title']).replace('{{PAGE_CONTENT}}', content_sanitized)
+    
+    is_game = any(k in page['filename'] for k in ['flip-coin', 'spin-bottle', 'tic-tac-toe', 'json-formatter'])
+    layout_class = 'container page-layout game-page' if is_game else 'container page-layout'
+    page_tmpl_patched = page_tmpl.replace('class="container page-layout"', f'class="{layout_class}"')
+    
+    page_html = page_tmpl_patched.replace('{{HEAD}}', head).replace('{{HEADER}}', header).replace('{{FOOTER}}', footer).replace('{{PAGE_TITLE}}', page['title']).replace('{{PAGE_CONTENT}}', content_sanitized)
     
     dest_path = os.path.join(output_dir, page['filename'].lstrip('/'))
     os.makedirs(os.path.dirname(dest_path), exist_ok=True)
