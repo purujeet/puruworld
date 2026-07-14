@@ -15563,9 +15563,7 @@ window.postsData = [
     "readTime": 3,
     "coverImage": null,
     "excerpt": "Tax-Saving Strategies for Indian Employees: Maximizing Returns on CTC in 2024 Introduction: For Indian employees, maximizing tax savings while optimizing their...",
-    "tags": [
-      "Tax-Saving Strategies for Indian Employees: Maximizing Returns on CTC in 2024"
-    ]
+    "tags": []
   },
   {
     "title": "Under the Indian Sky: A Guide to Stargazing in the Land of Diversity ",
@@ -15605,9 +15603,7 @@ window.postsData = [
     "readTime": 1,
     "coverImage": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhWVjw9b9LKUxLPlDGtrntsG8W9lHtraYCnyDPX1VEY9L4If3gnI_r_xXNa4fFP6Ik8GrVdr0Bt6pBn3owtlj2arrMoTQhzsjTbpUOvvlq5P1nr3E7DT42YJCq0HGA1y7R6Thgt9rbInwODw0gNwocn1kKPwilDVk-p1vIIggzbBBcqLMRwsO0uGj56Ig/s16000/Screenshot%202024-04-04%20110813.png",
     "excerpt": "Recently, boAt, an Indian consumer electronic brand again made headlines. Known for its wearable devices like earphones and smartwatches, a new advertisement ha...",
-    "tags": [
-      "boAt Faces Backlash Over Controversial Advertisement Comparing EarPods with AirPods"
-    ]
+    "tags": []
   },
   {
     "title": "Samsung Galaxy M55 and Galaxy M15 5G Set to Launch in India on April 8: Key Specs & Availability",
@@ -15617,9 +15613,7 @@ window.postsData = [
     "readTime": 2,
     "coverImage": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgmbF9KfO-A1oZViPVMLcsaKU6yL5xGhOw9i0meuK5cKVs3YvcaVQY5y7OOYzRDhXqjUi7rj1ORrWGrxrZa8hoyUEeOM2U0DnRgOFGGFI5NpyML-ffaZTNEgXt3IQmw-3Zil7FLdB0gCeex1194-3qaX41YftyfmncovaoDSs7Ba798397hphFo92Qe3g/w867-h233/Screenshot%202024-04-04%20105533.png",
     "excerpt": "Samsung Galaxy M55 and Galaxy M15 5G Set to Launch in India on April 8: Key Specs & Availability Samsung is gearing up to introduce the eagerly awaited Samsung...",
-    "tags": [
-      "Samsung Galaxy M55 and Galaxy M15 5G Set to Launch in India on April 8: Key Specs & Availability"
-    ]
+    "tags": []
   },
   {
     "title": "   Mega Charizard X Raid Guide For Pokémon GO: World Of Wonders",
@@ -15629,9 +15623,7 @@ window.postsData = [
     "readTime": 2,
     "coverImage": "https://mlpnk72yciwc.i.optimole.com/cqhiHLc.IIZS~2ef73/w:600/h:300/q:75/https://bleedingcool.com/wp-content/uploads/2024/03/EitJnbZXkAAvp2T-1-copy-118-1.jpg",
     "excerpt": "One of the original Mega Evolved Pokémon, Mega Charizard X, returns to Mega Raids this April in the new Pokémon GO slate. Welcome to the latest season in Pokémo...",
-    "tags": [
-      "Mega Charizard X Raid Guide For Pokémon GO: World Of Wonders"
-    ]
+    "tags": []
   },
   {
     "title": "Apple Services Resume Normal Operations Following Temporary Global Outages",
@@ -15641,9 +15633,7 @@ window.postsData = [
     "readTime": 1,
     "coverImage": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiyWSagdul4qqKjDBNXXqVl_neU3CSz2MkiYU_32ZKrd4qe-JIQ6KyFDEcIu8TD9-lLzMzrLEnQF-WfgJSFgReGFlTVm9WJQEDg8lXtsGXtKEe2H3gm5B_dbeWkiCvI4PJIRjtfYq63XQucy5NnFa4iSrKWzVS23qRAoQ8qkT8kXOGpSRT-aBbj-lYMwg/w519-h225/Screenshot%202024-04-04%20103308.png",
     "excerpt": "After experiencing brief disruptions globally, Apple services have now been restored to full functionality. The tech giant confirmed the resolution of the outag...",
-    "tags": [
-      "Apple Services Resume Normal Operations Following Temporary Global Outages"
-    ]
+    "tags": []
   },
   {
     "title": "Apple Podcasts Connect to be unavailable on April 13 for scheduled maintenance",
@@ -15653,9 +15643,7 @@ window.postsData = [
     "readTime": 1,
     "coverImage": null,
     "excerpt": "On Monday, Apple issued a notice to podcast creators regarding an upcoming maintenance outage on the Apple Podcasts Connect platform. Scheduled for April 13, th...",
-    "tags": [
-      "Apple Podcasts Connect to be unavailable on April 13 for scheduled maintenance"
-    ]
+    "tags": []
   },
   {
     "title": " MIGRATING TO ANDROIDX",
@@ -15676,8 +15664,7 @@ window.postsData = [
     "coverImage": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiSVuFDNtg0NyuoArVnbpyfpAO1omLQsaDkJMOQScMp0Fpo-pBWjYw4QFioB2G2ZXE7wYlX1kzou_R99W0g7PNmxsNGl94ULjHdxgh5R2476JasZ43GKfBOlVfp5CLv-WS6_I5Kk1SpVQ/s640/Screen1.png",
     "excerpt": "The Link in the error seems to be outdated. Try with the below link: https://visualstudio.microsoft.com/visual-cpp-build-tools/ Step 1: It will install file and...",
     "tags": [
-      "python",
-      "Visual studio c++ 14.0 ERROR"
+      "python"
     ]
   },
   {

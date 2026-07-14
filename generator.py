@@ -1492,6 +1492,52 @@ footer p {
     font-size: 0.9rem;
   }
 }
+
+/* Standalone Page Layout */
+.page-layout {
+  padding: 40px 0 80px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+.page-header {
+  margin-bottom: 30px;
+  text-align: center;
+}
+.page-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+.page-content {
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: var(--text-secondary);
+}
+.page-content p {
+  margin-bottom: 1.5rem;
+}
+.page-content h2 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 2.5rem 0 1rem 0;
+  color: var(--text-primary);
+}
+.page-content ul, .page-content ol {
+  margin-bottom: 1.5rem;
+  padding-left: 20px;
+}
+.page-content li {
+  margin-bottom: 0.5rem;
+}
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 2rem;
+  }
+}
 """
 
 # --- SHARED JAVASCRIPT ---
@@ -2433,15 +2479,15 @@ def get_header(rel_path, has_progress=False, id_val="Index"):
                     .replace('{{SCROLL_PROGRESS}}', progress_bar)\
                     .replace('{{ID}}', id_val)
 
-def get_footer():
-  return load_template('footer.html')
+def get_footer(rel_path):
+  return load_template('footer.html').replace('{{REL_PATH}}', rel_path)
 
 def make_post_html(post_title, post_date, post_tags, post_content, read_time, cover_image, rel_path, related_posts_html):
   post_tmpl = load_template('post.html')
   
   head = get_head(f"{post_title} - puru world official", clean_excerpt(post_content, 150), rel_path)
   header = get_header(rel_path, has_progress=True, id_val="Detail")
-  footer = get_footer()
+  footer = get_footer(rel_path)
   
   header_tags_html = "".join([f'<span class="filter-tag" style="cursor:default">{t}</span>' for t in post_tags])
   cover_image_html = f'<img class="post-hero-image" src="{cover_image}" alt="{post_title}" loading="eager" decoding="async">' if cover_image else ''
@@ -2578,7 +2624,9 @@ def main():
     for cat in cats:
       term = cat.get('term')
       if term and not term.startswith('http://') and not term.startswith('https://') and term != 'http://schemas.google.com/blogger/2008/kind#post' and term != 'http://schemas.google.com/blogger/2008/kind#page':
-        tags.append(term)
+        term_clean = term.strip()
+        if len(term_clean) <= 30 and len(term_clean.split()) <= 4 and term_clean.lower() != title.strip().lower():
+          tags.append(term_clean)
         
     if etype_text == 'POST':
       if not filename:
@@ -2659,7 +2707,7 @@ def main():
   index_tmpl = load_template('index.html')
   head = get_head("puru world official", "puru world official - A blog on everyday need daily. Exploring technology, lifeskills, travel, and more.", "./", '<script src="./posts-metadata.js"></script><script src="./videos-metadata.js"></script>')
   header = get_header("./", has_progress=False, id_val="Index")
-  footer = get_footer()
+  footer = get_footer("./")
   index_html = index_tmpl.replace('{{HEAD}}', head).replace('{{HEADER}}', header).replace('{{FOOTER}}', footer)
   
   with open(os.path.join(output_dir, 'index.html'), 'w', encoding='utf-8') as f:
@@ -2679,7 +2727,7 @@ def main():
   videos_tmpl = load_template('videos.html')
   head = get_head("Videos - puru world official", "Watch my latest video updates, gaming livestreams, and tutorials from Puru World.", "../", '<script src="../videos-metadata.js"></script>')
   header = get_header("../", has_progress=False, id_val="Videos")
-  footer = get_footer()
+  footer = get_footer("../")
   videos_html = videos_tmpl.replace('{{HEAD}}', head).replace('{{HEADER}}', header).replace('{{FOOTER}}', footer)
   
   videos_page_dir = os.path.join(output_dir, 'p')
@@ -2706,7 +2754,7 @@ def main():
     tmpl = load_template(filename)
     head = get_head(title, desc, "../")
     header = get_header("../", has_progress=False, id_val="Legal")
-    footer = get_footer()
+    footer = get_footer("../")
     html = tmpl.replace('{{HEAD}}', head).replace('{{HEADER}}', header).replace('{{FOOTER}}', footer)
     
     with open(os.path.join(videos_page_dir, filename), 'w', encoding='utf-8') as f:
@@ -2799,7 +2847,7 @@ def main():
     page_tmpl = load_template('page.html')
     head = get_head(f"{page['title']} - puru world official", clean_excerpt(page['content'], 150), page['rel_path'])
     header = get_header(page['rel_path'], has_progress=False, id_val="Page")
-    footer = get_footer()
+    footer = get_footer(page['rel_path'])
     page_html = page_tmpl.replace('{{HEAD}}', head).replace('{{HEADER}}', header).replace('{{FOOTER}}', footer).replace('{{PAGE_TITLE}}', page['title']).replace('{{PAGE_CONTENT}}', content_sanitized)
     
     dest_path = os.path.join(output_dir, page['filename'].lstrip('/'))

@@ -1221,3 +1221,49 @@ footer p {
     font-size: 0.9rem;
   }
 }
+
+/* Standalone Page Layout */
+.page-layout {
+  padding: 40px 0 80px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+.page-header {
+  margin-bottom: 30px;
+  text-align: center;
+}
+.page-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+.page-content {
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: var(--text-secondary);
+}
+.page-content p {
+  margin-bottom: 1.5rem;
+}
+.page-content h2 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 2.5rem 0 1rem 0;
+  color: var(--text-primary);
+}
+.page-content ul, .page-content ol {
+  margin-bottom: 1.5rem;
+  padding-left: 20px;
+}
+.page-content li {
+  margin-bottom: 0.5rem;
+}
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 2rem;
+  }
+}

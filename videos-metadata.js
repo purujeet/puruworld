@@ -2,240 +2,240 @@ window.videosData = [
   {
     "id": "GK-jACRaAjs",
     "title": "Fighting the Great sage wukong final boss. Will I get good ending??? 🤔",
-    "views": "18 views",
-    "timeAgo": "10 months ago",
+    "views": "19",
+    "timeAgo": "10 mo ago",
     "thumbnail": "https://i.ytimg.com/vi/GK-jACRaAjs/hqdefault.jpg",
     "category": "Gaming"
   },
   {
     "id": "Brb6x99ex0w",
     "title": "do din pehle ke match ka video",
-    "views": "25 views",
-    "timeAgo": "2 years ago",
+    "views": "25",
+    "timeAgo": "2 yr ago",
     "thumbnail": "https://i.ytimg.com/vi/Brb6x99ex0w/hqdefault.jpg",
     "category": "Gaming"
   },
   {
     "id": "vbbIa7Ybn44",
     "title": "🔥 Mythpat's 1v5 clutch || Moye Moye Version || COD || Ranked Match🔴",
-    "views": "128 views",
-    "timeAgo": "2 years ago",
+    "views": "128",
+    "timeAgo": "2 yr ago",
     "thumbnail": "https://i.ytimg.com/vi/vbbIa7Ybn44/hqdefault.jpg",
     "category": "Gaming"
   },
   {
     "id": "x_Ov3lFdhB4",
     "title": "🔥 Call of Duty Mobile| SnD | The Great Comeback from 1 5 to 6 5 🔴",
-    "views": "67 views",
-    "timeAgo": "2 years ago",
+    "views": "67",
+    "timeAgo": "2 yr ago",
     "thumbnail": "https://i.ytimg.com/vi/x_Ov3lFdhB4/hqdefault.jpg",
     "category": "Others"
   },
   {
     "id": "nR2BVr7fKbw",
     "title": "ACE | RUBICS ON FIRE 🔥🔥🔥",
-    "views": "67 views",
-    "timeAgo": "2 years ago",
+    "views": "67",
+    "timeAgo": "2 yr ago",
     "thumbnail": "https://i.ytimg.com/vi/nR2BVr7fKbw/hqdefault.jpg",
     "category": "Others"
   },
   {
     "id": "-5Mxj3TJT3M",
     "title": "🔥COD Mobile | Ace in 60 Seconds | Tukke OP :-P 🔴",
-    "views": "107 views",
-    "timeAgo": "2 years ago",
+    "views": "107",
+    "timeAgo": "2 yr ago",
     "thumbnail": "https://i.ytimg.com/vi/-5Mxj3TJT3M/hqdefault.jpg",
     "category": "Gaming"
   },
   {
     "id": "lv0gLGIR45Q",
     "title": "Salesforce 2: Add fields into the Page Layout",
-    "views": "121 views",
-    "timeAgo": "4 years ago",
+    "views": "121",
+    "timeAgo": "4 yr ago",
     "thumbnail": "https://i.ytimg.com/vi/lv0gLGIR45Q/hqdefault.jpg",
     "category": "Others"
   },
   {
     "id": "45YWrGXx44Y",
     "title": "Salesforce: 1. How to create Custom Object and Custom Field",
-    "views": "17 views",
-    "timeAgo": "4 years ago",
+    "views": "17",
+    "timeAgo": "4 yr ago",
     "thumbnail": "https://i.ytimg.com/vi/45YWrGXx44Y/hqdefault.jpg",
     "category": "Others"
   },
   {
     "id": "f1xhlhnvYSg",
     "title": "Milestones achieved",
-    "views": "31 views",
-    "timeAgo": "5 years ago",
+    "views": "31",
+    "timeAgo": "5 yr ago",
     "thumbnail": "https://i.ytimg.com/vi/f1xhlhnvYSg/hqdefault.jpg",
     "category": "Others"
   },
   {
     "id": "xbpq-wrPD3U",
     "title": "Migration to AndroidX || Update old Android Applications",
-    "views": "178 views",
-    "timeAgo": "5 years ago",
+    "views": "178",
+    "timeAgo": "5 yr ago",
     "thumbnail": "https://i.ytimg.com/vi/xbpq-wrPD3U/hqdefault.jpg",
     "category": "Others"
   },
   {
     "id": "xDALRpHinS4",
     "title": "Python for beginners in Hindi || Python Seekho",
-    "views": "15k views",
-    "timeAgo": "5 years ago",
+    "views": "15k",
+    "timeAgo": "5 yr ago",
     "thumbnail": "https://i.ytimg.com/vi/xDALRpHinS4/hqdefault.jpg",
     "category": "Coding & Tech"
   },
   {
     "id": "jLG2g5CE82s",
     "title": "DIY wallpaper (how to use)",
-    "views": "22 views",
-    "timeAgo": "5 years ago",
+    "views": "22",
+    "timeAgo": "5 yr ago",
     "thumbnail": "https://i.ytimg.com/vi/jLG2g5CE82s/hqdefault.jpg",
     "category": "Others"
   },
   {
     "id": "Zutpvox5ygI",
     "title": "AI Series || Lecture 2 || Sentiment Analysis",
-    "views": "8k views",
-    "timeAgo": "5 years ago",
+    "views": "8k",
+    "timeAgo": "5 yr ago",
     "thumbnail": "https://i.ytimg.com/vi/Zutpvox5ygI/hqdefault.jpg",
     "category": "Others"
   },
   {
     "id": "1ukcs2ux7J4",
     "title": "AI Series || Lecture 1 || Language Translator",
-    "views": "308 views",
-    "timeAgo": "6 years ago",
+    "views": "308",
+    "timeAgo": "6 yr ago",
     "thumbnail": "https://i.ytimg.com/vi/1ukcs2ux7J4/hqdefault.jpg",
     "category": "Others"
   },
   {
     "id": "ZqV1AxvTDCM",
     "title": "Grad gram app tutorial in hindi",
-    "views": "211 views",
-    "timeAgo": "8 years ago",
+    "views": "211",
+    "timeAgo": "8 yr ago",
     "thumbnail": "https://i.ytimg.com/vi/ZqV1AxvTDCM/hqdefault.jpg",
     "category": "Coding & Tech"
   },
   {
     "id": "DoPelLMWwyY",
     "title": "GRAD GRAM APP TUTORIAL ENGLISH",
-    "views": "376 views",
-    "timeAgo": "8 years ago",
+    "views": "376",
+    "timeAgo": "8 yr ago",
     "thumbnail": "https://i.ytimg.com/vi/DoPelLMWwyY/hqdefault.jpg",
     "category": "Coding & Tech"
   },
   {
     "id": "rgcYk41XHWI",
     "title": "Google I O 2018 keynote in 14 minutes",
-    "views": "230 views",
-    "timeAgo": "8 years ago",
+    "views": "230",
+    "timeAgo": "8 yr ago",
     "thumbnail": "https://i.ytimg.com/vi/rgcYk41XHWI/hqdefault.jpg",
     "category": "Others"
   },
   {
     "id": "LE3gy1-VNWc",
     "title": "Microsoft build 2018 keynotes",
-    "views": "188 views",
-    "timeAgo": "8 years ago",
+    "views": "188",
+    "timeAgo": "8 yr ago",
     "thumbnail": "https://i.ytimg.com/vi/LE3gy1-VNWc/hqdefault.jpg",
     "category": "Others"
   },
   {
     "id": "h7iplPyOXIg",
     "title": "How to see deleted whatsapp messages on the phone",
-    "views": "257 views",
-    "timeAgo": "8 years ago",
+    "views": "257",
+    "timeAgo": "8 yr ago",
     "thumbnail": "https://i.ytimg.com/vi/h7iplPyOXIg/hqdefault.jpg",
     "category": "Others"
   },
   {
     "id": "_FDFo_5bqbE",
     "title": "Free software and hardware promotions",
-    "views": "286 views",
-    "timeAgo": "8 years ago",
+    "views": "286",
+    "timeAgo": "8 yr ago",
     "thumbnail": "https://i.ytimg.com/vi/_FDFo_5bqbE/hqdefault.jpg",
     "category": "Others"
   },
   {
     "id": "iLsi2sFeWOA",
     "title": "[2018] Top 5 smartphones under 10,000/-",
-    "views": "158 views",
-    "timeAgo": "8 years ago",
+    "views": "158",
+    "timeAgo": "8 yr ago",
     "thumbnail": "https://i.ytimg.com/vi/iLsi2sFeWOA/hqdefault.jpg",
     "category": "Others"
   },
   {
     "id": "qU7y7YdYV-g",
     "title": "Using cardview in your app for list",
-    "views": "166 views",
-    "timeAgo": "8 years ago",
+    "views": "166",
+    "timeAgo": "8 yr ago",
     "thumbnail": "https://i.ytimg.com/vi/qU7y7YdYV-g/hqdefault.jpg",
     "category": "Others"
   },
   {
     "id": "uFZtVer4Uiw",
     "title": "Using custom font for your app in android studio",
-    "views": "149 views",
-    "timeAgo": "8 years ago",
+    "views": "149",
+    "timeAgo": "8 yr ago",
     "thumbnail": "https://i.ytimg.com/vi/uFZtVer4Uiw/hqdefault.jpg",
     "category": "Others"
   },
   {
     "id": "QsFqjyPieCQ",
     "title": "Part 3 || Gaming in python || pygame",
-    "views": "144 views",
-    "timeAgo": "8 years ago",
+    "views": "144",
+    "timeAgo": "8 yr ago",
     "thumbnail": "https://i.ytimg.com/vi/QsFqjyPieCQ/hqdefault.jpg",
     "category": "Gaming"
   },
   {
     "id": "lIMynsXHf_o",
     "title": "Part 2 : Making a game in python || pygame",
-    "views": "218 views",
-    "timeAgo": "8 years ago",
+    "views": "218",
+    "timeAgo": "8 yr ago",
     "thumbnail": "https://i.ytimg.com/vi/lIMynsXHf_o/hqdefault.jpg",
     "category": "Coding & Tech"
   },
   {
     "id": "l2qDdQnhAkM",
     "title": "Installing the Module in python | pygame | making a gaming screen",
-    "views": "291 views",
-    "timeAgo": "8 years ago",
+    "views": "291",
+    "timeAgo": "8 yr ago",
     "thumbnail": "https://i.ytimg.com/vi/l2qDdQnhAkM/hqdefault.jpg",
     "category": "Gaming"
   },
   {
     "id": "NM7j-dxve-8",
     "title": "Redmi Note 5 pro | features | pros | cons",
-    "views": "141 views",
-    "timeAgo": "8 years ago",
+    "views": "141",
+    "timeAgo": "8 yr ago",
     "thumbnail": "https://i.ytimg.com/vi/NM7j-dxve-8/hqdefault.jpg",
     "category": "Others"
   },
   {
     "id": "MBRWH2Q4V7U",
     "title": "how to recover deleted history on google",
-    "views": "332 views",
-    "timeAgo": "8 years ago",
+    "views": "332",
+    "timeAgo": "8 yr ago",
     "thumbnail": "https://i.ytimg.com/vi/MBRWH2Q4V7U/hqdefault.jpg",
     "category": "Others"
   },
   {
     "id": "nBBJEUgFoL8",
     "title": "Running turboC++ in windows 10",
-    "views": "106 views",
-    "timeAgo": "8 years ago",
+    "views": "106",
+    "timeAgo": "8 yr ago",
     "thumbnail": "https://i.ytimg.com/vi/nBBJEUgFoL8/hqdefault.jpg",
     "category": "Coding & Tech"
   },
   {
     "id": "FHS8d7d7pSw",
     "title": "Android |  Making celebration effect in your app",
-    "views": "256 views",
-    "timeAgo": "8 years ago",
+    "views": "256",
+    "timeAgo": "8 yr ago",
     "thumbnail": "https://i.ytimg.com/vi/FHS8d7d7pSw/hqdefault.jpg",
     "category": "Others"
   },
