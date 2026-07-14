@@ -110,7 +110,7 @@ def sanitize_blogger_html(content):
             return img_tag[:-1] + attr_str + '>'
         return img_tag
 
-    content = re.sub(r'<img\s+[^>]+>', clean_standalone_img, content, flags=re.IGNORECASE)
+    content = re.sub(r'<img\s+[^+]+>', clean_standalone_img, content, flags=re.IGNORECASE)
     return content
 
 def classify_video(title):
@@ -664,33 +664,96 @@ header .header-content {
   background-color: rgba(234, 179, 8, 0.25);
 }
 
-/* Tag Filters */
-.tags-wrapper {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
+/* Sidebar Navigation Panels */
+.blog-page-layout, .videos-page-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+  margin-top: 20px;
 }
-.filter-tag {
+
+@media (min-width: 992px) {
+  .blog-page-layout, .videos-page-layout {
+    grid-template-columns: 250px 1fr;
+  }
+}
+
+.blog-sidebar, .videos-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: sticky;
+  top: calc(var(--header-height) + 20px);
+  height: fit-content;
+}
+
+.filter-tag, .video-category-btn {
   background-color: var(--bg-secondary);
   border: 1px solid var(--border-color);
   color: var(--text-secondary);
-  padding: 7px 16px;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: 500;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+  width: 100%;
+  text-align: left;
 }
-.filter-tag:hover {
+
+.filter-tag svg, .video-category-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+.filter-tag:hover, .video-category-btn:hover {
   border-color: var(--accent-color);
   color: var(--accent-color);
 }
-.filter-tag.active {
+
+.filter-tag.active, .video-category-btn.active {
   background: var(--accent-gradient);
   border-color: transparent;
   color: white;
-  box-shadow: 0 4px 10px rgba(99, 102, 241, 0.25);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+}
+
+.filter-tag .tag-count, .video-category-btn .category-count {
+  font-size: 0.75rem;
+  background-color: var(--border-color);
+  color: var(--text-muted);
+  padding: 2px 8px;
+  border-radius: 20px;
+  transition: all 0.2s;
+}
+
+.filter-tag.active .tag-count, .video-category-btn.active .category-count {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+@media (max-width: 991px) {
+  .blog-sidebar, .videos-sidebar {
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    position: static;
+    scrollbar-width: none;
+  }
+  .blog-sidebar::-webkit-scrollbar, .videos-sidebar::-webkit-scrollbar {
+    display: none;
+  }
+  .filter-tag, .video-category-btn {
+    flex-shrink: 0;
+    width: auto;
+  }
 }
 
 /* Featured Post Layout */
@@ -939,96 +1002,30 @@ header .header-content {
   transform: translate(-50%, -50%) scale(1.1);
 }
 
-/* Videos Page Layout (Left sidebar navigation & right grid) */
-.videos-page-layout {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 30px;
-  margin-top: 20px;
-}
-
-@media (min-width: 992px) {
-  .videos-page-layout {
-    grid-template-columns: 240px 1fr;
-  }
-}
-
-.videos-sidebar {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  position: sticky;
-  top: calc(var(--header-height) + 20px);
-  height: fit-content;
-}
-
-.video-category-btn {
-  background-color: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  color: var(--text-secondary);
-  padding: 12px 16px;
-  border-radius: 10px;
-  font-family: 'Outfit', sans-serif;
-  font-weight: 600;
-  font-size: 0.95rem;
-  cursor: pointer;
-  display: flex;
+/* Video Subscribe Shortcut */
+.video-subscribe-btn {
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  transition: all 0.2s ease;
-  box-shadow: var(--shadow-sm);
-  width: 100%;
-  text-align: left;
+  gap: 4px;
+  background-color: #ef4444;
+  color: white !important;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-size: 0.8rem;
+  padding: 6px 12px;
+  border-radius: 6px;
+  text-decoration: none !important;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.2);
+  margin-top: 10px;
+  width: fit-content;
 }
-
-.video-category-btn svg {
-  width: 18px;
-  height: 18px;
-  fill: currentColor;
+.video-subscribe-btn:hover {
+  background-color: #dc2626;
+  transform: translateY(-1px);
 }
-
-.video-category-btn:hover {
-  border-color: var(--accent-color);
-  color: var(--accent-color);
-}
-
-.video-category-btn.active {
-  background: var(--accent-gradient);
-  border-color: transparent;
-  color: white;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
-}
-
-.video-category-btn .category-count {
-  font-size: 0.75rem;
-  background-color: var(--border-color);
-  color: var(--text-muted);
-  padding: 2px 8px;
-  border-radius: 20px;
-  transition: all 0.2s;
-}
-
-.video-category-btn.active .category-count {
-  background-color: rgba(255, 255, 255, 0.2);
-  color: white;
-}
-
-@media (max-width: 991px) {
-  .videos-sidebar {
-    flex-direction: row;
-    overflow-x: auto;
-    padding-bottom: 10px;
-    position: static;
-    scrollbar-width: none;
-  }
-  .videos-sidebar::-webkit-scrollbar {
-    display: none;
-  }
-  .video-category-btn {
-    flex-shrink: 0;
-    width: auto;
-  }
+.video-subscribe-btn:active {
+  transform: translateY(0);
 }
 
 /* Pagination */
@@ -1384,6 +1381,7 @@ header .header-content {
   backdrop-filter: blur(8px);
   z-index: 1000;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   opacity: 0;
@@ -1395,7 +1393,7 @@ header .header-content {
 }
 .lightbox-img {
   max-width: 90%;
-  max-height: 90%;
+  max-height: 80%;
   border-radius: 12px;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   transform: scale(0.95);
@@ -1611,11 +1609,10 @@ function switchTab(tab) {
   
   const tabBlog = document.getElementById('tab-blog');
   const tabVideos = document.getElementById('tab-videos');
-  const postsGrid = document.getElementById('posts-grid');
+  const blogPageLayout = document.getElementById('blog-page-layout');
   const videosPageLayout = document.getElementById('videos-page-layout');
   const pagination = document.getElementById('pagination');
   const videosPagination = document.getElementById('videos-pagination');
-  const tagsWrapper = document.getElementById('tags-wrapper');
   const searchBox = document.getElementById('search-box');
   
   if (!tabBlog || !tabVideos) return;
@@ -1623,11 +1620,10 @@ function switchTab(tab) {
   if (tab === 'blog') {
     tabBlog.classList.add('active');
     tabVideos.classList.remove('active');
-    if (postsGrid) postsGrid.style.display = 'grid';
+    if (blogPageLayout) blogPageLayout.style.display = 'grid';
     if (videosPageLayout) videosPageLayout.style.display = 'none';
     if (pagination) pagination.style.display = 'flex';
     if (videosPagination) videosPagination.style.display = 'none';
-    if (tagsWrapper) tagsWrapper.style.display = 'flex';
     if (searchBox) {
       searchBox.placeholder = 'Search across 1,500+ blog articles...';
       searchBox.value = searchQuery;
@@ -1636,11 +1632,10 @@ function switchTab(tab) {
   } else {
     tabBlog.classList.remove('active');
     tabVideos.classList.add('active');
-    if (postsGrid) postsGrid.style.display = 'none';
+    if (blogPageLayout) blogPageLayout.style.display = 'none';
     if (videosPageLayout) videosPageLayout.style.display = 'grid';
     if (pagination) pagination.style.display = 'none';
     if (videosPagination) videosPagination.style.display = 'flex';
-    if (tagsWrapper) tagsWrapper.style.display = 'none';
     if (searchBox) {
       searchBox.placeholder = 'Search YouTube video library...';
       searchBox.value = '';
@@ -1656,8 +1651,8 @@ function switchTab(tab) {
 }
 
 function renderTags() {
-  const tagsWrapper = document.getElementById('tags-wrapper');
-  if (!tagsWrapper) return;
+  const sidebar = document.getElementById('blog-sidebar');
+  if (!sidebar) return;
 
   const tagCounts = {};
   allPosts.forEach(post => {
@@ -1668,39 +1663,40 @@ function renderTags() {
     }
   });
 
-  // Sort tags by frequency
-  const sortedTags = Object.keys(tagCounts).sort((a, b) => tagCounts[b] - tagCounts[a]).slice(0, 15);
+  // Sort tags by frequency, show top 10 categories
+  const sortedTags = Object.keys(tagCounts).sort((a, b) => tagCounts[b] - tagCounts[a]).slice(0, 10);
 
-  tagsWrapper.innerHTML = `
-    <button class="filter-tag ${activeTag === null ? 'active' : ''}" onclick="selectTag(null)">All Posts</button>
+  let html = `
+    <button class="filter-tag ${activeTag === null ? 'active' : ''}" onclick="selectTag(null)">
+      <span style="display:flex; align-items:center; gap:8px;">
+        <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+        All Articles
+      </span>
+      <span class="tag-count">${allPosts.length}</span>
+    </button>
   `;
 
   sortedTags.forEach(tag => {
-    tagsWrapper.innerHTML += `
-      <button class="filter-tag ${activeTag === tag ? 'active' : ''}" onclick="selectTag('${tag}')">${tag} (${tagCounts[tag]})</button>
+    const count = tagCounts[tag] || 0;
+    const isActive = activeTag === tag;
+    html += `
+      <button class="filter-tag ${isActive ? 'active' : ''}" onclick="selectTag('${tag}')">
+        <span style="display:flex; align-items:center; gap:8px;">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+          ${tag}
+        </span>
+        <span class="tag-count">${count}</span>
+      </button>
     `;
   });
+
+  sidebar.innerHTML = html;
 }
 
 function selectTag(tag) {
   activeTag = tag;
   currentPage = 1;
-  
-  // Update UI active state
-  const tagsWrapper = document.getElementById('tags-wrapper');
-  if (tagsWrapper) {
-    const buttons = tagsWrapper.querySelectorAll('.filter-tag');
-    buttons.forEach(btn => {
-      const isAll = tag === null && btn.textContent.includes('All Posts');
-      const isMatch = tag !== null && btn.textContent.startsWith(tag + ' ');
-      if (isAll || isMatch) {
-        btn.classList.add('active');
-      } else {
-        btn.classList.remove('active');
-      }
-    });
-  }
-  
+  renderTags();
   applyFilters();
 }
 
@@ -1814,7 +1810,12 @@ function applyVideoFilters() {
               ${video.timeAgo || 'recent'}
             </span>
           </div>
-          <h2 class="card-title" style="font-size: 1.15rem; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${displayTitle}</h2>
+          <h2 class="card-title" style="font-size: 1.15rem; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 0;">${displayTitle}</h2>
+          
+          <a href="https://www.youtube.com/@PuruWorld?sub_confirmation=1" target="_blank" onclick="event.stopPropagation();" class="video-subscribe-btn">
+            <svg viewBox="0 0 24 24" style="width:14px; height:14px; fill:currentColor; margin-right:4px;"><path d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.11C19.517 3.545 12 3.545 12 3.545s-7.517 0-9.388.508a3.003 3.003 0 0 0-2.11 2.11C0 8.033 0 12 0 12s0 3.967.502 5.837a3.003 3.003 0 0 0 2.11 2.11c1.871.508 9.388.508 9.388.508s7.517 0 9.388-.508a3.003 3.003 0 0 0 2.11-2.11C24 15.967 24 12 24 12s0-3.967-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            Subscribe
+          </a>
         </div>
       </article>
     `;
@@ -1949,18 +1950,7 @@ function resetFilters() {
     searchQuery = '';
     activeTag = null;
     currentPage = 1;
-    
-    const tagsWrapper = document.getElementById('tags-wrapper');
-    if (tagsWrapper) {
-      const buttons = tagsWrapper.querySelectorAll('.filter-tag');
-      buttons.forEach(btn => {
-        if (btn.textContent.includes('All Posts')) {
-          btn.classList.add('active');
-        } else {
-          btn.classList.remove('active');
-        }
-      });
-    }
+    renderTags();
     applyFilters();
   } else {
     activeVideoCategory = 'All';
@@ -2370,11 +2360,21 @@ function playVideo(videoId) {
     document.body.appendChild(lightbox);
   }
 
-  // Clear previous lightbox elements to display video
+  const videoObj = allVideos.find(v => v.id === videoId);
+  const videoTitle = videoObj ? videoObj.title : 'Watch Video';
+
+  // Modal with autoplay, fullscreen capabilities, and Subscribe shortcut inside lightbox footer
   lightbox.innerHTML = `
     <button class="lightbox-close" aria-label="Close lightbox">&times;</button>
     <div class="lightbox-video-container">
-      <iframe class="lightbox-video" src="https://www.youtube.com/embed/${videoId}?autoplay=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      <iframe class="lightbox-video" src="https://www.youtube.com/embed/${videoId}?autoplay=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen webkitallowfullscreen mozallowfullscreen allow="autoplay; fullscreen"></iframe>
+    </div>
+    <div class="lightbox-video-footer" style="margin-top: 15px; display: flex; justify-content: space-between; align-items: center; width: 85%; max-width: 800px; color: white;">
+      <span id="lightbox-video-title" style="font-family:'Outfit', sans-serif; font-size:1.15rem; font-weight:600; text-overflow:ellipsis; overflow:hidden; white-space:nowrap; max-width:70%; text-align:left;">${videoTitle}</span>
+      <a href="https://www.youtube.com/@PuruWorld?sub_confirmation=1" target="_blank" class="modal-subscribe-btn" style="background-color:#ef4444; color:white; padding:8px 16px; border-radius:8px; font-weight:700; font-size:0.9rem; display:flex; align-items:center; gap:6px; text-decoration:none; transition:background-color 0.2s; font-family:'Outfit', sans-serif; box-shadow:0 2px 8px rgba(239,68,68,0.3);">
+        <svg viewBox="0 0 24 24" style="width:16px; height:16px; fill:currentColor;"><path d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.11C19.517 3.545 12 3.545 12 3.545s-7.517 0-9.388.508a3.003 3.003 0 0 0-2.11 2.11C0 8.033 0 12 0 12s0 3.967.502 5.837a3.003 3.003 0 0 0 2.11 2.11c1.871.508 9.388.508 9.388.508s7.517 0 9.388-.508a3.003 3.003 0 0 0 2.11-2.11C24 15.967 24 12 24 12s0-3.967-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+        Subscribe
+      </a>
     </div>
   `;
 
@@ -2392,7 +2392,7 @@ function playVideo(videoId) {
     if (iframe) iframe.src = ''; // Halt video playback
     setTimeout(() => {
       lightbox.style.display = 'none';
-      lightbox.innerHTML = ''; // Clear elements
+      lightbox.innerHTML = '';
     }, 300);
     document.body.style.overflow = '';
   };
@@ -2456,7 +2456,6 @@ INDEX_HTML_TEMPLATE = """<!DOCTYPE html>
       <nav class="nav-links">
         <a href="./index.html" class="nav-link" onclick="event.preventDefault(); switchTab('blog')">Home</a>
         <a href="./index.html?tab=videos" class="nav-link" onclick="event.preventDefault(); switchTab('videos')">Videos</a>
-        <a href="./p/subscribe-today.html" class="nav-link">Subscribe</a>
         <button class="theme-toggle-btn" aria-label="Toggle dark mode" id="theme-toggle">
           <svg class="moon-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
           <svg class="sun-icon" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path></svg>
@@ -2504,14 +2503,15 @@ INDEX_HTML_TEMPLATE = """<!DOCTYPE html>
         <input type="text" id="search-box" class="search-box" placeholder="Search across 1,500+ blog articles...">
         <span class="clear-icon" id="clear-search-icon" onclick="resetFilters()">&times;</span>
       </div>
-
-      <div class="tags-wrapper" id="tags-wrapper">
-        <!-- Tags will load dynamically -->
-      </div>
     </section>
 
-    <div class="posts-grid" id="posts-grid">
-      <!-- Posts will render dynamically -->
+    <div class="blog-page-layout" id="blog-page-layout">
+      <aside class="blog-sidebar" id="blog-sidebar">
+        <!-- Blog tags sidebar will load dynamically -->
+      </aside>
+      <div class="posts-grid" id="posts-grid" style="margin-bottom: 0;">
+        <!-- Posts will render dynamically -->
+      </div>
     </div>
 
     <div class="videos-page-layout" id="videos-page-layout" style="display: none;">
@@ -2576,7 +2576,6 @@ VIDEOS_HTML_TEMPLATE = """<!DOCTYPE html>
       <nav class="nav-links">
         <a href="../index.html" class="nav-link">Home</a>
         <a href="../index.html?tab=videos" class="nav-link">Videos</a>
-        <a href="../p/subscribe-today.html" class="nav-link">Subscribe</a>
         <button class="theme-toggle-btn" aria-label="Toggle dark mode" id="theme-toggle">
           <svg class="moon-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
           <svg class="sun-icon" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path></svg>
@@ -2670,7 +2669,6 @@ def make_post_html(post_title, post_date, post_tags, post_content, read_time, co
       <nav class="nav-links">
         <a href="{rel_path}index.html" class="nav-link">Home</a>
         <a href="{rel_path}index.html?tab=videos" class="nav-link">Videos</a>
-        <a href="{rel_path}p/subscribe-today.html" class="nav-link">Subscribe</a>
         <button class="theme-toggle-btn" aria-label="Toggle dark mode" id="theme-toggle">
           <svg class="moon-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
           <svg class="sun-icon" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path></svg>
@@ -3038,7 +3036,6 @@ def main():
       <nav class="nav-links">
         <a href="{page['rel_path']}index.html" class="nav-link">Home</a>
         <a href="{page['rel_path']}index.html?tab=videos" class="nav-link">Videos</a>
-        <a href="{page['rel_path']}p/subscribe-today.html" class="nav-link">Subscribe</a>
         <button class="theme-toggle-btn" aria-label="Toggle dark mode" id="theme-toggle">
           <svg class="moon-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
           <svg class="sun-icon" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path></svg>

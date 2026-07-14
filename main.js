@@ -112,11 +112,10 @@ function switchTab(tab) {
   
   const tabBlog = document.getElementById('tab-blog');
   const tabVideos = document.getElementById('tab-videos');
-  const postsGrid = document.getElementById('posts-grid');
+  const blogPageLayout = document.getElementById('blog-page-layout');
   const videosPageLayout = document.getElementById('videos-page-layout');
   const pagination = document.getElementById('pagination');
   const videosPagination = document.getElementById('videos-pagination');
-  const tagsWrapper = document.getElementById('tags-wrapper');
   const searchBox = document.getElementById('search-box');
   
   if (!tabBlog || !tabVideos) return;
@@ -124,11 +123,10 @@ function switchTab(tab) {
   if (tab === 'blog') {
     tabBlog.classList.add('active');
     tabVideos.classList.remove('active');
-    if (postsGrid) postsGrid.style.display = 'grid';
+    if (blogPageLayout) blogPageLayout.style.display = 'grid';
     if (videosPageLayout) videosPageLayout.style.display = 'none';
     if (pagination) pagination.style.display = 'flex';
     if (videosPagination) videosPagination.style.display = 'none';
-    if (tagsWrapper) tagsWrapper.style.display = 'flex';
     if (searchBox) {
       searchBox.placeholder = 'Search across 1,500+ blog articles...';
       searchBox.value = searchQuery;
@@ -137,11 +135,10 @@ function switchTab(tab) {
   } else {
     tabBlog.classList.remove('active');
     tabVideos.classList.add('active');
-    if (postsGrid) postsGrid.style.display = 'none';
+    if (blogPageLayout) blogPageLayout.style.display = 'none';
     if (videosPageLayout) videosPageLayout.style.display = 'grid';
     if (pagination) pagination.style.display = 'none';
     if (videosPagination) videosPagination.style.display = 'flex';
-    if (tagsWrapper) tagsWrapper.style.display = 'none';
     if (searchBox) {
       searchBox.placeholder = 'Search YouTube video library...';
       searchBox.value = '';
@@ -157,8 +154,8 @@ function switchTab(tab) {
 }
 
 function renderTags() {
-  const tagsWrapper = document.getElementById('tags-wrapper');
-  if (!tagsWrapper) return;
+  const sidebar = document.getElementById('blog-sidebar');
+  if (!sidebar) return;
 
   const tagCounts = {};
   allPosts.forEach(post => {
@@ -169,39 +166,40 @@ function renderTags() {
     }
   });
 
-  // Sort tags by frequency
-  const sortedTags = Object.keys(tagCounts).sort((a, b) => tagCounts[b] - tagCounts[a]).slice(0, 15);
+  // Sort tags by frequency, show top 10 categories
+  const sortedTags = Object.keys(tagCounts).sort((a, b) => tagCounts[b] - tagCounts[a]).slice(0, 10);
 
-  tagsWrapper.innerHTML = `
-    <button class="filter-tag ${activeTag === null ? 'active' : ''}" onclick="selectTag(null)">All Posts</button>
+  let html = `
+    <button class="filter-tag ${activeTag === null ? 'active' : ''}" onclick="selectTag(null)">
+      <span style="display:flex; align-items:center; gap:8px;">
+        <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+        All Articles
+      </span>
+      <span class="tag-count">${allPosts.length}</span>
+    </button>
   `;
 
   sortedTags.forEach(tag => {
-    tagsWrapper.innerHTML += `
-      <button class="filter-tag ${activeTag === tag ? 'active' : ''}" onclick="selectTag('${tag}')">${tag} (${tagCounts[tag]})</button>
+    const count = tagCounts[tag] || 0;
+    const isActive = activeTag === tag;
+    html += `
+      <button class="filter-tag ${isActive ? 'active' : ''}" onclick="selectTag('${tag}')">
+        <span style="display:flex; align-items:center; gap:8px;">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+          ${tag}
+        </span>
+        <span class="tag-count">${count}</span>
+      </button>
     `;
   });
+
+  sidebar.innerHTML = html;
 }
 
 function selectTag(tag) {
   activeTag = tag;
   currentPage = 1;
-  
-  // Update UI active state
-  const tagsWrapper = document.getElementById('tags-wrapper');
-  if (tagsWrapper) {
-    const buttons = tagsWrapper.querySelectorAll('.filter-tag');
-    buttons.forEach(btn => {
-      const isAll = tag === null && btn.textContent.includes('All Posts');
-      const isMatch = tag !== null && btn.textContent.startsWith(tag + ' ');
-      if (isAll || isMatch) {
-        btn.classList.add('active');
-      } else {
-        btn.classList.remove('active');
-      }
-    });
-  }
-  
+  renderTags();
   applyFilters();
 }
 
@@ -315,7 +313,12 @@ function applyVideoFilters() {
               ${video.timeAgo || 'recent'}
             </span>
           </div>
-          <h2 class="card-title" style="font-size: 1.15rem; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${displayTitle}</h2>
+          <h2 class="card-title" style="font-size: 1.15rem; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 0;">${displayTitle}</h2>
+          
+          <a href="https://www.youtube.com/@PuruWorld?sub_confirmation=1" target="_blank" onclick="event.stopPropagation();" class="video-subscribe-btn">
+            <svg viewBox="0 0 24 24" style="width:14px; height:14px; fill:currentColor; margin-right:4px;"><path d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.11C19.517 3.545 12 3.545 12 3.545s-7.517 0-9.388.508a3.003 3.003 0 0 0-2.11 2.11C0 8.033 0 12 0 12s0 3.967.502 5.837a3.003 3.003 0 0 0 2.11 2.11c1.871.508 9.388.508 9.388.508s7.517 0 9.388-.508a3.003 3.003 0 0 0 2.11-2.11C24 15.967 24 12 24 12s0-3.967-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            Subscribe
+          </a>
         </div>
       </article>
     `;
@@ -450,18 +453,7 @@ function resetFilters() {
     searchQuery = '';
     activeTag = null;
     currentPage = 1;
-    
-    const tagsWrapper = document.getElementById('tags-wrapper');
-    if (tagsWrapper) {
-      const buttons = tagsWrapper.querySelectorAll('.filter-tag');
-      buttons.forEach(btn => {
-        if (btn.textContent.includes('All Posts')) {
-          btn.classList.add('active');
-        } else {
-          btn.classList.remove('active');
-        }
-      });
-    }
+    renderTags();
     applyFilters();
   } else {
     activeVideoCategory = 'All';
@@ -871,11 +863,21 @@ function playVideo(videoId) {
     document.body.appendChild(lightbox);
   }
 
-  // Clear previous lightbox elements to display video
+  const videoObj = allVideos.find(v => v.id === videoId);
+  const videoTitle = videoObj ? videoObj.title : 'Watch Video';
+
+  // Modal with autoplay, fullscreen capabilities, and Subscribe shortcut inside lightbox footer
   lightbox.innerHTML = `
     <button class="lightbox-close" aria-label="Close lightbox">&times;</button>
     <div class="lightbox-video-container">
-      <iframe class="lightbox-video" src="https://www.youtube.com/embed/${videoId}?autoplay=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      <iframe class="lightbox-video" src="https://www.youtube.com/embed/${videoId}?autoplay=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen webkitallowfullscreen mozallowfullscreen allow="autoplay; fullscreen"></iframe>
+    </div>
+    <div class="lightbox-video-footer" style="margin-top: 15px; display: flex; justify-content: space-between; align-items: center; width: 85%; max-width: 800px; color: white;">
+      <span id="lightbox-video-title" style="font-family:'Outfit', sans-serif; font-size:1.15rem; font-weight:600; text-overflow:ellipsis; overflow:hidden; white-space:nowrap; max-width:70%; text-align:left;">${videoTitle}</span>
+      <a href="https://www.youtube.com/@PuruWorld?sub_confirmation=1" target="_blank" class="modal-subscribe-btn" style="background-color:#ef4444; color:white; padding:8px 16px; border-radius:8px; font-weight:700; font-size:0.9rem; display:flex; align-items:center; gap:6px; text-decoration:none; transition:background-color 0.2s; font-family:'Outfit', sans-serif; box-shadow:0 2px 8px rgba(239,68,68,0.3);">
+        <svg viewBox="0 0 24 24" style="width:16px; height:16px; fill:currentColor;"><path d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.11C19.517 3.545 12 3.545 12 3.545s-7.517 0-9.388.508a3.003 3.003 0 0 0-2.11 2.11C0 8.033 0 12 0 12s0 3.967.502 5.837a3.003 3.003 0 0 0 2.11 2.11c1.871.508 9.388.508 9.388.508s7.517 0 9.388-.508a3.003 3.003 0 0 0 2.11-2.11C24 15.967 24 12 24 12s0-3.967-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+        Subscribe
+      </a>
     </div>
   `;
 
@@ -893,7 +895,7 @@ function playVideo(videoId) {
     if (iframe) iframe.src = ''; // Halt video playback
     setTimeout(() => {
       lightbox.style.display = 'none';
-      lightbox.innerHTML = ''; // Clear elements
+      lightbox.innerHTML = '';
     }, 300);
     document.body.style.overflow = '';
   };
