@@ -155,6 +155,46 @@ const allApps = [
     icon: "visibility",
     tag: "External Tool",
     isExternal: true
+  },
+  {
+    title: "SFDX Data Dictionary",
+    description: "Convert Salesforce SFDX metadata/object definitions directly into formatted Excel sheets.",
+    url: "https://purujeet.github.io/SFMetaToExcel/",
+    icon: "table_chart",
+    tag: "Salesforce Tool",
+    isExternal: true
+  },
+  {
+    title: "Local Barter & Swap",
+    description: "Post listings and swap goods or services locally without money on this decentralized barter platform.",
+    url: "https://purujeet.github.io/Barter-platform/",
+    icon: "swap_horiz",
+    tag: "Web App",
+    isExternal: true
+  },
+  {
+    title: "Orbit Drop",
+    description: "Challenge friends to a multiplayer space-themed physics arcade game powered by Phaser and PeerJS.",
+    url: "https://purujeet.github.io/orbit-drop/",
+    icon: "rocket_launch",
+    tag: "Arcade Game",
+    isExternal: true
+  },
+  {
+    title: "Image to PDF Converter",
+    description: "Convert multiple image files (JPG, PNG) into a single optimized PDF document in your browser.",
+    url: "https://purujeet.github.io/Image2Pdf/",
+    icon: "picture_as_pdf",
+    tag: "Utility Tool",
+    isExternal: true
+  },
+  {
+    title: "Universal Text Converter",
+    description: "Convert text formats (XML, CSV, JSON, XLSX, YAML) seamlessly in your browser with automated structure parsing.",
+    url: "https://purujeet.github.io/universaltextconverter/",
+    icon: "transform",
+    tag: "Developer Tool",
+    isExternal: true
   }
 ];
 
