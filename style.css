@@ -763,7 +763,8 @@ header .header-content {
   justify-content: center;
   align-items: center;
   gap: 10px;
-  margin-bottom: 80px;
+  margin-top: 50px;
+  margin-bottom: 120px;
 }
 .page-btn {
   background-color: var(--bg-secondary);

@@ -1034,7 +1034,8 @@ header .header-content {
   justify-content: center;
   align-items: center;
   gap: 10px;
-  margin-bottom: 80px;
+  margin-top: 50px;
+  margin-bottom: 120px;
 }
 .page-btn {
   background-color: var(--bg-secondary);
@@ -1725,6 +1726,14 @@ const allApps = [
     description: "Convert raw JSON payloads directly into Salesforce Apex class structures.",
     url: "https://json2apex.com",
     icon: "cloud_queue",
+    tag: "External Tool",
+    isExternal: true
+  },
+  {
+    title: "Python Visualizer",
+    description: "Visualize python execution flows and trace memory stack frames in real-time.",
+    url: "https://purujeet.github.io/pythonVisualizer/",
+    icon: "visibility",
     tag: "External Tool",
     isExternal: true
   }

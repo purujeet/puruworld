@@ -147,6 +147,14 @@ const allApps = [
     icon: "cloud_queue",
     tag: "External Tool",
     isExternal: true
+  },
+  {
+    title: "Python Visualizer",
+    description: "Visualize python execution flows and trace memory stack frames in real-time.",
+    url: "https://purujeet.github.io/pythonVisualizer/",
+    icon: "visibility",
+    tag: "External Tool",
+    isExternal: true
   }
 ];
 
