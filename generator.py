@@ -351,9 +351,9 @@ a:hover {
 
 /* Base Layout & Header */
 .container {
-  max-width: 1200px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 16px;
 }
 
 header {
@@ -451,7 +451,7 @@ header .header-content {
 /* Hero Section */
 .hero {
   position: relative;
-  padding: 80px 0 60px;
+  padding: 30px 0 15px;
   text-align: center;
   overflow: hidden;
 }
@@ -493,18 +493,18 @@ header .header-content {
 }
 
 .hero h1 {
-  font-size: 3.5rem;
-  margin-bottom: 16px;
+  font-size: 2.2rem;
+  margin-bottom: 12px;
   background: var(--accent-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  letter-spacing: -0.05em;
+  letter-spacing: -0.04em;
   line-height: 1.15;
 }
 .hero p {
   color: var(--text-secondary);
-  font-size: 1.25rem;
-  max-width: 600px;
+  font-size: 1rem;
+  max-width: 550px;
   margin: 0 auto;
 }
 .blog-stats {
@@ -852,8 +852,8 @@ header .header-content {
 /* Main Post Grid */
 .posts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 30px;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 20px;
   margin-bottom: 50px;
 }
 
@@ -1811,11 +1811,6 @@ function applyVideoFilters() {
             </span>
           </div>
           <h2 class="card-title" style="font-size: 1.15rem; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 0;">${displayTitle}</h2>
-          
-          <a href="https://www.youtube.com/@PuruWorld?sub_confirmation=1" target="_blank" onclick="event.stopPropagation();" class="video-subscribe-btn">
-            <svg viewBox="0 0 24 24" style="width:14px; height:14px; fill:currentColor; margin-right:4px;"><path d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.11C19.517 3.545 12 3.545 12 3.545s-7.517 0-9.388.508a3.003 3.003 0 0 0-2.11 2.11C0 8.033 0 12 0 12s0 3.967.502 5.837a3.003 3.003 0 0 0 2.11 2.11c1.871.508 9.388.508 9.388.508s7.517 0 9.388-.508a3.003 3.003 0 0 0 2.11-2.11C24 15.967 24 12 24 12s0-3.967-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-            Subscribe
-          </a>
         </div>
       </article>
     `;
@@ -2363,18 +2358,14 @@ function playVideo(videoId) {
   const videoObj = allVideos.find(v => v.id === videoId);
   const videoTitle = videoObj ? videoObj.title : 'Watch Video';
 
-  // Modal with autoplay, fullscreen capabilities, and Subscribe shortcut inside lightbox footer
+  // Modal with autoplay, fullscreen capabilities
   lightbox.innerHTML = `
     <button class="lightbox-close" aria-label="Close lightbox">&times;</button>
     <div class="lightbox-video-container">
-      <iframe class="lightbox-video" src="https://www.youtube.com/embed/${videoId}?autoplay=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen webkitallowfullscreen mozallowfullscreen allow="autoplay; fullscreen"></iframe>
+      <iframe class="lightbox-video" src="https://www.youtube.com/embed/${videoId}?autoplay=1&fs=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen webkitallowfullscreen mozallowfullscreen allow="autoplay; fullscreen"></iframe>
     </div>
-    <div class="lightbox-video-footer" style="margin-top: 15px; display: flex; justify-content: space-between; align-items: center; width: 85%; max-width: 800px; color: white;">
-      <span id="lightbox-video-title" style="font-family:'Outfit', sans-serif; font-size:1.15rem; font-weight:600; text-overflow:ellipsis; overflow:hidden; white-space:nowrap; max-width:70%; text-align:left;">${videoTitle}</span>
-      <a href="https://www.youtube.com/@PuruWorld?sub_confirmation=1" target="_blank" class="modal-subscribe-btn" style="background-color:#ef4444; color:white; padding:8px 16px; border-radius:8px; font-weight:700; font-size:0.9rem; display:flex; align-items:center; gap:6px; text-decoration:none; transition:background-color 0.2s; font-family:'Outfit', sans-serif; box-shadow:0 2px 8px rgba(239,68,68,0.3);">
-        <svg viewBox="0 0 24 24" style="width:16px; height:16px; fill:currentColor;"><path d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.11C19.517 3.545 12 3.545 12 3.545s-7.517 0-9.388.508a3.003 3.003 0 0 0-2.11 2.11C0 8.033 0 12 0 12s0 3.967.502 5.837a3.003 3.003 0 0 0 2.11 2.11c1.871.508 9.388.508 9.388.508s7.517 0 9.388-.508a3.003 3.003 0 0 0 2.11-2.11C24 15.967 24 12 24 12s0-3.967-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-        Subscribe
-      </a>
+    <div class="lightbox-video-footer" style="margin-top: 15px; display: flex; justify-content: center; align-items: center; width: 85%; max-width: 800px; color: white;">
+      <span id="lightbox-video-title" style="font-family:'Outfit', sans-serif; font-size:1.15rem; font-weight:600; text-overflow:ellipsis; overflow:hidden; white-space:nowrap; width:100%; text-align:center;">${videoTitle}</span>
     </div>
   `;
 
