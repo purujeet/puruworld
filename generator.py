@@ -2688,6 +2688,31 @@ def main():
     f.write(videos_html)
   print("Generated p/videos.html")
   
+  # Generate standard ads.txt
+  with open(os.path.join(output_dir, 'ads.txt'), 'w', encoding='utf-8') as f:
+    f.write("google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0\n")
+  print("Generated ads.txt")
+  
+  # Generate standard legal/info pages
+  legal_pages = [
+    ('privacy.html', 'Privacy Policy - puru world official', 'Privacy Policy page for puru world official.'),
+    ('about.html', 'About Us - puru world official', 'Learn more about puru world official, our mission, and our content creators.'),
+    ('contact.html', 'Contact Us - puru world official', 'Get in touch with puru world official for support, feedback, or business inquiries.'),
+    ('terms.html', 'Terms of Service - puru world official', 'Read the Terms of Service for puru world official.'),
+    ('disclaimer.html', 'Disclaimer - puru world official', 'Content disclaimer and liability guidelines for puru world official.')
+  ]
+  
+  for filename, title, desc in legal_pages:
+    tmpl = load_template(filename)
+    head = get_head(title, desc, "../")
+    header = get_header("../", has_progress=False, id_val="Legal")
+    footer = get_footer()
+    html = tmpl.replace('{{HEAD}}', head).replace('{{HEADER}}', header).replace('{{FOOTER}}', footer)
+    
+    with open(os.path.join(videos_page_dir, filename), 'w', encoding='utf-8') as f:
+      f.write(html)
+    print(f"Generated p/{filename}")
+  
   print("Writing post HTML files...")
   for i, post in enumerate(raw_posts):
     content_rewritten = rewrite_internal_links(post['content'], post['depth'])
@@ -2717,6 +2742,59 @@ def main():
   for i, page in enumerate(raw_pages):
     content_rewritten = rewrite_internal_links(page['content'], page['depth'])
     content_sanitized = sanitize_blogger_html(content_rewritten)
+    
+    if 'flip-coin' in page['filename']:
+      content_sanitized = content_sanitized.replace(
+        '.coin.flipping {\n            animation: flip 1s ease-in-out;\n        }',
+        '/* removed flipping animation class */'
+      ).replace(
+        '.tails {\n            background: linear-gradient(45deg, #c0c0c0, #999999);\n            transform: rotateY(180deg);\n        }',
+        '.tails {\n            background: linear-gradient(45deg, #c0c0c0, #999999);\n            transform: rotateX(180deg);\n        }'
+      ).replace(
+        '@keyframes flip {\n            0% { transform: rotateY(0deg); }\n            50% { transform: rotateY(720deg); }\n            100% { transform: rotateY(0deg); }\n        }',
+        '@keyframes jump {\n            0% { transform: translateY(0) scale(1); }\n            50% { transform: translateY(-160px) scale(1.1); }\n            100% { transform: translateY(0) scale(1); }\n        }\n        .coin-container.flipping {\n            animation: jump 1.2s ease-in-out;\n        }'
+      ).replace(
+        'transition: transform 1s ease-in-out;',
+        'transition: transform 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.15);'
+      ).replace(
+        '''        function flipCoin() {
+            const coin = document.getElementById('coin');
+            coin.classList.add('flipping');
+            
+            // Randomly decide heads or tails
+            const isHeads = Math.random() > 0.5;
+            const rotation = isHeads ? 0 : 180;
+            coin.style.transform = `rotateY(${rotation}deg)`;
+            
+            // Remove flipping class after animation
+            setTimeout(() => {
+                coin.classList.remove('flipping');
+            }, 1000);
+        }''',
+        '''        let currentRotation = 0;
+        function flipCoin() {
+            const coin = document.getElementById('coin');
+            const container = document.querySelector('.coin-container');
+            const btn = document.querySelector('.flip-button');
+            btn.disabled = true;
+            
+            const isHeads = Math.random() > 0.5;
+            const spins = Math.floor(Math.random() * 4 + 5) * 360;
+            
+            currentRotation += spins;
+            if (Math.round(currentRotation / 180) % 2 !== (isHeads ? 0 : 1)) {
+                currentRotation += 180;
+            }
+            
+            coin.style.transform = `rotateX(${currentRotation}deg)`;
+            container.classList.add('flipping');
+            
+            setTimeout(() => {
+                container.classList.remove('flipping');
+                btn.disabled = false;
+            }, 1200);
+        }'''
+      )
     
     page_tmpl = load_template('page.html')
     head = get_head(f"{page['title']} - puru world official", clean_excerpt(page['content'], 150), page['rel_path'])
