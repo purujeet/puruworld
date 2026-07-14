@@ -1637,11 +1637,15 @@ function initHomePage() {
 
     renderTags();
     renderVideoCategories();
+    renderAppsGrid();
     
     // Check URL parameters for active tab
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('tab') === 'videos') {
+    const tabParam = urlParams.get('tab');
+    if (tabParam === 'videos') {
       switchTab('videos');
+    } else if (tabParam === 'apps') {
+      switchTab('apps');
     } else {
       switchTab('blog');
     }
@@ -1650,45 +1654,118 @@ function initHomePage() {
   }
 }
 
+const allApps = [
+  {
+    title: "Coin Flipper",
+    description: "Flip a virtual coin with realistic 3D jump physics. Perfect for quick decision-making and random draws.",
+    url: "./p/flip-coin.html",
+    icon: "monetization_on",
+    tag: "Interactive Tool"
+  },
+  {
+    title: "Tic Tac Toe",
+    description: "Play the classic Tic Tac Toe game with a friend or challenge the AI bot.",
+    url: "./p/tic-tac-toe.html",
+    icon: "grid_on",
+    tag: "Casual Game"
+  },
+  {
+    title: "Spin the Bottle",
+    description: "An interactive spin-the-bottle party game with smooth CSS rotation physics.",
+    url: "./p/spin-bottle.html",
+    icon: "cached",
+    tag: "Party Game"
+  },
+  {
+    title: "JSON Formatter",
+    description: "A developer tool to format, validate, and beautify raw JSON strings easily.",
+    url: "./p/json-formatter.html",
+    icon: "code",
+    tag: "Developer Tool"
+  },
+  {
+    title: "JSON to Apex Converter",
+    description: "Convert raw JSON payloads directly into Salesforce Apex class structures.",
+    url: "https://json2apex.com",
+    icon: "cloud_queue",
+    tag: "External Tool",
+    isExternal: true
+  }
+];
+
+function renderAppsGrid() {
+  const grid = document.getElementById('apps-grid');
+  if (!grid) return;
+  
+  grid.innerHTML = allApps.map(app => {
+    const targetAttr = app.isExternal ? 'target="_blank"' : '';
+    const iconHtml = `
+      <div class="card-image-fallback" style="background: var(--accent-gradient); min-height: 160px; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; border-radius: 12px 12px 0 0; position: relative;">
+        <span class="material-icons" style="font-size: 3rem; margin-bottom: 8px;">${app.icon}</span>
+        <span class="card-tag" style="background: rgba(255,255,255,0.25); color: white; border-color: transparent; font-family: 'Outfit', sans-serif;">${app.tag}</span>
+      </div>
+    `;
+    
+    return `
+      <article class="post-card" style="display: flex; flex-direction: column;">
+        <div class="card-image-wrapper">
+          ${iconHtml}
+        </div>
+        <div class="card-content" style="display: flex; flex-direction: column; flex-grow: 1; padding: 20px;">
+          <h2 class="card-title" style="margin: 0 0 10px 0;"><a href="${app.url}" ${targetAttr} style="color: var(--text-primary); text-decoration: none; font-family: 'Outfit', sans-serif;">${app.title}</a></h2>
+          <p class="card-excerpt" style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px; flex-grow: 1;">${app.description}</p>
+          <div style="margin-top: auto; display: flex; justify-content: space-between; align-items: center;">
+            <a href="${app.url}" ${targetAttr} class="back-btn" style="padding: 6px 12px; font-size: 0.85rem; border-color: var(--accent-color); color: var(--accent-color); font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; border-radius: 6px; border: 1px solid var(--accent-color); transition: all 0.2s;">
+              Launch ${app.isExternal ? 'Site' : 'App'}
+              <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor;"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42 5.43 5.43H5v2z"/></svg>
+            </a>
+          </div>
+        </div>
+      </article>
+    `;
+  }).join('');
+}
+
 function switchTab(tab) {
   activeTab = tab;
   
   const tabBlog = document.getElementById('tab-blog');
   const tabVideos = document.getElementById('tab-videos');
+  const tabApps = document.getElementById('tab-apps');
   const blogPageLayout = document.getElementById('blog-page-layout');
   const videosPageLayout = document.getElementById('videos-page-layout');
+  const appsPageLayout = document.getElementById('apps-page-layout');
   const pagination = document.getElementById('pagination');
   const videosPagination = document.getElementById('videos-pagination');
+  const searchFilterSection = document.getElementById('search-filter-section');
   const searchBox = document.getElementById('search-box');
   
-  if (!tabBlog || !tabVideos) return;
+  if (tabBlog) tabBlog.classList.toggle('active', tab === 'blog');
+  if (tabVideos) tabVideos.classList.toggle('active', tab === 'videos');
+  if (tabApps) tabApps.classList.toggle('active', tab === 'apps');
+  
+  if (blogPageLayout) blogPageLayout.style.display = tab === 'blog' ? 'grid' : 'none';
+  if (videosPageLayout) videosPageLayout.style.display = tab === 'videos' ? 'grid' : 'none';
+  if (appsPageLayout) appsPageLayout.style.display = tab === 'apps' ? 'grid' : 'none';
+  
+  if (pagination) pagination.style.display = tab === 'blog' ? 'flex' : 'none';
+  if (videosPagination) videosPagination.style.display = tab === 'videos' ? 'flex' : 'none';
+  if (searchFilterSection) searchFilterSection.style.display = tab === 'apps' ? 'none' : 'block';
   
   if (tab === 'blog') {
-    tabBlog.classList.add('active');
-    tabVideos.classList.remove('active');
-    if (blogPageLayout) blogPageLayout.style.display = 'grid';
-    if (videosPageLayout) videosPageLayout.style.display = 'none';
-    if (pagination) pagination.style.display = 'flex';
-    if (videosPagination) videosPagination.style.display = 'none';
     if (searchBox) {
       searchBox.placeholder = 'Search across 1,500+ blog articles...';
       searchBox.value = searchQuery;
     }
     applyFilters();
-  } else {
-    tabBlog.classList.remove('active');
-    tabVideos.classList.add('active');
-    if (blogPageLayout) blogPageLayout.style.display = 'none';
-    if (videosPageLayout) videosPageLayout.style.display = 'grid';
-    if (pagination) pagination.style.display = 'none';
-    if (videosPagination) videosPagination.style.display = 'flex';
+  } else if (tab === 'videos') {
     if (searchBox) {
       searchBox.placeholder = 'Search YouTube video library...';
       searchBox.value = '';
     }
     applyVideoFilters();
   }
-
+  
   // Update clear icon state
   const clearIcon = document.getElementById('clear-search-icon');
   if (clearIcon && searchBox) {
@@ -2458,6 +2535,7 @@ window.playVideo = playVideo;
 window.switchTab = switchTab;
 window.selectVideoCategory = selectVideoCategory;
 window.changeVideoPage = changeVideoPage;
+window.renderAppsGrid = renderAppsGrid;
 """
 
 def load_template(name):
