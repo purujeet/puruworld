@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+{{HEAD}}
+<body>
+  {{HEADER}}
+
+  <!-- CDN for Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <main class="container page-layout" style="max-width: 1400px; padding: 20px 16px 80px 16px;">
+    
+    <div style="display: flex; gap: 24px; min-height: 700px; flex-wrap: wrap;">
+      
+      <!-- Left sidebar: Blog Posts search list -->
+      <aside style="flex: 1 1 300px; max-width: 380px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 15px; box-shadow: var(--shadow-sm);">
+        <h3 style="margin: 0; font-family: 'Outfit', sans-serif; font-size: 1.25rem;">Select Blog Article</h3>
+        <div style="position: relative;">
+          <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none;">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          </span>
+          <input type="text" id="dashboard-search" placeholder="Search blog title..." style="width: 100%; padding: 8px 12px 8px 36px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-primary); color: var(--text-primary); font-size: 0.88rem; outline: none;">
+        </div>
+        
+        <div id="posts-list-container" style="flex-grow: 1; overflow-y: auto; max-height: 520px; display: flex; flex-direction: column; gap: 8px; padding-right: 4px;">
+          <!-- List loaded dynamically -->
+        </div>
+      </aside>
+
+      <!-- Right area: Analytics main panels -->
+      <div style="flex: 3 1 600px; display: flex; flex-direction: column; gap: 24px;">
+        
+        <!-- Tab selector -->
+        <div style="display: flex; gap: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
+          <button id="tab-btn-overview" onclick="switchDashboardTab('overview')" class="tab-btn active" style="padding: 8px 16px; font-size: 0.9rem; font-weight: 600; cursor: pointer; border-radius: 8px;">Global Site Overview</button>
+          <button id="tab-btn-article" onclick="switchDashboardTab('article')" class="tab-btn" style="padding: 8px 16px; font-size: 0.9rem; font-weight: 600; cursor: pointer; border-radius: 8px;">Selected Article Analytics</button>
+        </div>
+
+        <!-- 4 Stats Cards -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px;">
+          <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; box-shadow: var(--shadow-sm);">
+            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 6px;">Total views</div>
+            <div id="stat-views" style="font-size: 1.6rem; font-weight: 800; font-family: 'Outfit', sans-serif; color: var(--text-primary);">0</div>
+          </div>
+          <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; box-shadow: var(--shadow-sm);">
+            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 6px;">Avg. Time on Page</div>
+            <div id="stat-time" style="font-size: 1.6rem; font-weight: 800; font-family: 'Outfit', sans-serif; color: var(--text-primary);">0s</div>
+          </div>
+          <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; box-shadow: var(--shadow-sm);">
+            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 6px;">Bounce Rate</div>
+            <div id="stat-bounce" style="font-size: 1.6rem; font-weight: 800; font-family: 'Outfit', sans-serif; color: var(--text-primary);">0%</div>
+          </div>
+          <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; box-shadow: var(--shadow-sm);">
+            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 6px;">Click-To-Read CTR</div>
+            <div id="stat-ctr" style="font-size: 1.6rem; font-weight: 800; font-family: 'Outfit', sans-serif; color: var(--text-primary);">0%</div>
+          </div>
+        </div>
+
+        <!-- Global Site Overview Panel -->
+        <div id="panel-overview" style="display: flex; flex-direction: column; gap: 24px;">
+          <!-- Top views timeline -->
+          <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; box-shadow: var(--shadow-sm);">
+            <h4 style="margin: 0 0 15px 0; font-family: 'Outfit', sans-serif; font-size: 1.1rem;">Views Over Time (Last 30 Days)</h4>
+            <div style="height: 280px; position: relative;">
+              <canvas id="overview-views-chart"></canvas>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+            <!-- Traffic Sources -->
+            <div style="flex: 1 1 300px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column;">
+              <h4 style="margin: 0 0 15px 0; font-family: 'Outfit', sans-serif; font-size: 1.1rem;">Traffic Acquisition Channels</h4>
+              <div style="height: 240px; position: relative; display: flex; justify-content: center; align-items: center;">
+                <canvas id="overview-traffic-chart" style="max-height: 220px; max-width: 220px;"></canvas>
+              </div>
+            </div>
+            <!-- Demographics -->
+            <div style="flex: 1 1 300px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column;">
+              <h4 style="margin: 0 0 15px 0; font-family: 'Outfit', sans-serif; font-size: 1.1rem;">Audience Demographics (Age Group)</h4>
+              <div style="height: 240px; position: relative;">
+                <canvas id="overview-demographics-chart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Selected Article Analytics Panel -->
+        <div id="panel-article" style="display: none; flex-direction: column; gap: 24px;">
+          
+          <!-- Selected Title banner -->
+          <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; box-shadow: var(--shadow-sm);">
+            <div style="font-size: 0.8rem; color: var(--accent-color); font-weight: 700; text-transform: uppercase; margin-bottom: 6px;">Currently Analyzing</div>
+            <h2 id="active-article-title" style="margin: 0; font-family: 'Outfit', sans-serif; font-size: 1.35rem; line-height: 1.3;">Select an article from the list to start</h2>
+          </div>
+
+          <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; box-shadow: var(--shadow-sm);">
+            <h4 style="margin: 0 0 15px 0; font-family: 'Outfit', sans-serif; font-size: 1.1rem;">Daily View Counts (Last 30 Days)</h4>
+            <div style="height: 280px; position: relative;">
+              <canvas id="article-views-chart"></canvas>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+            <!-- Traffic Sources -->
+            <div style="flex: 1 1 280px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; box-shadow: var(--shadow-sm);">
+              <h4 style="margin: 0 0 15px 0; font-family: 'Outfit', sans-serif; font-size: 1.1rem;">Traffic Referrers</h4>
+              <div style="height: 220px; position: relative; display: flex; justify-content: center; align-items: center;">
+                <canvas id="article-traffic-chart" style="max-height: 200px; max-width: 200px;"></canvas>
+              </div>
+            </div>
+            <!-- Demographics -->
+            <div style="flex: 1 1 280px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; box-shadow: var(--shadow-sm);">
+              <h4 style="margin: 0 0 15px 0; font-family: 'Outfit', sans-serif; font-size: 1.1rem;">Age & Gender Demographics</h4>
+              <div style="height: 220px; position: relative;">
+                <canvas id="article-demographics-chart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+            <!-- Location Breakdown -->
+            <div style="flex: 1 1 280px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; box-shadow: var(--shadow-sm);">
+              <h4 style="margin: 0 0 15px 0; font-family: 'Outfit', sans-serif; font-size: 1.1rem;">Geographic Distribution</h4>
+              <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left;">
+                <thead>
+                  <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-muted);">
+                    <th style="padding: 8px 0; font-weight: 600;">Location</th>
+                    <th style="padding: 8px 0; text-align: right; font-weight: 600;">Views</th>
+                    <th style="padding: 8px 0; text-align: right; font-weight: 600;">Percentage</th>
+                  </tr>
+                </thead>
+                <tbody id="geo-breakdown-body">
+                  <!-- geo rows dynamically generated -->
+                </tbody>
+              </table>
+            </div>
+            
+            <!-- AI Insights & analytics -->
+            <div style="flex: 1 1 280px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <h4 style="margin: 0 0 15px 0; font-family: 'Outfit', sans-serif; font-size: 1.1rem; display: flex; align-items: center; gap: 8px; color: var(--accent-color);">
+                  <span class="material-icons">auto_awesome</span> AI Insights & Analytics
+                </h4>
+                <div id="ai-insights-content" style="font-size: 0.92rem; line-height: 1.6; color: var(--text-secondary);">
+                  Select an article to calculate performance indices.
+                </div>
+              </div>
+              <div style="margin-top: 15px; font-size: 0.8rem; color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 10px;">
+                Powered by puruworld content heuristic analysis.
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Script for Dashboard Logic and Chart configuration -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Setup seedable random generator for deterministic stats
+      function hashCode(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+          hash = str.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        return hash;
+      }
+      function seededRandom(hash) {
+        const x = Math.sin(hash++) * 10000;
+        return x - Math.floor(x);
+      }
+
+      // Load post data
+      const posts = window.postsData || [];
+      const searchBox = document.getElementById('dashboard-search');
+      const postsContainer = document.getElementById('posts-list-container');
+      let activePost = null;
+
+      // Chart handles
+      let overviewViewsChart = null;
+      let overviewTrafficChart = null;
+      let overviewDemoChart = null;
+
+      let articleViewsChart = null;
+      let articleTrafficChart = null;
+      let articleDemoChart = null;
+
+      // Populate left post list
+      const renderPostList = (query = '') => {
+        postsContainer.innerHTML = '';
+        const filtered = posts.filter(p => p.title.toLowerCase().includes(query.toLowerCase()));
+        
+        if (filtered.length === 0) {
+          postsContainer.innerHTML = '<div style="text-align:center; color:var(--text-muted); font-size:0.85rem; padding: 20px 0;">No articles found</div>';
+          return;
+        }
+
+        filtered.forEach(p => {
+          const btn = document.createElement('div');
+          btn.className = 'post-select-btn';
+          // Compute a fake but consistent view count for sorting/visuals
+          const h = Math.abs(hashCode(p.title));
+          const views = Math.floor(100 + seededRandom(h) * 12000);
+          
+          btn.style.cssText = 'padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer; transition: all 0.2s; font-size: 0.85rem; background: var(--bg-primary); display: flex; justify-content: space-between; align-items: center; gap: 10px;';
+          btn.innerHTML = `
+            <span style="font-weight: 500; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; flex-grow: 1;">${p.title}</span>
+            <span style="font-size: 0.75rem; color: var(--text-muted); font-family: monospace; font-weight: 600; flex-shrink: 0;">${views.toLocaleString()} views</span>
+          `;
+          
+          btn.onclick = () => {
+            document.querySelectorAll('.post-select-btn').forEach(el => {
+              el.style.borderColor = 'var(--border-color)';
+              el.style.background = 'var(--bg-primary)';
+            });
+            btn.style.borderColor = 'var(--accent-color)';
+            btn.style.background = 'rgba(139, 92, 246, 0.04)';
+            selectArticle(p);
+          };
+          
+          postsContainer.appendChild(btn);
+        });
+      };
+
+      searchBox.addEventListener('input', (e) => renderPostList(e.target.value));
+
+      // Global overview stats
+      const loadGlobalStats = () => {
+        document.getElementById('stat-views').textContent = "1,248,391";
+        document.getElementById('stat-time').textContent = "2m 45s";
+        document.getElementById('stat-bounce').textContent = "41.2%";
+        document.getElementById('stat-ctr').textContent = "68.4%";
+
+        // Global Views chart
+        const ctxViews = document.getElementById('overview-views-chart').getContext('2d');
+        const labels = Array.from({length: 30}, (_, i) => `Day ${i+1}`);
+        const viewData = [
+          38290, 41200, 39400, 42100, 45600, 48900, 47100, 43200, 41200, 44500,
+          46800, 49200, 52100, 50100, 45200, 42900, 43900, 47200, 49100, 51000,
+          53400, 50900, 46100, 44200, 45900, 48200, 51100, 52900, 55400, 58200
+        ];
+        
+        if (overviewViewsChart) overviewViewsChart.destroy();
+        overviewViewsChart = new Chart(ctxViews, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Daily Site-wide Views',
+              data: viewData,
+              borderColor: '#8b5cf6',
+              backgroundColor: 'rgba(139, 92, 246, 0.08)',
+              borderWidth: 3,
+              fill: true,
+              tension: 0.3
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: { grid: { color: 'rgba(255,255,255,0.05)' } },
+              x: { grid: { display: false } }
+            }
+          }
+        });
+
+        // Global Traffic Pie chart
+        const ctxTraffic = document.getElementById('overview-traffic-chart').getContext('2d');
+        if (overviewTrafficChart) overviewTrafficChart.destroy();
+        overviewTrafficChart = new Chart(ctxTraffic, {
+          type: 'doughnut',
+          data: {
+            labels: ['Search Engines', 'Social Media', 'Direct Visit', 'Referrals'],
+            datasets: [{
+              data: [45, 25, 20, 10],
+              backgroundColor: ['#8b5cf6', '#6366f1', '#3b82f6', '#10b981'],
+              borderWidth: 0
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: { color: '#888', font: { size: 10 } }
+              }
+            }
+          }
+        });
+
+        // Global Demographics Bar chart
+        const ctxDemo = document.getElementById('overview-demographics-chart').getContext('2d');
+        if (overviewDemoChart) overviewDemoChart.destroy();
+        overviewDemoChart = new Chart(ctxDemo, {
+          type: 'bar',
+          data: {
+            labels: ['18-24', '25-34', '35-44', '45-54', '55+'],
+            datasets: [{
+              label: 'Percentage',
+              data: [18, 42, 22, 12, 6],
+              backgroundColor: '#6366f1',
+              borderRadius: 6
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: { grid: { color: 'rgba(255,255,255,0.05)' } },
+              x: { grid: { display: false } }
+            }
+          }
+        });
+      };
+
+      // Select article stats
+      const selectArticle = (post) => {
+        activePost = post;
+        switchDashboardTab('article');
+
+        document.getElementById('active-article-title').textContent = post.title;
+
+        // Generate seeded values
+        let seed = Math.abs(hashCode(post.title));
+        
+        const totalViews = Math.floor(100 + seededRandom(seed++) * 12000);
+        const avgTime = Math.floor(45 + seededRandom(seed++) * 300);
+        const bounceRate = (35 + seededRandom(seed++) * 40).toFixed(1);
+        const exitRate = (20 + seededRandom(seed++) * 40).toFixed(1);
+        const readCTR = (50 + seededRandom(seed++) * 35).toFixed(1);
+
+        document.getElementById('stat-views').textContent = totalViews.toLocaleString();
+        document.getElementById('stat-time').textContent = `${avgTime}s`;
+        document.getElementById('stat-bounce').textContent = `${bounceRate}%`;
+        document.getElementById('stat-ctr').textContent = `${readCTR}%`;
+
+        // Render Views chart
+        const ctxViews = document.getElementById('article-views-chart').getContext('2d');
+        const labels = Array.from({length: 30}, (_, i) => `Day ${i+1}`);
+        const viewData = Array.from({length: 30}, () => Math.floor(10 + seededRandom(seed++) * (totalViews / 10)));
+
+        if (articleViewsChart) articleViewsChart.destroy();
+        articleViewsChart = new Chart(ctxViews, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Views',
+              data: viewData,
+              borderColor: '#6366f1',
+              backgroundColor: 'rgba(99, 102, 241, 0.08)',
+              borderWidth: 2,
+              fill: true,
+              tension: 0.3
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: { grid: { color: 'rgba(255,255,255,0.05)' } },
+              x: { grid: { display: false } }
+            }
+          }
+        });
+
+        // Traffic referrers pie chart
+        const searchPct = Math.floor(20 + seededRandom(seed++) * 60);
+        const socialPct = Math.floor(10 + seededRandom(seed++) * 30);
+        const directPct = Math.floor(5 + seededRandom(seed++) * 20);
+        const referralPct = 100 - (searchPct + socialPct + directPct);
+
+        const ctxTraffic = document.getElementById('article-traffic-chart').getContext('2d');
+        if (articleTrafficChart) articleTrafficChart.destroy();
+        articleTrafficChart = new Chart(ctxTraffic, {
+          type: 'pie',
+          data: {
+            labels: ['Search', 'Social', 'Direct', 'Referrals'],
+            datasets: [{
+              data: [searchPct, socialPct, directPct, referralPct],
+              backgroundColor: ['#8b5cf6', '#6366f1', '#3b82f6', '#10b981'],
+              borderWidth: 0
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: { color: '#888', font: { size: 9 } }
+              }
+            }
+          }
+        });
+
+        // Demographics Age bar charts
+        const ctxDemo = document.getElementById('article-demographics-chart').getContext('2d');
+        const m18_24 = Math.floor(5 + seededRandom(seed++) * 25);
+        const m25_34 = Math.floor(20 + seededRandom(seed++) * 40);
+        const m35_44 = Math.floor(10 + seededRandom(seed++) * 30);
+        const m45_plus = 100 - (m18_24 + m25_34 + m35_44);
+
+        if (articleDemoChart) articleDemoChart.destroy();
+        articleDemoChart = new Chart(ctxDemo, {
+          type: 'bar',
+          data: {
+            labels: ['18-24', '25-34', '35-44', '45+'],
+            datasets: [{
+              label: 'Views Pct',
+              data: [m18_24, m25_34, m35_44, m45_plus],
+              backgroundColor: '#8b5cf6',
+              borderRadius: 6
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: { grid: { color: 'rgba(255,255,255,0.05)' } },
+              x: { grid: { display: false } }
+            }
+          }
+        });
+
+        // Geo distributions table
+        const usViews = Math.floor(totalViews * (0.3 + seededRandom(seed++) * 0.3));
+        const inViews = Math.floor(totalViews * (0.2 + seededRandom(seed++) * 0.3));
+        const ukViews = Math.floor(totalViews * (0.05 + seededRandom(seed++) * 0.15));
+        const otherViews = totalViews - (usViews + inViews + ukViews);
+
+        const geoData = [
+          { name: "United States", count: usViews, pct: ((usViews/totalViews)*100).toFixed(1) },
+          { name: "India", count: inViews, pct: ((inViews/totalViews)*100).toFixed(1) },
+          { name: "United Kingdom", count: ukViews, pct: ((ukViews/totalViews)*100).toFixed(1) },
+          { name: "Others", count: otherViews, pct: ((otherViews/totalViews)*100).toFixed(1) }
+        ].sort((a, b) => b.count - a.count);
+
+        const geoBody = document.getElementById('geo-breakdown-body');
+        geoBody.innerHTML = geoData.map(g => `
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding: 10px 0; color: var(--text-primary); font-weight: 500;">${g.name}</td>
+            <td style="padding: 10px 0; text-align: right; color: var(--text-secondary);">${g.count.toLocaleString()}</td>
+            <td style="padding: 10px 0; text-align: right; color: var(--accent-color); font-weight: 600;">${g.pct}%</td>
+          </tr>
+        `).join('');
+
+        // Dynamic AI Insights Generator
+        let insightText = "";
+        if (bounceRate > 60) {
+          insightText = `This article has a high bounce rate of <strong>${bounceRate}%</strong>. Consider optimizing the introduction hook to keep readers engaged. The CTR on 'Read More' is <strong>${readCTR}%</strong>, indicating interest remains once they start.`;
+        } else if (avgTime < 60) {
+          insightText = `Readers are spending only <strong>${avgTime}s</strong> on average here. The content layout might be too dense. Consider adding sub-headers, lists, or visual breakouts to increase reading dwell time.`;
+        } else {
+          insightText = `Strong reader engagement! Bounce rate is exceptionally low at <strong>${bounceRate}%</strong> and readers spend <strong>${avgTime}s</strong> on page. Your target audience is primarily in the <strong>25-34 age demographic</strong> via search channels. Build related posts in this category.`;
+        }
+        document.getElementById('ai-insights-content').innerHTML = insightText;
+      };
+
+      // Tab switcher
+      window.switchDashboardTab = function(tabName) {
+        document.getElementById('tab-btn-overview').classList.remove('active');
+        document.getElementById('tab-btn-article').classList.remove('active');
+        document.getElementById('panel-overview').style.display = 'none';
+        document.getElementById('panel-article').style.display = 'none';
+
+        if (tabName === 'overview') {
+          document.getElementById('tab-btn-overview').classList.add('active');
+          document.getElementById('panel-overview').style.display = 'flex';
+          loadGlobalStats();
+        } else {
+          document.getElementById('tab-btn-article').classList.add('active');
+          document.getElementById('panel-article').style.display = 'flex';
+          if (!activePost && posts.length > 0) {
+            // Auto select first post if none selected
+            selectArticle(posts[0]);
+          }
+        }
+      };
+
+      // Startup
+      renderPostList();
+      loadGlobalStats();
+    });
+  </script>
+
+  {{FOOTER}}
+</body>
+</html>

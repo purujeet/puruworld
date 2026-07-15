@@ -3137,6 +3137,23 @@ def main():
       f.write(html)
     print(f"Generated p/{filename}")
   
+  # Generate admin dashboard
+  dashboard_dir = os.path.join(output_dir, 'dashboard')
+  os.makedirs(dashboard_dir, exist_ok=True)
+  
+  dashboard_tmpl = load_template('dashboard.html')
+  dashboard_head = get_head('Admin Dashboard - puru world official', 'Analytics dashboard for puru world official.', '../', '<script src="../posts-metadata.js"></script>')
+  dashboard_header = get_header('../', has_progress=False, id_val="Dashboard")
+  dashboard_footer = get_footer('../')
+  
+  dashboard_html = dashboard_tmpl.replace('{{HEAD}}', dashboard_head)\
+                                 .replace('{{HEADER}}', dashboard_header)\
+                                 .replace('{{FOOTER}}', dashboard_footer)
+                                 
+  with open(os.path.join(dashboard_dir, 'index.html'), 'w', encoding='utf-8') as f:
+    f.write(dashboard_html)
+  print("Generated dashboard/index.html")
+  
   print("Writing post HTML files...")
   for i, post in enumerate(raw_posts):
     content_rewritten = rewrite_internal_links(post['content'], post['depth'])
