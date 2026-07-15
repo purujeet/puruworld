@@ -279,6 +279,13 @@ function renderAppsGrid() {
   
   grid.innerHTML = allApps.map(app => {
     const targetAttr = app.isExternal ? 'target="_blank"' : '';
+    
+    // Resolve URL depending on relative path depth
+    let resolvedUrl = app.url;
+    if (!app.isExternal && window.relPathDepth === '../') {
+      resolvedUrl = app.url.replace(/^\.\/p\//, './').replace(/^p\//, '');
+    }
+
     const iconHtml = `
       <div class="card-image-fallback" style="background: var(--accent-gradient); min-height: 160px; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; border-radius: 12px 12px 0 0; position: relative;">
         <span class="material-icons" style="font-size: 3rem; margin-bottom: 8px;">${app.icon}</span>
@@ -292,10 +299,10 @@ function renderAppsGrid() {
           ${iconHtml}
         </div>
         <div class="card-content" style="display: flex; flex-direction: column; flex-grow: 1; padding: 20px;">
-          <h2 class="card-title" style="margin: 0 0 10px 0;"><a href="${app.url}" ${targetAttr} style="color: var(--text-primary); text-decoration: none; font-family: 'Outfit', sans-serif;">${app.title}</a></h2>
+          <h2 class="card-title" style="margin: 0 0 10px 0;"><a href="${resolvedUrl}" ${targetAttr} style="color: var(--text-primary); text-decoration: none; font-family: 'Outfit', sans-serif;">${app.title}</a></h2>
           <p class="card-excerpt" style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px; flex-grow: 1;">${app.description}</p>
           <div style="margin-top: auto; display: flex; justify-content: space-between; align-items: center;">
-            <a href="${app.url}" ${targetAttr} class="back-btn" style="padding: 6px 12px; font-size: 0.85rem; border-color: var(--accent-color); color: var(--accent-color); font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; border-radius: 6px; border: 1px solid var(--accent-color); transition: all 0.2s;">
+            <a href="${resolvedUrl}" ${targetAttr} class="back-btn" style="padding: 6px 12px; font-size: 0.85rem; border-color: var(--accent-color); color: var(--accent-color); font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; border-radius: 6px; border: 1px solid var(--accent-color); transition: all 0.2s;">
               Launch ${app.isExternal ? 'Site' : 'App'}
               <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor;"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42 5.43 5.43H5v2z"/></svg>
             </a>
