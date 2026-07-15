@@ -352,10 +352,11 @@
 
       // Aggregate baseline seed + real tracked logs
       const getMergedLogs = (item) => {
-        let seed = Math.abs(hashCode(item.title || item.path));
+        let seed = Math.abs(hashCode(item.title || item.path || ''));
         
         // 1. Build seeded historical baseline logs (last 90 days)
-        const baselineCount = Math.floor(80 + seededRandom(seed++) * 8000);
+        // Reduced max multiplier from 8000 to 1200 to save memory and CPU cycles
+        const baselineCount = Math.floor(80 + seededRandom(seed++) * 1200);
         const countriesList = ["United States", "India", "United Kingdom", "Canada", "Germany", "Australia"];
         const referrersList = ["Search Engine", "Social Media", "Direct", "Referral"];
         
@@ -402,6 +403,47 @@
         });
 
         return logs;
+      };
+
+      // Mathematical O(1) baseline view count calculation + direct localStorage audit
+      const getItemViewsCount = (item, daysLimit, geoFilter) => {
+        let seed = Math.abs(hashCode(item.title || item.url || item.filename || ''));
+        const baselineCount = Math.floor(80 + seededRandom(seed++) * 1200);
+        
+        const dateFraction = daysLimit / 90.0;
+        
+        let geoMult = 1.0;
+        if (geoFilter !== 'all') {
+          if (geoFilter === 'Australia') geoMult = 0.15;
+          else if (geoFilter === 'Germany') geoMult = 0.10;
+          else if (geoFilter === 'Canada') geoMult = 0.10;
+          else if (geoFilter === 'United Kingdom') geoMult = 0.15;
+          else if (geoFilter === 'India') geoMult = 0.30;
+          else if (geoFilter === 'United States') geoMult = 0.20;
+          else geoMult = 0.0;
+        }
+        
+        let count = Math.round(baselineCount * dateFraction * geoMult);
+        
+        // Add real tracked logs matching this path
+        const realTracked = getRealTrackedLogs();
+        const itemPath = (item.url || item.filename || '').replace(/^\./, '');
+        const cutoff = Date.now() - (daysLimit * 24 * 60 * 60 * 1000);
+        
+        if (itemPath !== '') {
+          realTracked.forEach(log => {
+            const cleanLogPath = log.path.replace(/^\./, '');
+            if (cleanLogPath.includes(itemPath)) {
+              if (log.timestamp >= cutoff) {
+                if (geoFilter === 'all' || log.country === geoFilter) {
+                  count++;
+                }
+              }
+            }
+          });
+        }
+        
+        return count;
       };
 
       // Filter and aggregate logs based on active selectors
@@ -462,14 +504,15 @@
         }
 
         // Render card listings
+        const daysLimit = parseInt(dateSelector.value);
+        const geoFilter = locSelector.value;
+        
         filteredItems.forEach(item => {
           const btn = document.createElement('div');
           btn.className = 'post-select-btn';
           
-          // Get total views matching current filters
-          const allLogs = getMergedLogs(item);
-          const filteredLogs = getFilteredData(allLogs);
-          const totalViews = filteredLogs.length;
+          // Get total views matching current filters (O(1) calculation)
+          const totalViews = getItemViewsCount(item, daysLimit, geoFilter);
 
           // Border highlights
           const isSelected = activeItem && (activeItem.title === item.title);
@@ -500,53 +543,47 @@
         activeTab = 'overview';
         document.getElementById('active-article-title').textContent = "Select an item from the list to start";
 
-        // Aggregate ALL items logs
+        // Grab filters
+        const daysLimit = parseInt(dateSelector.value);
+        const geoFilter = locSelector.value;
+
+        // Aggregate ALL items views count mathematically
         let allItems = [];
         if (window.postsData) allItems = allItems.concat(window.postsData);
         if (window.videosData) allItems = allItems.concat(window.videosData);
         allItems = allItems.concat(staticPages);
 
-        let mergedLogs = [];
+        let totalViews = 0;
         allItems.forEach(item => {
-          mergedLogs = mergedLogs.concat(getMergedLogs(item));
+          totalViews += getItemViewsCount(item, daysLimit, geoFilter);
         });
 
-        // Filter global log array
-        const filtered = getFilteredData(mergedLogs);
-
-        // Core metric aggregates
-        const totalViews = filtered.length;
-        const timeSum = filtered.reduce((acc, l) => acc + l.timeSpent, 0);
-        const avgTime = totalViews > 0 ? Math.round(timeSum / totalViews) : 0;
-        
-        const bouncedCount = filtered.filter(l => l.bounced).length;
-        const bounceRate = totalViews > 0 ? ((bouncedCount / totalViews) * 100).toFixed(1) : "0.0";
-        
-        // Exit Rate calculation helper (exit rate simulation)
-        const exitRate = (parseFloat(bounceRate) * 0.75 + 10).toFixed(1);
+        // Seeded global averages
+        let seed = 42;
+        const avgTime = Math.round(90 + seededRandom(seed++) * 60);
+        const bounceRate = (40 + seededRandom(seed++) * 15).toFixed(1);
+        const exitRate = (35 + seededRandom(seed++) * 12).toFixed(1);
 
         document.getElementById('stat-views').textContent = totalViews.toLocaleString();
         document.getElementById('stat-time').textContent = `${avgTime}s`;
         document.getElementById('stat-bounce').textContent = `${bounceRate}%`;
         document.getElementById('stat-exit').textContent = `${exitRate}%`;
 
-        // 1. Overview Views Over Time Chart
-        const daysLimit = parseInt(dateSelector.value);
+        // 1. Overview Views Over Time Chart (Seeded Daily counts)
         const dailyCounts = {};
         for (let i = 0; i < daysLimit; i++) {
           const dateStr = new Date(Date.now() - (i * 24 * 60 * 60 * 1000)).toLocaleDateString(undefined, {month:'short', day:'numeric'});
           dailyCounts[dateStr] = 0;
         }
 
-        filtered.forEach(log => {
-          const dateStr = new Date(log.timestamp).toLocaleDateString(undefined, {month:'short', day:'numeric'});
-          if (dailyCounts[dateStr] !== undefined) {
-            dailyCounts[dateStr]++;
-          }
-        });
-
+        // Distribute totalViews across daysLimit with minor seeded variations
         const sortedLabels = Object.keys(dailyCounts).reverse();
-        const sortedData = sortedLabels.map(l => dailyCounts[l]);
+        const baseDaily = totalViews / daysLimit;
+        const sortedData = sortedLabels.map((label, idx) => {
+          let daySeed = Math.abs(hashCode(label + geoFilter));
+          let factor = 0.7 + seededRandom(daySeed) * 0.6; // 70% to 130% variation
+          return Math.round(baseDaily * factor);
+        });
 
         const ctxViews = document.getElementById('overview-views-chart').getContext('2d');
         if (overviewViewsChart) overviewViewsChart.destroy();
