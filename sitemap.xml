@@ -3,6 +3,7 @@
   <url><loc>https://purujeet.github.io/puruworld/</loc><priority>1.0</priority><changefreq>daily</changefreq></url>
   <url><loc>https://purujeet.github.io/puruworld/index.html</loc><priority>0.9</priority><changefreq>daily</changefreq></url>
   <url><loc>https://purujeet.github.io/puruworld/p/videos.html</loc><priority>0.9</priority><changefreq>daily</changefreq></url>
+  <url><loc>https://purujeet.github.io/puruworld/p/tools-games.html</loc><priority>0.9</priority><changefreq>weekly</changefreq></url>
   <url><loc>https://purujeet.github.io/puruworld/dashboard/index.html</loc><priority>0.7</priority><changefreq>weekly</changefreq></url>
   <url><loc>https://purujeet.github.io/puruworld/p/json-formatter.html</loc><priority>0.8</priority><changefreq>weekly</changefreq></url>
   <url><loc>https://purujeet.github.io/puruworld/p/tic-tac-toe.html</loc><priority>0.8</priority><changefreq>weekly</changefreq></url>

@@ -30,6 +30,9 @@
 
 <body>
   <header class="header-Detail">
+  <script>
+    window.relPathDepth = "../../";
+  </script>
   <div class="container header-content" style="display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 20px;">
     <div class="logo-search-wrapper" style="display: flex; align-items: center; gap: 20px; flex-grow: 1; max-width: 600px;">
       <div class="logo">
@@ -39,18 +42,19 @@
       </div>
       
       <!-- Top Line Search Box -->
-      <div class="header-search-box-wrapper" id="header-search-container" style="position: relative; flex-grow: 1; display: none;">
+      <div class="header-search-box-wrapper" id="header-search-container" style="position: relative; flex-grow: 1;">
         <span class="search-icon" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; display: flex; align-items: center;">
           <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width: 16px; height: 16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
         </span>
-        <input type="text" id="search-box" class="search-box" placeholder="Search articles & videos..." style="width: 100%; padding: 8px 36px 8px 36px; border: 1px solid var(--border-color); border-radius: 20px; background-color: var(--bg-secondary); color: var(--text-primary); font-size: 0.88rem; outline: none; transition: all 0.2s;">
+        <input type="text" id="search-box" class="search-box" placeholder="Search..." style="width: 100%; padding: 8px 36px 8px 36px; border: 1px solid var(--border-color); border-radius: 20px; background-color: var(--bg-secondary); color: var(--text-primary); font-size: 0.88rem; outline: none; transition: all 0.2s;">
         <span class="clear-icon" id="clear-search-icon" onclick="resetFilters()" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); cursor: pointer; display: none; font-size: 16px; font-weight: bold;">&times;</span>
       </div>
     </div>
     
     <nav class="nav-links" style="display: flex; align-items: center; gap: 20px; flex-shrink: 0;">
-      <a href="../../index.html" class="nav-link" onclick="if(typeof switchTab === 'function' && window.location.pathname.includes('index.html')) { event.preventDefault(); switchTab('blog'); }">Home</a>
-      <a href="../../index.html?tab=apps" class="nav-link" onclick="if(typeof switchTab === 'function' && window.location.pathname.includes('index.html')) { event.preventDefault(); switchTab('apps'); }">Tools & Games</a>
+      <a href="../../index.html" class="nav-link">Home</a>
+      <a href="../../p/videos.html" class="nav-link">Videos</a>
+      <a href="../../p/tools-games.html" class="nav-link">Tools & Games</a>
       <button class="theme-toggle-btn" aria-label="Toggle dark mode" id="theme-toggle">
         <svg class="moon-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
         <svg class="sun-icon" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path></svg>
@@ -80,6 +84,10 @@
           <span>
             <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
             4 min read
+          </span>
+          <span id="post-view-count">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:14px; height:14px; vertical-align:middle; margin-right:4px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+            <span id="view-count-number">...</span> views
           </span>
         </div>
         <div class="post-header-tags">

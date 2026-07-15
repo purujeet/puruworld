@@ -1708,9 +1708,49 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Videos Grid logic (Standalone fallback)
   const videosGrid = document.getElementById('videos-grid');
-  const isStandaloneVideosPage = videosGrid && !document.getElementById('posts-grid');
-  if (isStandaloneVideosPage) {
+  if (videosGrid) {
     initVideosPage();
+  }
+
+  // Apps Grid logic (Standalone apps page)
+  const appsGrid = document.getElementById('apps-grid');
+  if (appsGrid) {
+    renderAppsGrid();
+  }
+
+  // Global search bar enter key listener for redirection
+  const searchBox = document.getElementById('search-box');
+  if (searchBox) {
+    const isHomePage = document.getElementById('posts-grid') !== null;
+    const isVideosPage = document.getElementById('videos-grid') !== null;
+    
+    if (!isHomePage && !isVideosPage) {
+      searchBox.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          const query = searchBox.value.trim();
+          if (query) {
+            const depth = window.relPathDepth || '';
+            window.location.href = `${depth}index.html?search=${encodeURIComponent(query)}`;
+          }
+        }
+      });
+    }
+  }
+
+  // Dynamic View Counter for Article Detail Page
+  const titleEl = document.querySelector('.post-header-title');
+  if (titleEl) {
+    const postTitle = titleEl.textContent;
+    let seed = Math.abs(hashCode(postTitle));
+    const baseline = Math.floor(80 + seededRandom(seed++) * 1200);
+    const realTracked = getRealTrackedLogs();
+    let count = baseline;
+    const cleanPath = window.location.pathname.replace(/^\./, '');
+    realTracked.forEach(log => {
+      if (log.path.replace(/^\./, '').includes(cleanPath)) count++;
+    });
+    const valEl = document.getElementById('view-count-number');
+    if (valEl) valEl.textContent = count.toLocaleString();
   }
 
   // Post Detail Page widgets
@@ -1733,47 +1773,43 @@ const videosPerPage = 12;
 let activeVideoCategory = 'All';
 let activeTab = 'blog';
 
+// Helper to generate a seeded baseline view count + localStorage visits
+function getPostViews(post) {
+  let seed = Math.abs(hashCode(post.title || post.url || ''));
+  const baseline = Math.floor(80 + seededRandom(seed++) * 1200);
+  
+  let count = baseline;
+  const realTracked = getRealTrackedLogs();
+  const itemPath = (post.url || '').replace(/^\./, '');
+  if (itemPath !== '') {
+    realTracked.forEach(log => {
+      if (log.path.replace(/^\./, '').includes(itemPath)) {
+        count++;
+      }
+    });
+  }
+  return count;
+}
+
 function initHomePage() {
   try {
-    const rawPosts = (window.postsData || []).map(p => ({ ...p, isVideo: false }));
-    const rawVideos = (window.videosData || []).map(v => ({
-      title: v.title,
-      url: `https://www.youtube.com/watch?v=${v.id}`,
-      isVideo: true,
-      id: v.id,
-      thumbnail: v.thumbnail,
-      coverImage: v.thumbnail,
-      views: v.views,
-      timeAgo: v.timeAgo,
-      tags: ["Videos", v.category],
-      formattedDate: v.timeAgo,
-      readTime: "Video",
-      excerpt: `Watch my YouTube video: "${v.title}". Ingested from the official YouTube Channel.`
-    }));
-    
-    // Intersperse videos: 4 posts, then 1 video
-    const combined = [];
-    let pIdx = 0, vIdx = 0;
-    while (pIdx < rawPosts.length || vIdx < rawVideos.length) {
-      for (let i = 0; i < 4 && pIdx < rawPosts.length; i++) {
-        combined.push(rawPosts[pIdx++]);
-      }
-      if (vIdx < rawVideos.length) {
-        combined.push(rawVideos[vIdx++]);
-      }
-    }
-    
-    allPosts = combined;
+    allPosts = window.postsData || [];
     filteredPosts = [...allPosts];
-    
-    allVideos = window.videosData || [];
-    filteredVideos = [...allVideos];
     
     // Bind search and filter events
     const searchBox = document.getElementById('search-box');
     if (searchBox) {
       searchBox.value = '';
-      searchBox.placeholder = 'Search articles & videos...';
+      searchBox.placeholder = 'Search articles...';
+      
+      // Load search from URL query param if present
+      const urlParams = new URLSearchParams(window.location.search);
+      const searchParam = urlParams.get('search');
+      if (searchParam) {
+        searchBox.value = searchParam;
+        searchQuery = searchParam.toLowerCase().trim();
+      }
+      
       searchBox.addEventListener('input', (e) => {
         const query = e.target.value.toLowerCase().trim();
         searchQuery = query;
@@ -1785,21 +1821,15 @@ function initHomePage() {
           clearIcon.style.display = query ? 'block' : 'none';
         }
       });
+      
+      if (searchQuery) {
+        applyFilters();
+      }
     }
 
     renderTags();
-    renderAppsGrid();
-    
-    // Check URL parameters for active tab
-    const urlParams = new URLSearchParams(window.location.search);
-    const tabParam = urlParams.get('tab');
-    if (tabParam === 'apps') {
-      switchTab('apps');
-    } else {
-      switchTab('blog');
-    }
   } catch (error) {
-    console.error('Failed to load databases:', error);
+    console.error('Failed to load database:', error);
   }
 }
 
@@ -2362,6 +2392,10 @@ function renderPostsGrid() {
               <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
               ${featuredPost.readTime} min read
             </span>
+            <span>
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:14px; height:14px; vertical-align:middle; margin-right:4px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+              ${getPostViews(featuredPost).toLocaleString()} views
+            </span>
           </div>
           <h2 class="featured-title"><a href=".${featuredPost.url}">${featuredPost.title}</a></h2>
           <p class="featured-excerpt">${featuredPost.excerpt}</p>
@@ -2440,6 +2474,10 @@ function renderPostsGrid() {
             <span>
               <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
               ${post.readTime} min read
+            </span>
+            <span>
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:14px; height:14px; vertical-align:middle; margin-right:4px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+              ${getPostViews(post).toLocaleString()} views
             </span>
           </div>
           <h2 class="card-title"><a href=".${post.url}">${displayTitle}</a></h2>
@@ -3322,6 +3360,15 @@ def main():
   with open(os.path.join(videos_page_dir, 'videos.html'), 'w', encoding='utf-8') as f:
     f.write(videos_html)
   print("Generated p/videos.html")
+
+  # Write p/tools-games.html page modularly
+  tools_tmpl = load_template('tools-games.html')
+  head_tools = get_head("Tools & Games - puru world official", "Play virtual casual games or launch interactive developer utility products.", "../", "p/tools-games.html")
+  header_tools = get_header("../", has_progress=False, id_val="Tools")
+  tools_html = tools_tmpl.replace('{{HEAD}}', head_tools).replace('{{HEADER}}', header_tools).replace('{{FOOTER}}', footer)
+  with open(os.path.join(videos_page_dir, 'tools-games.html'), 'w', encoding='utf-8') as f:
+    f.write(tools_html)
+  print("Generated p/tools-games.html")
   
   # Generate standard ads.txt
   with open(os.path.join(output_dir, 'ads.txt'), 'w', encoding='utf-8') as f:
@@ -3935,6 +3982,7 @@ def main():
     '  <url><loc>https://purujeet.github.io/puruworld/</loc><priority>1.0</priority><changefreq>daily</changefreq></url>',
     '  <url><loc>https://purujeet.github.io/puruworld/index.html</loc><priority>0.9</priority><changefreq>daily</changefreq></url>',
     '  <url><loc>https://purujeet.github.io/puruworld/p/videos.html</loc><priority>0.9</priority><changefreq>daily</changefreq></url>',
+    '  <url><loc>https://purujeet.github.io/puruworld/p/tools-games.html</loc><priority>0.9</priority><changefreq>weekly</changefreq></url>',
     '  <url><loc>https://purujeet.github.io/puruworld/dashboard/index.html</loc><priority>0.7</priority><changefreq>weekly</changefreq></url>'
   ]
   
