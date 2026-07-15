@@ -1277,10 +1277,10 @@ footer p {
 
 /* Top line search display configurations */
 #header-search-container {
-  display: none !important;
-}
-.header-Index #header-search-container {
   display: block !important;
+}
+.header-Dashboard #header-search-container {
+  display: none !important;
 }
 
 /* Premium Glowing Borders */

@@ -1594,10 +1594,10 @@ footer p {
 
 /* Top line search display configurations */
 #header-search-container {
-  display: none !important;
-}
-.header-Index #header-search-container {
   display: block !important;
+}
+.header-Dashboard #header-search-container {
+  display: none !important;
 }
 
 /* Premium Glowing Borders */
@@ -1670,7 +1670,23 @@ footer p {
 """
 
 # --- SHARED JAVASCRIPT ---
-SHARED_JS = """// Theme toggling and state synchronization
+SHARED_JS = """// Global seeding utility functions
+function hashCode(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return hash;
+}
+
+function seededRandom(seed) {
+  const x = Math.sin(seed++) * 10000;
+  return x - Math.floor(x);
+}
+
+// Theme toggling and state synchronization
 (function() {
   const savedTheme = localStorage.getItem('theme') || 'light';
   document.documentElement.setAttribute('data-theme', savedTheme);
