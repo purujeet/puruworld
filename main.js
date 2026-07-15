@@ -743,19 +743,12 @@ function renderPostsGrid() {
           <div class="featured-badge">Latest Article</div>
         </div>
         <div class="featured-content">
-          <div class="card-meta">
-            <span>
-              <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
-              ${featuredPost.formattedDate}
-            </span>
-            <span>
-              <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
-              ${featuredPost.readTime} min read
-            </span>
-            <span>
-              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:14px; height:14px; vertical-align:middle; margin-right:4px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-              ${getPostViews(featuredPost).toLocaleString()} views
-            </span>
+          <div class="card-meta" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 0.8rem; color: var(--text-muted);">
+            <span>${featuredPost.formattedDate}</span>
+            <span style="opacity: 0.5;">•</span>
+            <span>${featuredPost.readTime} min read</span>
+            <span style="opacity: 0.5;">•</span>
+            <span style="color: var(--accent-color); font-weight: 600;">${getPostViews(featuredPost).toLocaleString()} views</span>
           </div>
           <h2 class="featured-title"><a href=".${featuredPost.url}">${featuredPost.title}</a></h2>
           <p class="featured-excerpt">${featuredPost.excerpt}</p>
@@ -826,19 +819,12 @@ function renderPostsGrid() {
           ${coverImageHtml}
         </div>
         <div class="card-content">
-          <div class="card-meta">
-            <span>
-              <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
-              ${post.formattedDate}
-            </span>
-            <span>
-              <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
-              ${post.readTime} min read
-            </span>
-            <span>
-              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:14px; height:14px; vertical-align:middle; margin-right:4px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-              ${getPostViews(post).toLocaleString()} views
-            </span>
+          <div class="card-meta" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 0.8rem; color: var(--text-muted);">
+            <span>${post.formattedDate}</span>
+            <span style="opacity: 0.5;">•</span>
+            <span>${post.readTime} min read</span>
+            <span style="opacity: 0.5;">•</span>
+            <span style="color: var(--accent-color); font-weight: 600;">${getPostViews(post).toLocaleString()} views</span>
           </div>
           <h2 class="card-title"><a href=".${post.url}">${displayTitle}</a></h2>
           <p class="card-excerpt">${displayExcerpt}</p>
