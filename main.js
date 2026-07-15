@@ -477,7 +477,7 @@ function applyVideoFilters() {
     return `
       <article class="post-card video-card" onclick="playVideo('${video.id}')" style="cursor: pointer;">
         <div class="card-image-wrapper">
-          <img class="card-image" src="${video.thumbnail}" alt="${video.title}" loading="lazy">
+          <img class="card-image" src="${video.thumbnail}" alt="${video.title}" width="480" height="360" loading="lazy">
           <div class="play-overlay">
             <svg viewBox="0 0 24 24" fill="currentColor">
               <path d="M8 5v14l11-7z"/>
@@ -656,11 +656,10 @@ function renderPostsGrid() {
   let postsHtml = '';
   const isInitialState = (currentPage === 1 && !activeTag && !searchQuery);
 
-  let displayPosts = [];
   if (isInitialState) {
     const featuredPost = filteredPosts[0];
     const coverImageHtml = featuredPost.coverImage 
-      ? `<img class="featured-image" src="${featuredPost.coverImage}" alt="${featuredPost.title}" loading="eager">`
+      ? `<img class="featured-image" src="${featuredPost.coverImage}" alt="${featuredPost.title}" width="800" height="450" fetchpriority="high" loading="eager">`
       : `<div class="card-image-fallback">${featuredPost.title.slice(0, 2).toUpperCase()}</div>`;
     
     const tagsHtml = featuredPost.tags 
@@ -692,24 +691,24 @@ function renderPostsGrid() {
         </div>
       </article>
     `;
-
-    displayPosts = filteredPosts.slice(1, postsPerPage);
-  } else {
-    const startIndex = (currentPage - 1) * postsPerPage;
-    const endIndex = startIndex + postsPerPage;
-    displayPosts = filteredPosts.slice(startIndex, endIndex);
   }
 
-  postsHtml += displayPosts.map((post, idx) => {
+  let displayPosts = isInitialState ? filteredPosts.slice(1) : filteredPosts;
+
+  const startIndex = (currentPage - 1) * postsPerPage;
+  const endIndex = startIndex + postsPerPage;
+  const pagePosts = displayPosts.slice(startIndex, endIndex);
+
+  postsHtml += pagePosts.map((post, index) => {
     const displayTitle = searchQuery ? highlightText(post.title, searchQuery) : post.title;
     const displayExcerpt = searchQuery ? highlightText(post.excerpt, searchQuery) : post.excerpt;
 
-    const isBelowFold = (currentPage > 1 || idx > 2);
+    const isBelowFold = index > 1 || currentPage > 1;
     const lazyClass = isBelowFold ? 'post-card-lazy' : '';
     const loadingAttr = isBelowFold ? 'lazy' : 'eager';
 
     const coverImageHtml = post.coverImage 
-      ? `<img class="card-image" src="${post.coverImage}" alt="${post.title}" loading="${loadingAttr}" decoding="async">`
+      ? `<img class="card-image" src="${post.coverImage}" alt="${post.title}" width="400" height="250" loading="${loadingAttr}" decoding="async">`
       : `<div class="card-image-fallback">${post.title.slice(0, 2).toUpperCase()}</div>`;
 
     const tagsHtml = post.tags 

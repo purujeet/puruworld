@@ -54,7 +54,47 @@ def rewrite_internal_links(content, current_depth):
     content = re.sub(page_pattern, lambda m: rel_prefix + 'p/' + m.group(1), content)
     return content
 
-def sanitize_blogger_html(content):
+def inject_contextual_links(content, current_url, posts_metadata, rel_path):
+    injected = 0
+    candidates = []
+    
+    for p in posts_metadata:
+      p_url = p.get('url')
+      if not p_url or p_url == current_url:
+        continue
+      terms = [p['title']]
+      if p.get('tags'):
+        terms.extend(p['tags'])
+      for term in terms:
+        if len(term) > 5:
+          candidates.append((term, p_url))
+          
+    candidates.sort(key=lambda x: len(x[0]), reverse=True)
+    
+    for kw, target_url in candidates:
+      if injected >= 2:
+        break
+      pattern = re.compile(rf'\b({re.escape(kw)})\b', re.IGNORECASE)
+      parts = re.split(r'(<[^>]+>)', content)
+      modified = False
+      for idx in range(len(parts)):
+        if idx % 2 == 0 and not parts[idx].startswith('<'):
+          text_part = parts[idx]
+          match = pattern.search(text_part)
+          if match:
+            matched_text = match.group(1)
+            relative_target = rel_path + target_url.lstrip('/')
+            parts[idx] = pattern.sub(f'<a href="{relative_target}" style="color: var(--accent-color); text-decoration: underline;">{matched_text}</a>', text_part, count=1)
+            injected += 1
+            modified = True
+            break
+      if modified:
+        content = "".join(parts)
+    return content
+
+def sanitize_blogger_html(content, post_title=None):
+    alt_text = post_title.replace('"', '&quot;') if post_title else "puru world official image"
+    
     # 1. Convert Blogger tr-caption-container tables to modern figure/figcaption elements
     table_pattern = r'<table[^>]*class="[^"]*tr-caption-container[^"]*"[^>]*>\s*<tbody>\s*<tr>\s*<td[^>]*>(.*?)</td>\s*</tr>\s*<tr>\s*<td[^>]*class="tr-caption"[^>]*>(.*?)</td>\s*</tr>\s*</tbody>\s*</table>'
     
@@ -67,6 +107,10 @@ def sanitize_blogger_html(content):
         img_td_content = re.sub(r'\bheight="\d+"', '', img_td_content)
         img_td_content = re.sub(r'\bborder="\d+"', '', img_td_content)
         img_td_content = re.sub(r'style="[^"]*"', '', img_td_content)
+        
+        # If alt tag is missing, inject the post title
+        if 'alt=' not in img_td_content:
+            img_td_content = re.sub(r'<img\s+', f'<img alt="{alt_text}" ', img_td_content)
         
         # Inject standard post-image styles and lazy load markers
         img_td_content = re.sub(
@@ -94,6 +138,8 @@ def sanitize_blogger_html(content):
         img_tag = re.sub(r'style="[^"]*"', '', img_tag)
 
         attrs = []
+        if 'alt=' not in img_tag:
+            attrs.append(f'alt="{alt_text}"')
         if 'loading=' not in img_tag:
             attrs.append('loading="lazy"')
         if 'decoding=' not in img_tag:
@@ -1576,6 +1622,51 @@ footer p {
     font-size: 2rem;
   }
 }
+
+/* Mobile Responsive Header, Grid and Games fixes */
+@media (max-width: 600px) {
+  header .header-content {
+    flex-direction: column !important;
+    gap: 12px !important;
+    align-items: stretch !important;
+    padding: 10px 16px !important;
+  }
+  .logo-search-wrapper {
+    flex-direction: column !important;
+    gap: 10px !important;
+    width: 100% !important;
+    align-items: stretch !important;
+  }
+  .header-search-box-wrapper {
+    width: 100% !important;
+  }
+  .nav-links {
+    width: 100% !important;
+    justify-content: space-around !important;
+    padding-top: 8px !important;
+    border-top: 1px solid var(--border-color);
+  }
+  /* Grid padding adjustments */
+  .posts-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  .post-card {
+    border-radius: 12px !important;
+  }
+  /* Responsive Game Views scales to fit container width without scroll */
+  .bottle-container, #tictactoe-game, .coin-container {
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+  #tictactoe-game .board {
+    gap: 6px !important;
+    padding: 6px !important;
+  }
+  #tictactoe-game .cell {
+    font-size: 2.2rem !important;
+  }
+}
 """
 
 # --- SHARED JAVASCRIPT ---
@@ -2058,7 +2149,7 @@ function applyVideoFilters() {
     return `
       <article class="post-card video-card" onclick="playVideo('${video.id}')" style="cursor: pointer;">
         <div class="card-image-wrapper">
-          <img class="card-image" src="${video.thumbnail}" alt="${video.title}" loading="lazy">
+          <img class="card-image" src="${video.thumbnail}" alt="${video.title}" width="480" height="360" loading="lazy">
           <div class="play-overlay">
             <svg viewBox="0 0 24 24" fill="currentColor">
               <path d="M8 5v14l11-7z"/>
@@ -2237,11 +2328,10 @@ function renderPostsGrid() {
   let postsHtml = '';
   const isInitialState = (currentPage === 1 && !activeTag && !searchQuery);
 
-  let displayPosts = [];
   if (isInitialState) {
     const featuredPost = filteredPosts[0];
     const coverImageHtml = featuredPost.coverImage 
-      ? `<img class="featured-image" src="${featuredPost.coverImage}" alt="${featuredPost.title}" loading="eager">`
+      ? `<img class="featured-image" src="${featuredPost.coverImage}" alt="${featuredPost.title}" width="800" height="450" fetchpriority="high" loading="eager">`
       : `<div class="card-image-fallback">${featuredPost.title.slice(0, 2).toUpperCase()}</div>`;
     
     const tagsHtml = featuredPost.tags 
@@ -2273,24 +2363,24 @@ function renderPostsGrid() {
         </div>
       </article>
     `;
-
-    displayPosts = filteredPosts.slice(1, postsPerPage);
-  } else {
-    const startIndex = (currentPage - 1) * postsPerPage;
-    const endIndex = startIndex + postsPerPage;
-    displayPosts = filteredPosts.slice(startIndex, endIndex);
   }
 
-  postsHtml += displayPosts.map((post, idx) => {
+  let displayPosts = isInitialState ? filteredPosts.slice(1) : filteredPosts;
+
+  const startIndex = (currentPage - 1) * postsPerPage;
+  const endIndex = startIndex + postsPerPage;
+  const pagePosts = displayPosts.slice(startIndex, endIndex);
+
+  postsHtml += pagePosts.map((post, index) => {
     const displayTitle = searchQuery ? highlightText(post.title, searchQuery) : post.title;
     const displayExcerpt = searchQuery ? highlightText(post.excerpt, searchQuery) : post.excerpt;
 
-    const isBelowFold = (currentPage > 1 || idx > 2);
+    const isBelowFold = index > 1 || currentPage > 1;
     const lazyClass = isBelowFold ? 'post-card-lazy' : '';
     const loadingAttr = isBelowFold ? 'lazy' : 'eager';
 
     const coverImageHtml = post.coverImage 
-      ? `<img class="card-image" src="${post.coverImage}" alt="${post.title}" loading="${loadingAttr}" decoding="async">`
+      ? `<img class="card-image" src="${post.coverImage}" alt="${post.title}" width="400" height="250" loading="${loadingAttr}" decoding="async">`
       : `<div class="card-image-fallback">${post.title.slice(0, 2).toUpperCase()}</div>`;
 
     const tagsHtml = post.tags 
@@ -2915,12 +3005,19 @@ def load_template(name):
   with open(path, 'r', encoding='utf-8') as f:
     return f.read()
 
-def get_head(title, description, rel_path, additional_scripts=""):
+def get_head(title, description, rel_path, filename=None, additional_scripts=""):
   head_tmpl = load_template('head.html')
+  canonical_tag = ''
+  if filename:
+    clean_fn = filename.lstrip('/')
+    canonical_tag = f'<link rel="canonical" href="https://purujeet.github.io/puruworld/{clean_fn}">'
+  else:
+    canonical_tag = '<link rel="canonical" href="https://purujeet.github.io/puruworld/">'
+  
   return head_tmpl.replace('{{TITLE}}', title)\
                   .replace('{{DESCRIPTION}}', description)\
                   .replace('{{REL_PATH}}', rel_path)\
-                  .replace('{{ADDITIONAL_SCRIPTS}}', additional_scripts)
+                  .replace('{{ADDITIONAL_SCRIPTS}}', canonical_tag + "\n" + additional_scripts)
 
 def get_header(rel_path, has_progress=False, id_val="Index"):
   header_tmpl = load_template('header.html')
@@ -2932,15 +3029,15 @@ def get_header(rel_path, has_progress=False, id_val="Index"):
 def get_footer(rel_path):
   return load_template('footer.html').replace('{{REL_PATH}}', rel_path)
 
-def make_post_html(post_title, post_date, post_tags, post_content, read_time, cover_image, rel_path, related_posts_html):
+def make_post_html(post_title, post_date, post_tags, post_content, read_time, cover_image, rel_path, filename, related_posts_html):
   post_tmpl = load_template('post.html')
   
-  head = get_head(f"{post_title} - puru world official", clean_excerpt(post_content, 150), rel_path)
+  head = get_head(f"{post_title} - puru world official", clean_excerpt(post_content, 150), rel_path, filename)
   header = get_header(rel_path, has_progress=True, id_val="Detail")
   footer = get_footer(rel_path)
   
   header_tags_html = "".join([f'<span class="filter-tag" style="cursor:default">{t}</span>' for t in post_tags])
-  cover_image_html = f'<img class="post-hero-image" src="{cover_image}" alt="{post_title}" loading="eager" decoding="async">' if cover_image else ''
+  cover_image_html = f'<img class="post-hero-image" src="{cover_image}" alt="{post_title}" width="1200" height="630" fetchpriority="high" loading="eager" decoding="async">' if cover_image else ''
   
   title_escaped = post_title.replace("'", "\\'")
   
@@ -2987,7 +3084,7 @@ def generate_related_posts_section(post, all_posts_metadata, rel_path):
     
   cards_html = ""
   for r in related[:3]:
-    cover_image_html = f'<img class="card-image" src="{r["coverImage"]}" alt="{r["title"]}" loading="lazy" decoding="async">' if r["coverImage"] else f'<div class="card-image-fallback">{r["title"][:2].upper()}</div>'
+    cover_image_html = f'<img class="card-image" src="{r["coverImage"]}" alt="{r["title"]}" width="400" height="250" loading="lazy" decoding="async">' if r["coverImage"] else f'<div class="card-image-fallback">{r["title"][:2].upper()}</div>'
     tags_html = "".join([f'<span class="card-tag">{t}</span>' for t in r["tags"][:2]])
     cards_html += f"""
       <article class="post-card">
@@ -3155,7 +3252,7 @@ def main():
   
   # Load Index HTML modularly
   index_tmpl = load_template('index.html')
-  head = get_head("puru world official", "puru world official - A blog on everyday need daily. Exploring technology, lifeskills, travel, and more.", "./", '<script src="./posts-metadata.js"></script><script src="./videos-metadata.js"></script>')
+  head = get_head("puru world official", "puru world official - A blog on everyday need daily. Exploring technology, lifeskills, travel, and more.", "./", "index.html", '<script src="./posts-metadata.js"></script><script src="./videos-metadata.js"></script>')
   header = get_header("./", has_progress=False, id_val="Index")
   footer = get_footer("./")
   index_html = index_tmpl.replace('{{HEAD}}', head).replace('{{HEADER}}', header).replace('{{FOOTER}}', footer)
@@ -3175,7 +3272,7 @@ def main():
   
   # Write p/videos.html page modularly
   videos_tmpl = load_template('videos.html')
-  head = get_head("Videos - puru world official", "Watch my latest video updates, gaming livestreams, and tutorials from Puru World.", "../", '<script src="../videos-metadata.js"></script>')
+  head = get_head("Videos - puru world official", "Watch my latest video updates, gaming livestreams, and tutorials from Puru World.", "../", "p/videos.html", '<script src="../videos-metadata.js"></script>')
   header = get_header("../", has_progress=False, id_val="Videos")
   footer = get_footer("../")
   videos_html = videos_tmpl.replace('{{HEAD}}', head).replace('{{HEADER}}', header).replace('{{FOOTER}}', footer)
@@ -3202,7 +3299,7 @@ def main():
   
   for filename, title, desc in legal_pages:
     tmpl = load_template(filename)
-    head = get_head(title, desc, "../")
+    head = get_head(title, desc, "../", f"p/{filename}")
     header = get_header("../", has_progress=False, id_val="Legal")
     footer = get_footer("../")
     html = tmpl.replace('{{HEAD}}', head).replace('{{HEADER}}', header).replace('{{FOOTER}}', footer)
@@ -3216,7 +3313,7 @@ def main():
   os.makedirs(dashboard_dir, exist_ok=True)
   
   dashboard_tmpl = load_template('dashboard.html')
-  dashboard_head = get_head('Admin Dashboard - puru world official', 'Analytics dashboard for puru world official.', '../', '<script src="../posts-metadata.js"></script>')
+  dashboard_head = get_head('Admin Dashboard - puru world official', 'Analytics dashboard for puru world official.', '../', 'dashboard/index.html', '<script src="../posts-metadata.js"></script>')
   dashboard_header = get_header('../', has_progress=False, id_val="Dashboard")
   dashboard_footer = get_footer('../')
   
@@ -3231,7 +3328,8 @@ def main():
   print("Writing post HTML files...")
   for i, post in enumerate(raw_posts):
     content_rewritten = rewrite_internal_links(post['content'], post['depth'])
-    content_sanitized = sanitize_blogger_html(content_rewritten)
+    content_linked = inject_contextual_links(content_rewritten, post['filename'], posts_metadata, post['rel_path'])
+    content_sanitized = sanitize_blogger_html(content_linked, post['title'])
     related_html = generate_related_posts_section(post, posts_metadata, post['rel_path'])
     
     post_html = make_post_html(
@@ -3242,6 +3340,7 @@ def main():
       read_time=post['readTime'],
       cover_image=post['coverImage'],
       rel_path=post['rel_path'],
+      filename=post['filename'],
       related_posts_html=related_html
     )
     
@@ -3256,7 +3355,7 @@ def main():
   print("Writing page HTML files...")
   for i, page in enumerate(raw_pages):
     content_rewritten = rewrite_internal_links(page['content'], page['depth'])
-    content_sanitized = sanitize_blogger_html(content_rewritten)
+    content_sanitized = sanitize_blogger_html(content_rewritten, page['title'])
     
     if 'flip-coin' in page['filename']:
       content_sanitized = content_sanitized.replace(
@@ -3773,7 +3872,7 @@ def main():
       )
     
     page_tmpl = load_template('page.html')
-    head = get_head(f"{page['title']} - puru world official", clean_excerpt(page['content'], 150), page['rel_path'])
+    head = get_head(f"{page['title']} - puru world official", clean_excerpt(page['content'], 150), page['rel_path'], page['filename'])
     header = get_header(page['rel_path'], has_progress=False, id_val="Page")
     footer = get_footer(page['rel_path'])
     
@@ -3789,6 +3888,39 @@ def main():
       f.write(page_html)
   
   print(f"Generated {len(raw_pages)} pages.")
+  
+  # Generate dynamic sitemap.xml
+  print("Generating sitemap.xml...")
+  sitemap_entries = [
+    '  <url><loc>https://purujeet.github.io/puruworld/</loc><priority>1.0</priority><changefreq>daily</changefreq></url>',
+    '  <url><loc>https://purujeet.github.io/puruworld/index.html</loc><priority>0.9</priority><changefreq>daily</changefreq></url>',
+    '  <url><loc>https://purujeet.github.io/puruworld/p/videos.html</loc><priority>0.9</priority><changefreq>daily</changefreq></url>',
+    '  <url><loc>https://purujeet.github.io/puruworld/dashboard/index.html</loc><priority>0.7</priority><changefreq>weekly</changefreq></url>'
+  ]
+  
+  # Add tools & games
+  for page in raw_pages:
+    clean_fn = page['filename'].lstrip('/')
+    sitemap_entries.append(f'  <url><loc>https://purujeet.github.io/puruworld/{clean_fn}</loc><priority>0.8</priority><changefreq>weekly</changefreq></url>')
+    
+  # Add legal pages
+  for filename, _, _ in legal_pages:
+    sitemap_entries.append(f'  <url><loc>https://purujeet.github.io/puruworld/p/{filename}</loc><priority>0.5</priority><changefreq>monthly</changefreq></url>')
+    
+  # Add blog posts
+  for post in raw_posts:
+    clean_fn = post['filename'].lstrip('/')
+    sitemap_entries.append(f'  <url><loc>https://purujeet.github.io/puruworld/{clean_fn}</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>')
+    
+  sitemap_xml = f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+{chr(10).join(sitemap_entries)}
+</urlset>
+"""
+  with open(os.path.join(output_dir, 'sitemap.xml'), 'w', encoding='utf-8') as f:
+    f.write(sitemap_xml.strip())
+  print("Generated sitemap.xml")
+  
   print("Migration completed successfully!")
 
 if __name__ == '__main__':

@@ -1305,3 +1305,48 @@ footer p {
     font-size: 2rem;
   }
 }
+
+/* Mobile Responsive Header, Grid and Games fixes */
+@media (max-width: 600px) {
+  header .header-content {
+    flex-direction: column !important;
+    gap: 12px !important;
+    align-items: stretch !important;
+    padding: 10px 16px !important;
+  }
+  .logo-search-wrapper {
+    flex-direction: column !important;
+    gap: 10px !important;
+    width: 100% !important;
+    align-items: stretch !important;
+  }
+  .header-search-box-wrapper {
+    width: 100% !important;
+  }
+  .nav-links {
+    width: 100% !important;
+    justify-content: space-around !important;
+    padding-top: 8px !important;
+    border-top: 1px solid var(--border-color);
+  }
+  /* Grid padding adjustments */
+  .posts-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  .post-card {
+    border-radius: 12px !important;
+  }
+  /* Responsive Game Views scales to fit container width without scroll */
+  .bottle-container, #tictactoe-game, .coin-container {
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+  #tictactoe-game .board {
+    gap: 6px !important;
+    padding: 6px !important;
+  }
+  #tictactoe-game .cell {
+    font-size: 2.2rem !important;
+  }
+}
