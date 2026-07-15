@@ -63,7 +63,35 @@ let activeTab = 'blog';
 
 function initHomePage() {
   try {
-    allPosts = window.postsData || [];
+    const rawPosts = (window.postsData || []).map(p => ({ ...p, isVideo: false }));
+    const rawVideos = (window.videosData || []).map(v => ({
+      title: v.title,
+      url: `https://www.youtube.com/watch?v=${v.id}`,
+      isVideo: true,
+      id: v.id,
+      thumbnail: v.thumbnail,
+      coverImage: v.thumbnail,
+      views: v.views,
+      timeAgo: v.timeAgo,
+      tags: ["Videos", v.category],
+      formattedDate: v.timeAgo,
+      readTime: "Video",
+      excerpt: `Watch my YouTube video: "${v.title}". Ingested from the official YouTube Channel.`
+    }));
+    
+    // Intersperse videos: 4 posts, then 1 video
+    const combined = [];
+    let pIdx = 0, vIdx = 0;
+    while (pIdx < rawPosts.length || vIdx < rawVideos.length) {
+      for (let i = 0; i < 4 && pIdx < rawPosts.length; i++) {
+        combined.push(rawPosts[pIdx++]);
+      }
+      if (vIdx < rawVideos.length) {
+        combined.push(rawVideos[vIdx++]);
+      }
+    }
+    
+    allPosts = combined;
     filteredPosts = [...allPosts];
     
     allVideos = window.videosData || [];
@@ -72,18 +100,13 @@ function initHomePage() {
     // Bind search and filter events
     const searchBox = document.getElementById('search-box');
     if (searchBox) {
-      searchBox.value = ''; // Clear search box on reload
+      searchBox.value = '';
+      searchBox.placeholder = 'Search articles & videos...';
       searchBox.addEventListener('input', (e) => {
         const query = e.target.value.toLowerCase().trim();
-        
-        if (activeTab === 'blog') {
-          searchQuery = query;
-          currentPage = 1;
-          applyFilters();
-        } else {
-          currentVideoPage = 1;
-          applyVideoFilters();
-        }
+        searchQuery = query;
+        currentPage = 1;
+        applyFilters();
 
         const clearIcon = document.getElementById('clear-search-icon');
         if (clearIcon) {
@@ -93,15 +116,12 @@ function initHomePage() {
     }
 
     renderTags();
-    renderVideoCategories();
     renderAppsGrid();
     
     // Check URL parameters for active tab
     const urlParams = new URLSearchParams(window.location.search);
     const tabParam = urlParams.get('tab');
-    if (tabParam === 'videos') {
-      switchTab('videos');
-    } else if (tabParam === 'apps') {
+    if (tabParam === 'apps') {
       switchTab('apps');
     } else {
       switchTab('blog');
@@ -235,40 +255,28 @@ function switchTab(tab) {
   activeTab = tab;
   
   const tabBlog = document.getElementById('tab-blog');
-  const tabVideos = document.getElementById('tab-videos');
   const tabApps = document.getElementById('tab-apps');
   const blogPageLayout = document.getElementById('blog-page-layout');
-  const videosPageLayout = document.getElementById('videos-page-layout');
   const appsPageLayout = document.getElementById('apps-page-layout');
   const pagination = document.getElementById('pagination');
-  const videosPagination = document.getElementById('videos-pagination');
   const searchFilterSection = document.getElementById('search-filter-section');
   const searchBox = document.getElementById('search-box');
   
   if (tabBlog) tabBlog.classList.toggle('active', tab === 'blog');
-  if (tabVideos) tabVideos.classList.toggle('active', tab === 'videos');
   if (tabApps) tabApps.classList.toggle('active', tab === 'apps');
   
   if (blogPageLayout) blogPageLayout.style.display = tab === 'blog' ? 'grid' : 'none';
-  if (videosPageLayout) videosPageLayout.style.display = tab === 'videos' ? 'grid' : 'none';
   if (appsPageLayout) appsPageLayout.style.display = tab === 'apps' ? 'grid' : 'none';
   
   if (pagination) pagination.style.display = tab === 'blog' ? 'flex' : 'none';
-  if (videosPagination) videosPagination.style.display = tab === 'videos' ? 'flex' : 'none';
   if (searchFilterSection) searchFilterSection.style.display = tab === 'apps' ? 'none' : 'block';
   
   if (tab === 'blog') {
     if (searchBox) {
-      searchBox.placeholder = 'Search across 1,500+ blog articles...';
+      searchBox.placeholder = 'Search articles & videos...';
       searchBox.value = searchQuery;
     }
     applyFilters();
-  } else if (tab === 'videos') {
-    if (searchBox) {
-      searchBox.placeholder = 'Search YouTube video library...';
-      searchBox.value = '';
-    }
-    applyVideoFilters();
   }
   
   // Update clear icon state
@@ -298,7 +306,7 @@ function renderTags() {
     <button class="filter-tag ${activeTag === null ? 'active' : ''}" onclick="selectTag(null)">
       <span style="display:flex; align-items:center; gap:8px;">
         <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
-        All Articles
+        All Articles & Videos
       </span>
       <span class="tag-count">${allPosts.length}</span>
     </button>
@@ -714,6 +722,37 @@ function renderPostsGrid() {
     const tagsHtml = post.tags 
       ? post.tags.slice(0, 3).map(tag => `<span class="card-tag">${tag}</span>`).join('')
       : '';
+
+    if (post.isVideo) {
+      return `
+        <article class="post-card video-card ${lazyClass}" onclick="playVideo('${post.id}')" style="cursor: pointer;">
+          <div class="card-image-wrapper">
+            <img class="card-image" src="${post.coverImage}" alt="${post.title}" width="400" height="250" loading="${loadingAttr}">
+            <div class="play-overlay">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+            </div>
+          </div>
+          <div class="card-content" style="display: flex; flex-direction: column; height: 100%;">
+            <div class="card-meta">
+              <span>
+                <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+                ${post.views || '0 views'}
+              </span>
+              <span>
+                <svg fill="currentColor" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 2 22 6.48 22 12s-4.48-10-10-10zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                ${post.timeAgo || 'recent'}
+              </span>
+            </div>
+            <h2 class="card-title" style="font-size: 1.15rem; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 8px;">${displayTitle}</h2>
+            <div class="card-tags" style="margin-top: auto;">
+              ${tagsHtml}
+            </div>
+          </div>
+        </article>
+      `;
+    }
 
     return `
       <article class="post-card ${lazyClass}">
