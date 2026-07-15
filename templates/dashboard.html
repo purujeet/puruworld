@@ -293,13 +293,31 @@
         });
       };
 
+      // Helper to parse YouTube view count strings (e.g. "19 views", "1.2K views")
+      const parseRealViews = (viewStr) => {
+        if (!viewStr) return 0;
+        let str = viewStr.toString().toLowerCase().replace(/[^0-9.k/m]/g, '').trim();
+        if (str.includes('k')) {
+          return parseFloat(str) * 1000;
+        }
+        if (str.includes('m')) {
+          return parseFloat(str) * 1000000;
+        }
+        return parseFloat(str) || 0;
+      };
+
       // Aggregate baseline seed + real tracked logs
       const getMergedLogs = (item) => {
         let seed = Math.abs(hashCode(item.title || item.path || ''));
         
         // 1. Build seeded historical baseline logs (last 90 days)
-        // Reduced max multiplier from 8000 to 1200 to save memory and CPU cycles
-        const baselineCount = Math.floor(80 + seededRandom(seed++) * 1200);
+        // Parse actual views for video items, fallback to seeded bounds for articles
+        let baselineCount = 0;
+        if (item.views !== undefined) {
+          baselineCount = Math.min(1000, parseRealViews(item.views));
+        } else {
+          baselineCount = Math.floor(80 + seededRandom(seed++) * 1200);
+        }
         const countriesList = ["United States", "India", "United Kingdom", "Canada", "Germany", "Australia"];
         const referrersList = ["Search Engine", "Social Media", "Direct", "Referral"];
         
@@ -350,8 +368,13 @@
 
       // Mathematical O(1) baseline view count calculation + direct localStorage audit
       const getItemViewsCount = (item, daysLimit, geoFilter) => {
-        let seed = Math.abs(hashCode(item.title || item.url || item.filename || ''));
-        const baselineCount = Math.floor(80 + seededRandom(seed++) * 1200);
+        let baselineCount = 0;
+        if (item.views !== undefined) {
+          baselineCount = parseRealViews(item.views);
+        } else {
+          let seed = Math.abs(hashCode(item.title || item.url || item.filename || ''));
+          baselineCount = Math.floor(80 + seededRandom(seed++) * 1200);
+        }
         
         const dateFraction = daysLimit / 90.0;
         
