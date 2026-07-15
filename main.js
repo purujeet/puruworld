@@ -14,6 +14,14 @@ function seededRandom(seed) {
   return x - Math.floor(x);
 }
 
+function getRealTrackedLogs() {
+  try {
+    return JSON.parse(localStorage.getItem('puruworld_analytics') || '[]');
+  } catch(e) {
+    return [];
+  }
+}
+
 // Theme toggling and state synchronization
 (function() {
   const savedTheme = localStorage.getItem('theme') || 'light';
