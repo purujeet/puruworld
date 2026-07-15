@@ -3044,6 +3044,7 @@ def make_post_html(post_title, post_date, post_tags, post_content, read_time, co
   post_html = post_tmpl.replace('{{HEAD}}', head)\
                        .replace('{{HEADER}}', header)\
                        .replace('{{FOOTER}}', footer)\
+                       .replace('{{REL_PATH}}', rel_path)\
                        .replace('{{POST_TITLE}}', post_title)\
                        .replace('{{POST_TITLE_JS}}', title_escaped)\
                        .replace('{{POST_DATE}}', post_date)\
