@@ -1253,3 +1253,77 @@ function initAIAgentWidget() {
 document.addEventListener('DOMContentLoaded', () => {
   initAIAgentWidget();
 });
+
+// Analytics tracking script
+(function() {
+  const currentPath = window.location.pathname;
+  const currentTitle = document.title;
+  const referrer = document.referrer || 'Direct';
+  
+  let country = sessionStorage.getItem('puruworld_geo_country') || 'Unknown';
+  
+  const logVisit = (cntry) => {
+    let logs = [];
+    try {
+      logs = JSON.parse(localStorage.getItem('puruworld_analytics') || '[]');
+    } catch(e) {}
+    
+    // Classify referrer
+    let source = 'Direct';
+    const refLower = referrer.toLowerCase();
+    if (refLower.includes('google.') || refLower.includes('bing.') || refLower.includes('yahoo.') || refLower.includes('duckduckgo.')) {
+      source = 'Search Engine';
+    } else if (refLower.includes('facebook.') || refLower.includes('t.co') || refLower.includes('twitter.') || refLower.includes('linkedin.') || refLower.includes('instagram.') || refLower.includes('reddit.')) {
+      source = 'Social Media';
+    } else if (referrer !== 'Direct' && !refLower.includes(window.location.hostname)) {
+      source = 'Referral';
+    }
+    
+    const visit = {
+      path: currentPath,
+      title: currentTitle,
+      source: source,
+      country: cntry,
+      timestamp: Date.now(),
+      timeSpent: 0,
+      bounced: true
+    };
+    
+    logs.push(visit);
+    if (logs.length > 5000) logs.shift();
+    localStorage.setItem('puruworld_analytics', JSON.stringify(logs));
+    
+    let startTime = Date.now();
+    window.addEventListener('beforeunload', () => {
+      let timeSpent = Math.round((Date.now() - startTime) / 1000);
+      try {
+        let currentLogs = JSON.parse(localStorage.getItem('puruworld_analytics') || '[]');
+        if (currentLogs.length > 0) {
+          let latest = currentLogs.find(l => l.path === currentPath && l.timestamp === visit.timestamp);
+          if (latest) {
+            latest.timeSpent = timeSpent;
+            latest.bounced = timeSpent < 15;
+            localStorage.setItem('puruworld_analytics', JSON.stringify(currentLogs));
+          }
+        }
+      } catch(e) {}
+    });
+  };
+
+  if (country === 'Unknown') {
+    fetch('https://ipapi.co/json/')
+      .then(r => r.json())
+      .then(data => {
+        country = data.country_name || 'United States';
+        sessionStorage.setItem('puruworld_geo_country', country);
+        logVisit(country);
+      })
+      .catch(() => {
+        country = 'United States';
+        sessionStorage.setItem('puruworld_geo_country', country);
+        logVisit(country);
+      });
+  } else {
+    logVisit(country);
+  }
+})();
