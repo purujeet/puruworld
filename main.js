@@ -180,6 +180,7 @@ function initHomePage() {
     }
 
     renderTags();
+    applyFilters(); // Trigger initial render of article list on entry
   } catch (error) {
     console.error('Failed to load database:', error);
   }
