@@ -7,7 +7,33 @@
   <!-- CDN for Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <main class="container page-layout" style="max-width: 1400px; padding: 20px 16px 80px 16px;">
+  <!-- Security Login Overlay -->
+  <div id="login-overlay" style="display: none; align-items: center; justify-content: center; min-height: 700px; padding: 40px 20px; font-family: 'Outfit', sans-serif;">
+    <div class="glassmorphism" style="width: 100%; max-width: 420px; padding: 40px; border-radius: 20px; border: 1px solid var(--border-color); background: var(--bg-secondary); box-shadow: var(--shadow-lg); text-align: center;">
+      <span class="material-icons" style="font-size: 3.5rem; color: var(--accent-color); margin-bottom: 15px;">lock</span>
+      <h2 style="margin: 0 0 8px 0; font-size: 1.8rem; font-weight: 700; color: var(--text-primary); font-family: 'Outfit', sans-serif;">Dashboard Login</h2>
+      <p style="margin: 0 0 30px 0; font-size: 0.95rem; color: var(--text-muted); line-height: 1.4;">Please authenticate with your admin credentials to access puruworld dashboard analytics.</p>
+      
+      <form id="login-form" style="display: flex; flex-direction: column; gap: 20px; text-align: left; margin: 0;">
+        <div>
+          <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; display: block; margin-bottom: 6px; font-family: 'Outfit', sans-serif; letter-spacing: 0.5px;">Username</label>
+          <input type="text" id="login-username" required placeholder="puru" autocomplete="username" style="width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-primary); color: var(--text-primary); outline: none; font-size: 0.95rem; transition: border-color 0.2s;">
+        </div>
+        
+        <div>
+          <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; display: block; margin-bottom: 6px; font-family: 'Outfit', sans-serif; letter-spacing: 0.5px;">Password</label>
+          <input type="password" id="login-password" required placeholder="••••••••" autocomplete="current-password" style="width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-primary); color: var(--text-primary); outline: none; font-size: 0.95rem; transition: border-color 0.2s;">
+        </div>
+        
+        <div id="login-error" style="color: #ef4444; font-size: 0.85rem; font-weight: 600; text-align: center; display: none;">Invalid username or password!</div>
+        
+        <button type="submit" class="btn" style="margin-top: 10px; width: 100%; padding: 12px; border-radius: 8px; font-weight: 700; border: none; color: white; background: var(--accent-gradient); cursor: pointer; transition: transform 0.2s; font-family: 'Outfit', sans-serif;">Authenticate</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="dashboard-content" style="display: none;">
+    <main class="container page-layout" style="max-width: 1400px; padding: 20px 16px 80px 16px;">
     
     <div style="display: flex; gap: 24px; min-height: 750px; flex-wrap: wrap;">
       
@@ -205,12 +231,56 @@
     </div>
 
   </main>
+  </div>
 
   <script src="{{REL_PATH}}videos-metadata.js"></script>
 
   <!-- Script for Dashboard Logic and Chart configuration -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      // Security Login Logic
+      const loginForm = document.getElementById('login-form');
+      const overlay = document.getElementById('login-overlay');
+      const content = document.getElementById('dashboard-content');
+      const usernameInput = document.getElementById('login-username');
+      const passwordInput = document.getElementById('login-password');
+      const errorMsg = document.getElementById('login-error');
+      
+      const isAuthenticated = sessionStorage.getItem('dashboard_auth') === 'true';
+      if (isAuthenticated) {
+        if (overlay) overlay.style.display = 'none';
+        if (content) content.style.display = 'block';
+      } else {
+        if (overlay) overlay.style.display = 'flex';
+        if (content) content.style.display = 'none';
+      }
+
+      if (loginForm) {
+        loginForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const user = usernameInput.value.trim();
+          const pass = passwordInput.value.trim();
+          
+          if (user === 'puru' && pass === '1998') {
+            sessionStorage.setItem('dashboard_auth', 'true');
+            errorMsg.style.display = 'none';
+            
+            overlay.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+            overlay.style.opacity = '0';
+            overlay.style.transform = 'scale(0.95)';
+            
+            setTimeout(() => {
+              overlay.style.display = 'none';
+              content.style.display = 'block';
+            }, 300);
+          } else {
+            errorMsg.style.display = 'block';
+            passwordInput.value = '';
+            passwordInput.focus();
+          }
+        });
+      }
+
       // Deterministic hash functions
       function hashCode(str) {
         let hash = 0;
