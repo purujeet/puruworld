@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Image to PDF Converter</title>
+    <!-- Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        :root {
+            --primary-bg: linear-gradient(to bottom, #4CAF50, #81C784);
+            --primary-text: #333333;
+            --card-bg: #ffffff;
+            --btn-bg: #4CAF50;
+            --btn-hover: #45a049;
+            --shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            --footer-bg: #e8f5e9;
+            --link-color: #2e7d32;
+        }
+        [data-theme="dark"] {
+            --primary-bg: linear-gradient(to bottom, #1B5E20, #4CAF50);
+            --primary-text: #e0e0e0;
+            --card-bg: #424242;
+            --btn-bg: #66bb6a;
+            --btn-hover: #5cb860;
+            --shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+            --footer-bg: #333333;
+            --link-color: #81c784;
+        }
+        body {
+            background: var(--primary-bg);
+            color: var(--primary-text);
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+        }
+        main {
+            flex: 1 0 auto;
+            overflow-y: auto;
+            padding-bottom: 100px; /* Space for fixed footer */
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+        .card {
+            background-color: var(--card-bg);
+            box-shadow: var(--shadow);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .nav-wrapper {
+            background-color: #4CAF50;
+        }
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            margin-right: 20px;
+        }
+        .theme-toggle label {
+            margin-right: 10px;
+            color: var(--primary-text);
+        }
+        .page-footer {
+            background-color: var(--footer-bg);
+            padding: 10px 0;
+            color: var(--primary-text);
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            z-index: 1000;
+            margin-top: 40px; /* Space above footer */
+        }
+        .page-footer a {
+            color: var(--link-color);
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        .page-footer a:hover {
+            color: var(--btn-hover);
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 0 10px;
+            }
+            .card {
+                padding: 15px;
+            }
+            .page-footer {
+                padding: 5px 0;
+            }
+        }
+    </style>
+    <!-- Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav>
+        <div class="nav-wrapper">
+            <a href="index.html" class="brand-logo center">Image to PDF Converter</a>
+            <ul class="right hide-on-med-and-down">
+                <li class="theme-toggle">
+                    <label for="themeSwitch">Dark Mode</label>
+                    <div class="switch">
+                        <label>
+                            <input type="checkbox" id="themeSwitch">
+                            <span class="lever"></span>
+                        </label>
+                    </div>
+                </li>
+                <li><a href="index.html">Home</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- About Us Section -->
+    <main>
+        <div class="container">
+            <div class="card">
+                <h4>About Us</h4>
+                <p>We are a passionate team dedicated to simplifying document management. Our Image to PDF Converter is designed to help users effortlessly convert images into professional PDF documents with a clean, user-friendly interface. Our mission is to provide free, accessible tools that enhance productivity.</p>
+                <p>Built with privacy in mind, all processing happens locally in your browser—no data is ever uploaded to our servers. We aim to deliver reliable, high-quality tools inspired by the needs of our users.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="page-footer">
+        <div class="container">
+            <div class="row">
+                <div class="col s12">
+                    <p>
+                        <a href="about.html">About Us</a> | 
+                        <a href="faq.html">FAQ</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Materialize
+        document.addEventListener('DOMContentLoaded', function() {
+            M.AutoInit();
+        });
+
+        // Dark Mode
+        const themeSwitch = document.getElementById('themeSwitch');
+        themeSwitch.addEventListener('change', () => {
+            document.documentElement.setAttribute('data-theme', themeSwitch.checked ? 'dark' : 'light');
+        });
+    </script>
+</body>
+</html>

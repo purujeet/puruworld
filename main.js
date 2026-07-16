@@ -226,10 +226,10 @@ const allApps = [
   {
     title: "Python Visualizer",
     description: "Visualize python execution flows and trace memory stack frames in real-time.",
-    url: "https://purujeet.github.io/pythonVisualizer/",
+    url: "pythonVisualizer/index.html",
     icon: "visibility",
-    tag: "External Tool",
-    isExternal: true
+    tag: "Interactive Tool",
+    isExternal: false
   },
   {
     title: "SFDX Data Dictionary",
@@ -250,26 +250,26 @@ const allApps = [
   {
     title: "Orbit Drop",
     description: "Challenge friends to a multiplayer space-themed physics arcade game powered by Phaser and PeerJS.",
-    url: "https://purujeet.github.io/orbit-drop/",
+    url: "orbit-drop/index.html",
     icon: "rocket_launch",
     tag: "Arcade Game",
-    isExternal: true
+    isExternal: false
   },
   {
     title: "Image to PDF Converter",
     description: "Convert multiple image files (JPG, PNG) into a single optimized PDF document in your browser.",
-    url: "https://purujeet.github.io/Image2Pdf/",
+    url: "Image2Pdf/index.html",
     icon: "picture_as_pdf",
     tag: "Utility Tool",
-    isExternal: true
+    isExternal: false
   },
   {
     title: "Universal Text Converter",
     description: "Convert text formats (XML, CSV, JSON, XLSX, YAML) seamlessly in your browser with automated structure parsing.",
-    url: "https://purujeet.github.io/universaltextconverter/",
+    url: "universaltextconverter/index.html",
     icon: "transform",
     tag: "Developer Tool",
-    isExternal: true
+    isExternal: false
   }
 ];
 
@@ -280,10 +280,10 @@ function renderAppsGrid() {
   grid.innerHTML = allApps.map(app => {
     const targetAttr = app.isExternal ? 'target="_blank"' : '';
     
-    // Resolve URL depending on relative path depth
+    // Resolve URL depending on relative path depth prefix
     let resolvedUrl = app.url;
-    if (!app.isExternal && window.relPathDepth === '../') {
-      resolvedUrl = app.url.replace(/^\.\/p\//, './').replace(/^p\//, '');
+    if (!app.isExternal && !app.url.startsWith('http')) {
+      resolvedUrl = window.relPathDepth + app.url.replace(/^\.\//, '');
     }
 
     const iconHtml = `
@@ -1193,160 +1193,7 @@ window.selectVideoCategory = selectVideoCategory;
 window.changeVideoPage = changeVideoPage;
 window.renderAppsGrid = renderAppsGrid;
 
-// Floating AI Search Agent Chat Widget
-function initAIAgentWidget() {
-  const style = document.createElement('style');
-  style.textContent = `
-    @keyframes slideUpWidget {
-      from { transform: translateY(20px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-    .widget-glowing-btn:hover {
-      box-shadow: 0 0 20px rgba(139, 92, 246, 0.6) !important;
-      transform: scale(1.05);
-    }
-  `;
-  document.head.appendChild(style);
 
-  const widget = document.createElement('div');
-  widget.id = 'ai-agent-widget';
-  widget.style.cssText = 'position: fixed; bottom: 24px; right: 24px; z-index: 10000; font-family: "Outfit", sans-serif;';
-  
-  widget.innerHTML = `
-    <!-- Floating Circular Button -->
-    <button id="ai-agent-btn" class="widget-glowing-btn" style="width: 56px; height: 56px; border-radius: 50%; background: var(--accent-gradient); border: none; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 16px rgba(139, 92, 246, 0.4); transition: all 0.2s;">
-      <span class="material-icons" style="font-size: 28px;">smart_toy</span>
-    </button>
-    <!-- Chat Window -->
-    <div id="ai-agent-panel" style="display: none; position: absolute; bottom: 70px; right: 0; width: 345px; height: 440px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.2); flex-direction: column; overflow: hidden; animation: slideUpWidget 0.25s cubic-bezier(0.4, 0, 0.2, 1); box-sizing: border-box;">
-      <!-- Header -->
-      <div style="background: var(--accent-gradient); color: white; padding: 16px; display: flex; align-items: center; gap: 10px; font-weight: bold; border-bottom: 1px solid var(--border-color);">
-        <span class="material-icons" style="font-size: 20px;">smart_toy</span>
-        <span>puruworld AI Agent</span>
-        <button id="ai-agent-close" style="background: none; border: none; color: white; margin-left: auto; cursor: pointer; display: flex; align-items: center;">
-          <span class="material-icons" style="font-size: 20px;">close</span>
-        </button>
-      </div>
-      <!-- Chat Area -->
-      <div id="ai-agent-messages" style="flex-grow: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; font-size: 0.88rem; line-height: 1.4; color: var(--text-primary); max-height: 310px;">
-        <div style="background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.15); padding: 10px 12px; border-radius: 12px 12px 12px 0; align-self: flex-start; max-width: 85%;">
-          Hello! I'm your AI Agent. Ask me to find articles, gaming tools, or search any topics on puruworld!
-        </div>
-      </div>
-      <!-- Input Area -->
-      <div style="padding: 12px; border-top: 1px solid var(--border-color); display: flex; gap: 8px; align-items: center; background: var(--bg-secondary);">
-        <input type="text" id="ai-agent-input" placeholder="Search or ask me anything..." style="flex-grow: 1; padding: 8px 14px; border-radius: 20px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); outline: none; font-size: 0.88rem; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);">
-        <button id="ai-agent-send" style="background: var(--accent-gradient); border: none; color: white; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;">
-          <span class="material-icons" style="font-size: 18px;">send</span>
-        </button>
-      </div>
-    </div>
-  `;
-  document.body.appendChild(widget);
-
-  const btn = widget.querySelector('#ai-agent-btn');
-  const panel = widget.querySelector('#ai-agent-panel');
-  const closeBtn = widget.querySelector('#ai-agent-close');
-  const input = widget.querySelector('#ai-agent-input');
-  const sendBtn = widget.querySelector('#ai-agent-send');
-  const messagesContainer = widget.querySelector('#ai-agent-messages');
-
-  btn.onclick = () => {
-    const isHidden = panel.style.display === 'none';
-    panel.style.display = isHidden ? 'flex' : 'none';
-    if (isHidden) input.focus();
-  };
-
-  closeBtn.onclick = () => {
-    panel.style.display = 'none';
-  };
-
-  const addMessage = (text, isUser = false) => {
-    const msg = document.createElement('div');
-    if (isUser) {
-      msg.style.cssText = 'background: var(--accent-gradient); color: white; padding: 10px 12px; border-radius: 12px 12px 0 12px; align-self: flex-end; max-width: 85%; word-break: break-word;';
-    } else {
-      msg.style.cssText = 'background: rgba(139, 92, 246, 0.08); border: 1px solid var(--border-color); padding: 10px 12px; border-radius: 12px 12px 12px 0; align-self: flex-start; max-width: 85%; word-break: break-word;';
-    }
-    msg.innerHTML = text;
-    messagesContainer.appendChild(msg);
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-  };
-
-  const handleSearch = (query) => {
-    addMessage(query, true);
-    input.value = '';
-    
-    setTimeout(() => {
-      const q = query.toLowerCase().trim();
-      const queryWords = q.split(/\s+/).filter(w => w.length > 1);
-      if (queryWords.length === 0 && q.length > 0) queryWords.push(q);
-
-      let matchedPosts = [];
-      if (window.postsData) {
-        matchedPosts = window.postsData.map(post => {
-          let score = 0;
-          const titleLower = post.title.toLowerCase();
-          const excerptLower = post.excerpt ? post.excerpt.toLowerCase() : '';
-          
-          if (titleLower.includes(q)) score += 10;
-          queryWords.forEach(word => {
-            if (titleLower.includes(word)) score += 5;
-            if (excerptLower.includes(word)) score += 2;
-          });
-          return { post, score };
-        }).filter(item => item.score > 0).sort((a,b) => b.score - a.score).slice(0, 3);
-      }
-
-      let matchedVideos = [];
-      if (window.videosData) {
-        matchedVideos = window.videosData.map(video => {
-          let score = 0;
-          const titleLower = video.title.toLowerCase();
-          if (titleLower.includes(q)) score += 10;
-          queryWords.forEach(word => {
-            if (titleLower.includes(word)) score += 5;
-          });
-          return { video, score };
-        }).filter(item => item.score > 0).sort((a,b) => b.score - a.score).slice(0, 3);
-      }
-
-      let replyHtml = "";
-      if (matchedPosts.length === 0 && matchedVideos.length === 0) {
-        replyHtml = "I searched puruworld but couldn't find matches for '" + query + "'. Try asking about 'python', 'salesforce', 'games', or 'tax'!";
-      } else {
-        replyHtml = "I found these relevant resources for you:<ul style='margin: 8px 0 0 16px; padding: 0;'>";
-        matchedPosts.forEach(item => {
-          const prefix = window.location.pathname.includes('/p/') ? '../' : './';
-          replyHtml += "<li style='margin-bottom: 6px;'><a href='" + prefix + item.post.url.replace(/^\//, '') + "' style='color: #8b5cf6; text-decoration: none; font-weight: 600;'>[Article] " + item.post.title + "</a></li>";
-        });
-        matchedVideos.forEach(item => {
-          const prefix = window.location.pathname.includes('/p/') ? '../' : './';
-          replyHtml += "<li style='margin-bottom: 6px;'><a href='" + prefix + "p/videos.html?search=" + encodeURIComponent(item.video.title) + "' style='color: #6366f1; text-decoration: none; font-weight: 600;'>[Video] " + item.video.title + "</a></li>";
-        });
-        replyHtml += "</ul>";
-      }
-      addMessage(replyHtml);
-    }, 400);
-  };
-
-  sendBtn.onclick = () => {
-    const val = input.value.trim();
-    if (val) handleSearch(val);
-  };
-
-  input.onkeydown = (e) => {
-    if (e.key === 'Enter') {
-      const val = input.value.trim();
-      if (val) handleSearch(val);
-    }
-  };
-}
-
-// Ingest script initialization
-document.addEventListener('DOMContentLoaded', () => {
-  initAIAgentWidget();
-});
 
 // Analytics tracking script
 (function() {

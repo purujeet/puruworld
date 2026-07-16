@@ -1,0 +1,592 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal Text Converter</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Scoped styles to avoid conflicts */
+        .universal-text-converter {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 24px;
+            background-color: #f5f7fa; /* Surface color */
+            min-height: 100vh;
+        }
+        .universal-text-converter .container {
+            display: flex;
+            flex-direction: column;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .universal-text-converter h1 {
+            font-size: 34px;
+            font-weight: 500;
+            color: #1a1a1a; /* On-surface color */
+            margin: 0 0 24px;
+        }
+        .universal-text-converter .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .universal-text-converter .controls select {
+            padding: 12px 48px 12px 16px;
+            font-size: 16px;
+            font-weight: 500;
+            color: #1a1a1a;
+            border: 1px solid #dadce0; /* Outline color */
+            border-radius: 8px;
+            background-color: #e8f0fe; /* Primary container */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08); /* Elevation 1 */
+            transition: box-shadow 0.3s ease, border-color 0.3s ease;
+            width: 320px; /* Prominent width */
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231a1a1a' width='24px' height='24px'%3E%3Cpath d='M7 10l5 5 5-5H7z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            cursor: pointer;
+        }
+        .universal-text-converter .controls select:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.12); /* Elevation 2 on hover */
+        }
+        .universal-text-converter .controls select:focus {
+            box-shadow: 0 0 12px rgba(66,133,244,0.4); /* Primary color focus */
+            border-color: #4285f4;
+            outline: none;
+        }
+        .universal-text-converter .controls button {
+            position: relative;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 500;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(45deg, #4285f4, #51adf6); /* Primary gradient */
+            box-shadow: 0 3px 6px rgba(0,0,0,0.16); /* Elevation 2 */
+            cursor: pointer;
+            overflow: hidden;
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+        .universal-text-converter .controls button:hover {
+            box-shadow: 0 6px 12px rgba(0,0,0,0.24); /* Elevation 3 */
+            transform: translateY(-2px);
+        }
+        .universal-text-converter .controls button:active {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.12); /* Elevation 1 */
+            transform: translateY(0);
+        }
+        /* Ripple effect */
+        .universal-text-converter .controls button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100px;
+            height: 100px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        .universal-text-converter .controls button:active::after {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        .universal-text-converter .panes {
+            display: flex;
+            gap: 40px;
+        }
+        .universal-text-converter .pane {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .universal-text-converter .pane label {
+            font-size: 16px;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            transition: transform 0.3s ease, color 0.3s ease;
+        }
+        .universal-text-converter .textarea-container {
+            position: relative;
+            width: 100%;
+        }
+        .universal-text-converter textarea {
+            width: 100%;
+            height: 400px;
+            padding: 24px 16px 16px;
+            font-size: 14px;
+            color: #1a1a1a;
+            border: 1px solid #dadce0;
+            border-radius: 12px; /* Rounded corners */
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08); /* Elevation 1 */
+            resize: vertical;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #4285f4 #e0e0e0;
+        }
+        .universal-text-converter textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+        .universal-text-converter textarea::-webkit-scrollbar-track {
+            background: #e0e0e0;
+            border-radius: 4px;
+        }
+        .universal-text-converter textarea::-webkit-scrollbar-thumb {
+            background: #4285f4;
+            border-radius: 4px;
+        }
+        .universal-text-converter textarea::-webkit-scrollbar-thumb:hover {
+            background: #3267d6;
+        }
+        .universal-text-converter textarea:focus {
+            border-color: #4285f4;
+            box-shadow: 0 0 12px rgba(66,133,244,0.3);
+            outline: none;
+        }
+        .universal-text-converter textarea[readonly] {
+            background-color: #fafafa;
+            cursor: default;
+        }
+        /* Floating label effect */
+        .universal-text-converter .textarea-container label {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            font-size: 14px;
+            color: #5f6368; /* On-surface variant */
+            pointer-events: none;
+            transition: all 0.2s ease;
+        }
+        .universal-text-converter textarea:focus + label,
+        .universal-text-converter textarea:not(:placeholder-shown) + label {
+            transform: translateY(-18px) scale(0.85);
+            color: #4285f4;
+            background: #fff;
+            padding: 0 4px;
+        }
+        .universal-text-converter .material-icons {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            color: #5f6368;
+            font-size: 20px;
+        }
+        .universal-text-converter #error {
+            color: #d93025; /* Error color */
+            margin-top: 16px;
+            text-align: center;
+            font-weight: 500;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="universal-text-converter">
+        <div class="container">
+            <h1>Universal Text Converter</h1>
+            <div class="controls">
+                <select id="conversionType">
+                    <option value="">Select Conversion</option>
+                    <option value="xmlToCsv">XML to CSV</option>
+                    <option value="csvToXml">CSV to XML</option>
+                    <option value="csvToJson">CSV to JSON</option>
+                    <option value="jsonToCsv">JSON to CSV</option>
+                    <option value="yamlToJson">YAML to JSON</option>
+                    <option value="jsonToYaml">JSON to YAML</option>
+                    <option value="xmlToJson">XML to JSON</option>
+                    <option value="jsonToXml">JSON to XML</option>
+                    <option value="tomlToJson">TOML to JSON</option>
+                    <option value="jsonToToml">JSON to TOML</option>
+                </select>
+                <button id="convertBtn">Convert</button>
+            </div>
+            <div class="panes">
+                <div class="pane">
+                    <div class="textarea-container">
+                        <textarea id="inputText" placeholder=" "></textarea>
+                        <label for="inputText">Input Text</label>
+                        <span class="material-icons">input</span>
+                    </div>
+                </div>
+                <div class="pane">
+                    <div class="textarea-container">
+                        <textarea id="outputText" readonly placeholder=" "></textarea>
+                        <label for="outputText">Output Text</label>
+                        <span class="material-icons">output</span>
+                    </div>
+                </div>
+            </div>
+            <div id="error"></div>
+        </div>
+    </div>
+
+    <script>
+        const convertBtn = document.getElementById('convertBtn');
+        const conversionType = document.getElementById('conversionType');
+        const inputText = document.getElementById('inputText');
+        const outputText = document.getElementById('outputText');
+        const errorDiv = document.getElementById('error');
+
+        // Simplified TOML parser (for basic key-value and nested structures)
+        function parseToml(toml) {
+            const result = {};
+            const lines = toml.split('\n');
+            let currentObj = result;
+            let currentTable = null;
+
+            for (let line of lines) {
+                line = line.trim();
+                if (line === '' || line.startsWith('#')) continue;
+
+                if (line.startsWith('[') && line.endsWith(']')) {
+                    currentTable = line.slice(1, -1).trim();
+                    result[currentTable] = {};
+                    currentObj = result[currentTable];
+                    continue;
+                }
+
+                const [key, value] = line.split('=').map(s => s.trim());
+                if (key && value) {
+                    let parsedValue = value;
+                    if (value.match(/^\d+$/)) {
+                        parsedValue = parseInt(value);
+                    } else if (value.match(/^\d+\.\d+$/)) {
+                        parsedValue = parseFloat(value);
+                    } else if (value === 'true' || value === 'false') {
+                        parsedValue = value === 'true';
+                    } else if (value.startsWith('"') && value.endsWith('"')) {
+                        parsedValue = value.slice(1, -1);
+                    }
+                    currentObj[key] = parsedValue;
+                }
+            }
+            return result;
+        }
+
+        function tomlToJson(toml) {
+            try {
+                const parsed = parseToml(toml);
+                return JSON.stringify(parsed, null, 2);
+            } catch (err) {
+                throw new Error('Invalid TOML format.');
+            }
+        }
+
+        function jsonToToml(json) {
+            const data = JSON.parse(json);
+            function objToToml(obj, indent = 0) {
+                let result = '';
+                for (const [key, value] of Object.entries(obj)) {
+                    if (typeof value === 'object' && !Array.isArray(value)) {
+                        result += `[${key}]\n`;
+                        result += objToToml(value, indent);
+                    } else {
+                        let formattedValue = value;
+                        if (typeof value === 'string') {
+                            formattedValue = `"${value}"`;
+                        } else if (typeof value === 'boolean') {
+                            formattedValue = value.toString();
+                        }
+                        result += `${key} = ${formattedValue}\n`;
+                    }
+                }
+                return result;
+            }
+            return objToToml(data).trim();
+        }
+
+        // Simplified YAML parser (for basic key-value and nested structures)
+        function parseYaml(yaml) {
+            const result = {};
+            const lines = yaml.split('\n');
+            let currentObj = result;
+            let indentStack = [0];
+
+            for (let line of lines) {
+                line = line.trim();
+                if (line === '' || line.startsWith('#')) continue;
+
+                const indent = line.search(/\S/);
+                const trimmed = line.trim();
+                const isList = trimmed.startsWith('- ');
+                
+                if (isList) {
+                    const value = trimmed.slice(2).trim();
+                    const parentIndent = indentStack[indentStack.length - 1];
+                    if (indent > parentIndent) {
+                        const lastKey = Object.keys(currentObj).pop();
+                        if (!Array.isArray(currentObj[lastKey])) {
+                            currentObj[lastKey] = [];
+                        }
+                        currentObj[lastKey].push(value);
+                    } else {
+                        while (indent < indentStack[indentStack.length - 1]) {
+                            indentStack.pop();
+                            currentObj = Object.values(currentObj)[0];
+                        }
+                        if (!Array.isArray(currentObj)) {
+                            currentObj = [];
+                        }
+                        currentObj.push(value);
+                    }
+                } else {
+                    const [key, value] = trimmed.split(':').map(s => s.trim());
+                    if (!value) {
+                        currentObj[key] = {};
+                        indentStack.push(indent);
+                        currentObj = currentObj[key];
+                    } else {
+                        currentObj[key] = value;
+                        while (indent < indentStack[indentStack.length - 1]) {
+                            indentStack.pop();
+                            currentObj = Object.values(currentObj)[0];
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+
+        function yamlToJson(yaml) {
+            try {
+                const parsed = parseYaml(yaml);
+                return JSON.stringify(parsed, null, 2);
+            } catch (err) {
+                throw new Error('Invalid YAML format.');
+            }
+        }
+
+        function jsonToYaml(json) {
+            const data = JSON.parse(json);
+            function objToYaml(obj, indent = 0) {
+                let result = '';
+                const indentStr = '  '.repeat(indent);
+                for (const [key, value] of Object.entries(obj)) {
+                    if (Array.isArray(value)) {
+                        for (const item of value) {
+                            result += `${indentStr}- ${item}\n`;
+                        }
+                    } else if (typeof value === 'object' && value !== null) {
+                        result += `${indentStr}${key}:\n${objToYaml(value, indent + 1)}`;
+                    } else {
+                        result += `${indentStr}${key}: ${value}\n`;
+                    }
+                }
+                return result;
+            }
+            return objToYaml(data).trim();
+        }
+
+        convertBtn.addEventListener('click', () => {
+            const type = conversionType.value;
+            const input = inputText.value.trim();
+            errorDiv.textContent = '';
+
+            if (!type) {
+                errorDiv.textContent = 'Please select a conversion type.';
+                return;
+            }
+            if (!input) {
+                errorDiv.textContent = 'Please enter input text.';
+                return;
+            }
+
+            try {
+                let result;
+                switch (type) {
+                    case 'xmlToCsv':
+                        result = xmlToCsv(input);
+                        break;
+                    case 'csvToXml':
+                        result = csvToXml(input);
+                        break;
+                    case 'csvToJson':
+                        result = csvToJson(input);
+                        break;
+                    case 'jsonToCsv':
+                        result = jsonToCsv(input);
+                        break;
+                    case 'yamlToJson':
+                        result = yamlToJson(input);
+                        break;
+                    case 'jsonToYaml':
+                        result = jsonToYaml(input);
+                        break;
+                    case 'xmlToJson':
+                        result = xmlToJson(input);
+                        break;
+                    case 'jsonToXml':
+                        result = jsonToXml(input);
+                        break;
+                    case 'tomlToJson':
+                        result = tomlToJson(input);
+                        break;
+                    case 'jsonToToml':
+                        result = jsonToToml(input);
+                        break;
+                    default:
+                        errorDiv.textContent = 'Invalid conversion type.';
+                        return;
+                }
+                outputText.value = result;
+            } catch (err) {
+                errorDiv.textContent = `Error: ${err.message}`;
+            }
+        });
+
+        function csvToJson(csv) {
+            const lines = csv.split('\n');
+            const headers = lines[0].split(',').map(h => h.trim());
+            const result = [];
+            for (let i = 1; i < lines.length; i++) {
+                if (lines[i].trim() === '') continue;
+                const values = lines[i].split(',').map(v => v.trim());
+                const obj = {};
+                headers.forEach((header, index) => {
+                    obj[header] = values[index] || '';
+                });
+                result.push(obj);
+            }
+            return JSON.stringify(result, null, 2);
+        }
+
+        function jsonToCsv(json) {
+            const data = JSON.parse(json);
+            if (!Array.isArray(data) || data.length === 0) {
+                throw new Error('JSON must be a non-empty array of objects.');
+            }
+            const headers = Object.keys(data[0]);
+            let csv = headers.join(',') + '\n';
+            data.forEach(obj => {
+                const values = headers.map(header => obj[header] || '');
+                csv += values.join(',') + '\n';
+            });
+            return csv.trim();
+        }
+
+        function xmlToCsv(xml) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(xml, 'application/xml');
+            if (doc.getElementsByTagName('parsererror').length > 0) {
+                throw new Error('Invalid XML.');
+            }
+            const items = doc.documentElement.children;
+            if (items.length === 0) {
+                throw new Error('No items found in XML.');
+            }
+            const headers = Array.from(items[0].children).map(child => child.tagName);
+            let csv = headers.join(',') + '\n';
+            for (let i = 0; i < items.length; i++) {
+                const values = headers.map(header => items[i].querySelector(header)?.textContent || '');
+                csv += values.join(',') + '\n';
+            }
+            return csv.trim();
+        }
+
+        function csvToXml(csv) {
+            const lines = csv.split('\n');
+            const headers = lines[0].split(',').map(h => h.trim());
+            let xml = '<root>\n';
+            for (let i = 1; i < lines.length; i++) {
+                if (lines[i].trim() === '') continue;
+                const values = lines[i].split(',').map(v => v.trim());
+                xml += '  <item>\n';
+                headers.forEach((header, index) => {
+                    xml += `    <${header}>${values[index] || ''}</${header}>\n`;
+                });
+                xml += '  </item>\n';
+            }
+            xml += '</root>';
+            return xml;
+        }
+
+        function xmlToJson(xml) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(xml, 'application/xml');
+            if (doc.getElementsByTagName('parsererror').length > 0) {
+                throw new Error('Invalid XML.');
+            }
+            const items = doc.documentElement.children;
+            if (items.length === 0) {
+                throw new Error('No items found in XML.');
+            }
+            const result = [];
+            for (let i = 0; i < items.length; i++) {
+                const obj = {};
+                Array.from(items[i].children).forEach(child => {
+                    obj[child.tagName] = child.textContent || '';
+                });
+                result.push(obj);
+            }
+            return JSON.stringify(result, null, 2);
+        }
+
+        function jsonToXml(json) {
+            const data = JSON.parse(json);
+            if (!Array.isArray(data) || data.length === 0) {
+                throw new Error('JSON must be a non-empty array of objects.');
+            }
+            let xml = '<root>\n';
+            data.forEach(obj => {
+                xml += '  <item>\n';
+                Object.entries(obj).forEach(([key, value]) => {
+                    xml += `    <${key}>${value}</${key}>\n`;
+                });
+                xml += '  </item>\n';
+            });
+            xml += '</root>';
+            return xml;
+        }
+    </script>
+</body>
+</html>

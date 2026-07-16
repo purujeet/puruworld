@@ -23,7 +23,7 @@
       document.documentElement.setAttribute('data-theme', savedTheme);
     })();
   </script>
-  <link rel="canonical" href="https://purujeet.github.io/puruworld/2024/09/how-to-start-your-own-etsy-shop.html">
+  <link rel="canonical" href="https://puruworld.com/2024/09/how-to-start-your-own-etsy-shop.html">
 
   <script src="../../main.js?v=1.3" defer></script>
 </head>
@@ -238,7 +238,7 @@
 
   <footer>
   <div class="container" style="display: flex; flex-direction: column; align-items: center; gap: 15px;">
-    <p style="margin: 0;">&copy; 2026 puru world official. All rights reserved.</p>
+    <p style="margin: 0;">&copy; 2026 puruworld.com. All rights reserved.</p>
     <div class="footer-links" style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; font-size: 0.85rem;">
       <a href="../../p/about.html" style="color: var(--text-muted); text-decoration: none; transition: color 0.2s;">About Us</a>
       <span style="color: var(--border-color);">|</span>
@@ -254,6 +254,296 @@
     </div>
   </div>
 </footer>
+
+<!-- Conversational Agent Chat Widget -->
+<div id="ai-chat-widget" style="position: fixed; bottom: 30px; right: 30px; z-index: 10000; font-family: 'Outfit', sans-serif;">
+  <!-- Floating Button -->
+  <button id="chat-toggle-btn" class="glowing-btn" style="width: 60px; height: 60px; border-radius: 50%; background: var(--accent-gradient); border: none; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 32px rgba(99, 102, 241, 0.4); transition: transform 0.3s, box-shadow 0.3s; position: relative; outline: none;">
+    <span class="material-icons" style="font-size: 1.8rem; margin: 0;">smart_toy</span>
+    <!-- Pulse badge -->
+    <span style="position: absolute; top: 0; right: 0; width: 14px; height: 14px; background: #10b981; border: 2.5px solid var(--bg-primary); border-radius: 50%; animation: pulse-badge 2s infinite;"></span>
+  </button>
+
+  <!-- Chat Window -->
+  <div id="chat-window" class="glassmorphism" style="display: none; width: 360px; height: 500px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: rgba(15, 23, 42, 0.95); box-shadow: 0 12px 40px rgba(0,0,0,0.5); flex-direction: column; overflow: hidden; transition: all 0.3s ease; transform: translateY(20px); opacity: 0; position: absolute; bottom: 80px; right: 0;">
+    <!-- Chat Header -->
+    <div style="background: var(--accent-gradient); padding: 15px; color: white; display: flex; align-items: center; justify-content: space-between;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span class="material-icons" style="font-size: 1.8rem; margin: 0;">smart_toy</span>
+        <div style="text-align: left;">
+          <h4 style="margin: 0; font-size: 1rem; font-weight: 600;">PuruWorld Assistant</h4>
+          <span style="font-size: 0.75rem; opacity: 0.85; display: flex; align-items: center; gap: 4px; margin-top: 2px;">
+            <span style="width: 6px; height: 6px; background: #10b981; border-radius: 50%;"></span> Online
+          </span>
+        </div>
+      </div>
+      <button id="chat-close-btn" style="background: none; border: none; color: white; cursor: pointer; display: flex; align-items: center;">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <!-- Chat Messages Container -->
+    <div id="chat-messages" style="flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; scrollbar-width: thin; text-align: left;">
+      <!-- Welcome message -->
+      <div class="msg bubble-bot">
+        Hi! I am the PuruWorld AI guide. Ask me anything about our blog posts, YouTube videos, tools, or games!
+      </div>
+    </div>
+
+    <!-- Suggestions Container -->
+    <div id="chat-suggestions" style="padding: 10px 15px; display: flex; gap: 8px; flex-wrap: wrap; border-top: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.2); justify-content: flex-start;">
+      <button class="suggest-chip" onclick="handleSuggestion('Hi, what are the latest blog articles?')">Latest Blogs</button>
+      <button class="suggest-chip" onclick="handleSuggestion('Show me popular videos')">Popular Videos</button>
+      <button class="suggest-chip" onclick="handleSuggestion('What games can I play?')">Play Games</button>
+    </div>
+
+    <!-- Chat Input Form -->
+    <form id="chat-form" style="display: flex; border-top: 1px solid rgba(255,255,255,0.05); background: rgba(15, 23, 42, 0.98); padding: 10px; margin: 0;">
+      <input type="text" id="chat-input" placeholder="Type your message..." autocomplete="off" style="flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: white; padding: 10px 15px; font-size: 0.9rem; outline: none; transition: border-color 0.2s;">
+      <button type="submit" style="background: var(--accent-gradient); border: none; color: white; border-radius: 10px; width: 40px; margin-left: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: opacity 0.2s;">
+        <span class="material-icons" style="font-size: 1.2rem; margin: 0;">send</span>
+      </button>
+    </form>
+  </div>
+</div>
+
+<style>
+  @keyframes pulse-badge {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+  }
+  #chat-toggle-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 36px rgba(99, 102, 241, 0.6);
+  }
+  .msg {
+    max-width: 85%;
+    padding: 10px 14px;
+    border-radius: 16px;
+    font-size: 0.88rem;
+    line-height: 1.45;
+    font-family: 'Outfit', sans-serif;
+  }
+  .bubble-bot {
+    background: rgba(255,255,255,0.08);
+    color: var(--text-primary, #f8fafc);
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+  .bubble-user {
+    background: var(--accent-gradient);
+    color: white;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+    box-shadow: var(--shadow-sm);
+  }
+  .suggest-chip {
+    background: rgba(99, 102, 241, 0.15);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    color: #a5b4fc;
+    border-radius: 20px;
+    padding: 5px 10px;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Outfit', sans-serif;
+  }
+  .suggest-chip:hover {
+    background: var(--accent-gradient);
+    color: white;
+    border-color: transparent;
+    transform: translateY(-1px);
+  }
+  #chat-input:focus {
+    border-color: #6366f1;
+    background: rgba(255,255,255,0.08);
+  }
+  .typing-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--text-muted, #94a3b8);
+    border-radius: 50%;
+    display: inline-block;
+    animation: typing-bounce 1.4s infinite ease-in-out both;
+  }
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes typing-bounce {
+    0%, 80%, 100% { transform: scale(0); }
+    40% { transform: scale(1); }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const toggleBtn = document.getElementById('chat-toggle-btn');
+    const closeBtn = document.getElementById('chat-close-btn');
+    const chatWindow = document.getElementById('chat-window');
+    const chatForm = document.getElementById('chat-form');
+    const chatInput = document.getElementById('chat-input');
+    const chatMessages = document.getElementById('chat-messages');
+
+    if (!toggleBtn || !chatWindow) return;
+
+    // Toggle Chat Window
+    toggleBtn.addEventListener('click', () => {
+      const isHidden = chatWindow.style.display === 'none';
+      if (isHidden) {
+        chatWindow.style.display = 'flex';
+        // Force reflow
+        chatWindow.offsetHeight;
+        chatWindow.style.transform = 'translateY(0)';
+        chatWindow.style.opacity = '1';
+        chatInput.focus();
+      } else {
+        closeChat();
+      }
+    });
+
+    if (closeBtn) closeBtn.addEventListener('click', closeChat);
+
+    function closeChat() {
+      chatWindow.style.transform = 'translateY(20px)';
+      chatWindow.style.opacity = '0';
+      setTimeout(() => {
+        chatWindow.style.display = 'none';
+      }, 300);
+    }
+
+    // Submit Msg
+    chatForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const text = chatInput.value.trim();
+      if (!text) return;
+      sendMessage(text);
+    });
+
+    window.handleSuggestion = function(text) {
+      sendMessage(text);
+    };
+
+    function sendMessage(text) {
+      // User message bubble
+      appendMessage(text, 'user');
+      chatInput.value = '';
+
+      // Auto scroll
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+
+      // Show typing indicator
+      const typingEl = appendTypingIndicator();
+      
+      // Simulate bot answer
+      setTimeout(() => {
+        typingEl.remove();
+        const response = getAIResponse(text);
+        appendMessage(response, 'bot');
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }, 600 + Math.random() * 600);
+    }
+
+    function appendMessage(text, sender) {
+      const div = document.createElement('div');
+      div.className = `msg bubble-${sender}`;
+      div.innerHTML = text;
+      chatMessages.appendChild(div);
+      return div;
+    }
+
+    function appendTypingIndicator() {
+      const div = document.createElement('div');
+      div.className = 'msg bubble-bot';
+      div.style.display = 'flex';
+      div.style.alignItems = 'center';
+      div.style.gap = '4px';
+      div.style.padding = '8px 12px';
+      div.innerHTML = `
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+      `;
+      chatMessages.appendChild(div);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      return div;
+    }
+
+    function getAIResponse(query) {
+      const q = query.toLowerCase();
+
+      // Welcomes
+      if (q.includes('hi') || q.includes('hello') || q.includes('hey') || q.includes('greetings')) {
+        return "Hello! 😊 Welcome to PuruWorld. I can help search our blogs, videos, games, or developer tools. What are you looking for today?";
+      }
+
+      // Play Games
+      if (q.includes('game') || q.includes('play') || q.includes('spin') || q.includes('tic') || q.includes('coin') || q.includes('bottle')) {
+        let base = window.relPathDepth || './';
+        return `We have awesome mini-games you can play directly in your browser:
+        <ul style="margin: 8px 0; padding-left: 20px;">
+          <li>🎮 <a href="${base}p/spin-bottle.html" style="color: #818cf8; font-weight: 500;">Spin the Bottle</a></li>
+          <li>🎮 <a href="${base}p/tic-tac-toe.html" style="color: #818cf8; font-weight: 500;">Tic Tac Toe</a></li>
+          <li>🎮 <a href="${base}p/flip-coin.html" style="color: #818cf8; font-weight: 500;">Flip a Coin</a></li>
+          <li>🎮 <a href="${base}orbit-drop/index.html" style="color: #818cf8; font-weight: 500;">Orbit Drop (Arcade)</a></li>
+        </ul>`;
+      }
+
+      // Videos request
+      if (q.includes('video') || q.includes('youtube') || q.includes('wukong') || q.includes('boss')) {
+        let base = window.relPathDepth || './';
+        let vlist = window.videosData || [];
+        let html = `Check out our gaming and tutorials library on our <a href="${base}p/videos.html" style="color: #818cf8; font-weight: 500;">Videos page</a>. Here are some featured uploads:<ul style="margin: 8px 0; padding-left: 20px;">`;
+        const limit = Math.min(3, vlist.length);
+        if (limit > 0) {
+          for (let i = 0; i < limit; i++) {
+            html += `<li>🎥 <a href="${vlist[i].url}" target="_blank" style="color: #818cf8;">${vlist[i].title}</a> (${vlist[i].views})</li>`;
+          }
+        } else {
+          html += `<li>🎥 <a href="https://www.youtube.com/@PuruWorld" target="_blank" style="color: #818cf8;">Puru World Official YouTube Channel</a></li>`;
+        }
+        html += `</ul>`;
+        return html;
+      }
+
+      // Tool request
+      if (q.includes('tool') || q.includes('converter') || q.includes('pdf') || q.includes('visualizer')) {
+        let base = window.relPathDepth || './';
+        return `Here are our developer tools and productivity utilities:
+        <ul style="margin: 8px 0; padding-left: 20px;">
+          <li>🛠️ <a href="${base}pythonVisualizer/index.html" style="color: #818cf8; font-weight: 500;">Python Visualizer</a></li>
+          <li>🛠️ <a href="${base}universaltextconverter/index.html" style="color: #818cf8; font-weight: 500;">Universal Text Converter</a></li>
+          <li>🛠️ <a href="${base}Image2Pdf/index.html" style="color: #818cf8; font-weight: 500;">Image to PDF Converter</a></li>
+          <li>🛠️ <a href="${base}p/json-formatter.html" style="color: #818cf8; font-weight: 500;">JSON Formatter</a></li>
+        </ul>`;
+      }
+
+      // Default keyword search inside articles
+      let posts = window.postsData || [];
+      let matches = [];
+      posts.forEach(p => {
+        if (p.title.toLowerCase().includes(q) || (p.excerpt && p.excerpt.toLowerCase().includes(q))) {
+          matches.push(p);
+        }
+      });
+
+      if (matches.length > 0) {
+        let html = `I found ${matches.length} articles matching your query:<ul style="margin: 8px 0; padding-left: 20px;">`;
+        const limit = Math.min(4, matches.length);
+        for (let i = 0; i < limit; i++) {
+          let base = window.relPathDepth || './';
+          let url = matches[i].url || matches[i].filename;
+          html += `<li>📰 <a href="${base}${url}" style="color: #818cf8; font-weight: 500;">${matches[i].title}</a></li>`;
+        }
+        html += `</ul>`;
+        return html;
+      }
+
+      return "I couldn't find any specific articles matching that query. Try typing keywords like 'boundaries', 'income', 'workout', 'games', 'videos', or 'pdf'!";
+    }
+  });
+</script>
+
 
 </body>
 </html>

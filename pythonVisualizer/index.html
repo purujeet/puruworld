@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Recursion Tree Visualizer</title>
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌳</text></svg>">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/dracula.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/python/python.min.js"></script>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+
+    <style>
+        .CodeMirror { height: 100%; font-size: 15px; font-family: 'Fira Code', monospace; }
+        .node circle { fill: #8b5cf6; stroke: #c4b5fd; stroke-width: 3px; cursor: pointer; transition: all 0.2s; }
+        .node text { font: 12px sans-serif; fill: #1f2937; font-weight: 600; pointer-events: none; }
+        .link { fill: none; stroke: #9ca3af; stroke-width: 2px; transition: opacity 0.2s; }
+        #tree-container { background-image: radial-gradient(#e5e7eb 1px, transparent 1px); background-size: 20px 20px; background-color: #f9fafb; cursor: grab; }
+        #tree-container:active { cursor: grabbing; }
+        
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1f2937; }
+        ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+
+        .node.dragging circle { fill: #ec4899 !important; stroke: #fbcfe8 !important; }
+        .node.active-step circle { stroke: #fbbf24 !important; stroke-width: 4px !important; fill: #f59e0b !important; }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden bg-gray-900 font-sans">
+
+    <header class="bg-gray-800 text-white p-4 flex justify-between items-center shadow-lg z-10">
+        <div>
+            <h1 class="text-2xl font-bold text-purple-400">Recursion Visualizer</h1>
+            <p class="text-xs text-gray-400">Watch the call stack resolve in real-time with I/O support.</p>
+        </div>
+        
+        <div class="flex items-center gap-3">
+            <span id="status" class="text-sm text-yellow-400 animate-pulse mr-2 w-28 text-right">Loading Engine...</span>
+            
+            <input type="file" id="file-input" class="hidden" accept=".py,.txt" />
+            <button id="import-btn" class="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1.5 rounded text-sm font-bold transition-colors border border-gray-600">Import</button>
+            <button id="export-btn" class="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1.5 rounded text-sm font-bold transition-colors border border-gray-600">Export</button>
+            
+            <div class="h-6 w-px bg-gray-600 mx-1"></div> 
+
+            <div class="flex items-center gap-2 opacity-80 hover:opacity-100 transition-opacity">
+                <span class="text-xs text-gray-400 font-bold tracking-wide">SPEED</span>
+                <input type="range" id="speed-slider" min="100" max="1500" value="1000" class="w-20 accent-purple-500 cursor-pointer" title="Adjust Animation Speed">
+            </div>
+
+            <div class="h-6 w-px bg-gray-600 mx-1"></div> 
+
+            <div id="debugger-controls" class="flex items-center gap-2 bg-gray-900 p-1 rounded border border-gray-700 opacity-50 pointer-events-none transition-opacity">
+                <button id="btn-restart" class="p-1.5 hover:bg-gray-700 rounded text-gray-300" title="Restart (Start over)">⏮️</button>
+                <button id="btn-step-back" class="p-1.5 hover:bg-gray-700 rounded text-gray-300" title="Step Backward">⏪</button>
+                <button id="btn-play-pause" class="p-1.5 hover:bg-gray-700 rounded text-gray-300 w-8" title="Auto-Play / Pause">▶️</button>
+                <button id="btn-step" class="p-1.5 hover:bg-gray-700 rounded text-gray-300" title="Step Forward">⏭️</button>
+                <span id="step-counter-display" class="text-xs text-gray-500 font-mono w-16 text-center">0 / 0</span>
+            </div>
+
+            <button id="run-btn" disabled class="bg-purple-600 hover:bg-purple-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-5 py-1.5 rounded font-bold transition-colors shadow-lg ml-1">
+                Run Code
+            </button>
+
+            <a href="https://ko-fi.com/purujeetsinghal" target="_blank" class="bg-transparent hover:bg-yellow-500/10 text-yellow-400 border border-yellow-500/50 hover:border-yellow-400 px-4 py-1.5 rounded text-sm font-bold transition-colors ml-2 flex items-center gap-1">
+                <span>💛</span> Support
+            </a>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+        
+        <div class="w-1/3 h-full border-r border-gray-700 bg-gray-800 flex flex-col">
+            <div class="h-3/5 border-b border-gray-700 flex flex-col">
+                <div class="bg-gray-900 text-gray-400 text-xs px-3 py-1 uppercase tracking-wider font-bold">Python Source Code</div>
+                <div class="flex-1 overflow-hidden"><textarea id="code-editor"></textarea></div>
+            </div>
+
+            <div class="h-2/5 flex">
+                <div class="w-1/2 border-r border-gray-700 flex flex-col">
+                    <div class="bg-gray-900 text-gray-400 text-xs px-3 py-1 uppercase tracking-wider font-bold">Custom Input (stdin)</div>
+                    <textarea id="stdin" class="flex-1 bg-gray-800 text-white p-3 text-sm font-mono resize-none focus:outline-none placeholder-gray-600" placeholder="Enter input here..."></textarea>
+                </div>
+                <div class="w-1/2 flex flex-col">
+                    <div class="bg-gray-900 text-gray-400 text-xs px-3 py-1 uppercase tracking-wider font-bold">Output (stdout)</div>
+                    <textarea id="stdout" readonly class="flex-1 bg-gray-900 text-green-400 p-3 text-sm font-mono resize-none focus:outline-none" placeholder="Program output will appear here..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="w-2/3 h-full relative" id="tree-container">
+            <div id="placeholder-text" class="absolute inset-0 flex items-center justify-center text-gray-400 pointer-events-none">
+                Write a recursive function and hit Run to generate the tree.
+            </div>
+        </div>
+
+    </div>
+
+    <footer class="bg-gray-900 border-t border-gray-800 p-2 text-center text-[10px] text-gray-500 tracking-wide flex justify-between px-6">
+        <span>© 2026 Open Source Recursion Visualizer. Free for educational and organizational use.</span>
+        <span class="text-green-600 font-semibold">✓ Secure Environment: Python executes entirely locally in WebAssembly. No source code or data is transmitted externally.</span>
+    </footer>
+
+    <script>
+        const defaultCode = `import sys\n\ndef factorial(n):\n    if n <= 1:\n        return 1\n    return n * factorial(n - 1)\n\n# Read from the Custom Input box\nraw_input = sys.stdin.read().strip()\nnum = int(raw_input) if raw_input else 4\n\nresult = factorial(num)\nprint(f"Finished! The result is {result}")\n`;
+
+        const editor = CodeMirror.fromTextArea(document.getElementById("code-editor"), {
+            mode: "python", theme: "dracula", lineNumbers: true, indentUnit: 4, matchBrackets: true
+        });
+        editor.setValue(defaultCode);
+        document.getElementById("stdin").value = "4"; 
+
+        let pyodide;
+
+        // --- DEBUGGER & SPEED STATE ---
+        let currentStep = 0;
+        let totalSteps = 0;
+        let isPlaying = false;
+        let playInterval = null;
+        
+        let playSpeedMs = 600; 
+        const speedSlider = document.getElementById("speed-slider");
+
+        speedSlider.addEventListener("input", (e) => {
+            playSpeedMs = 1600 - parseInt(e.target.value);
+            if (isPlaying) {
+                clearInterval(playInterval);
+                playInterval = setInterval(playNextStep, playSpeedMs);
+            }
+        });
+
+        async function init() {
+            pyodide = await loadPyodide();
+            document.getElementById("status").textContent = "Python Ready";
+            document.getElementById("status").className = "text-sm text-green-400";
+            document.getElementById("run-btn").disabled = false;
+        }
+
+        // --- IMPORT / EXPORT LOGIC ---
+        document.getElementById("export-btn").addEventListener("click", () => {
+            const code = editor.getValue();
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(new Blob([code], { type: "text/plain" }));
+            a.download = "recursion_script.py";
+            a.click();
+        });
+
+        const fileInput = document.getElementById("file-input");
+        document.getElementById("import-btn").addEventListener("click", () => fileInput.click());
+        fileInput.addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => editor.setValue(event.target.result);
+            reader.readAsText(file);
+            fileInput.value = ""; 
+        });
+
+        // --- DEBUGGER CONTROLS UI ---
+        const btnRestart = document.getElementById("btn-restart");
+        const btnStepBack = document.getElementById("btn-step-back");
+        const btnPlayPause = document.getElementById("btn-play-pause");
+        const btnStep = document.getElementById("btn-step");
+        const stepDisplay = document.getElementById("step-counter-display");
+        const debuggerPanel = document.getElementById("debugger-controls");
+
+        function updateDebuggerUI() {
+            stepDisplay.textContent = `${currentStep} / ${totalSteps}`;
+            btnPlayPause.textContent = isPlaying ? "⏸" : "▶️";
+            
+            if (currentStep >= totalSteps && isPlaying) {
+                togglePlay();
+            }
+        }
+
+        function playNextStep() {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                renderCurrentStep();
+            } else {
+                togglePlay(); 
+            }
+        }
+
+        function togglePlay() {
+            isPlaying = !isPlaying;
+            if (isPlaying) {
+                if (currentStep >= totalSteps) currentStep = 0; 
+                playInterval = setInterval(playNextStep, playSpeedMs);
+            } else {
+                clearInterval(playInterval);
+            }
+            updateDebuggerUI();
+        }
+
+        btnPlayPause.addEventListener("click", togglePlay);
+        
+        btnStep.addEventListener("click", () => {
+            if (isPlaying) togglePlay(); 
+            if (currentStep < totalSteps) {
+                currentStep++;
+                renderCurrentStep();
+            }
+        });
+
+        btnStepBack.addEventListener("click", () => {
+            if (isPlaying) togglePlay(); 
+            if (currentStep > 0) {
+                currentStep--;
+                renderCurrentStep();
+            }
+        });
+
+        btnRestart.addEventListener("click", () => {
+            if (isPlaying) togglePlay();
+            currentStep = 0;
+            renderCurrentStep();
+        });
+
+        // --- EXECUTION LOGIC ---
+        document.getElementById("run-btn").addEventListener("click", async () => {
+            if (isPlaying) togglePlay(); 
+            
+            document.getElementById("status").textContent = "Tracing...";
+            document.getElementById("status").className = "text-sm text-yellow-400";
+            document.getElementById("placeholder-text").style.display = "none";
+            debuggerPanel.classList.add("opacity-50", "pointer-events-none"); 
+            
+            const stdoutBox = document.getElementById("stdout");
+            stdoutBox.value = ""; 
+            stdoutBox.className = "flex-1 bg-gray-900 text-green-400 p-3 text-sm font-mono resize-none focus:outline-none";
+
+            pyodide.globals.set("USER_CODE", editor.getValue());
+            pyodide.globals.set("USER_INPUT", document.getElementById("stdin").value);
+
+            const tracerScript = `
+import sys
+import json
+from io import StringIO
+
+sys.stdin = StringIO(USER_INPUT)
+captured_output = StringIO()
+sys.stdout = captured_output
+
+_step_counter = 1
+_tree_root = {"name": "Execution Start", "call_step": 0, "return_step": 0, "children": []}
+_call_stack = [_tree_root]
+
+def _trace_calls(frame, event, arg):
+    global _step_counter
+    if frame.f_code.co_filename != "<string>": return _trace_calls
+    if frame.f_code.co_name == "<module>": return _trace_calls
+        
+    if event == "call":
+        func_name = frame.f_code.co_name
+        args = []
+        for i in range(frame.f_code.co_argcount):
+            try:
+                var_name = frame.f_code.co_varnames[i]
+                val = frame.f_locals.get(var_name)
+                args.append(f"{var_name}={repr(val)}")
+            except: pass
+        node = {"name": f"{func_name}({', '.join(args)})", "return_val": "", "call_step": _step_counter, "return_step": -1, "children": []}
+        _step_counter += 1
+        _call_stack[-1]["children"].append(node)
+        _call_stack.append(node)
+    elif event == "return":
+        if len(_call_stack) > 1:
+            node = _call_stack.pop()
+            node["return_val"] = repr(arg)
+            node["return_step"] = _step_counter
+            _step_counter += 1
+    return _trace_calls
+
+sys.setprofile(_trace_calls)
+
+error_msg = None
+try:
+    exec(USER_CODE, {"__name__": "__main__"})
+except Exception as e:
+    error_msg = str(e)
+    _tree_root["children"].append({"name": f"Error: {e}", "call_step": _step_counter, "return_step": _step_counter, "children": []})
+finally:
+    sys.setprofile(None)
+    sys.stdout = sys.__stdout__ 
+    _tree_root["return_step"] = _step_counter
+
+json.dumps({
+    "tree": _tree_root,
+    "stdout": captured_output.getvalue(),
+    "error": error_msg,
+    "total_steps": _step_counter
+})
+`;
+            try {
+                const jsonOutput = await pyodide.runPythonAsync(tracerScript);
+                const result = JSON.parse(jsonOutput);
+                
+                if (result.error) {
+                    stdoutBox.className = "flex-1 bg-gray-900 text-red-400 p-3 text-sm font-mono resize-none focus:outline-none";
+                    stdoutBox.value = result.stdout + "\\n[Error] " + result.error;
+                } else {
+                    stdoutBox.value = result.stdout || "[Program executed with no output]";
+                }
+
+                totalSteps = result.total_steps;
+                currentStep = 0;
+                
+                initD3Tree(result.tree); 
+                renderCurrentStep();     
+                
+                debuggerPanel.classList.remove("opacity-50", "pointer-events-none");
+                document.getElementById("status").textContent = "Execution Complete";
+                document.getElementById("status").className = "text-sm text-green-400";
+                
+                togglePlay();
+
+            } catch (err) {
+                stdoutBox.className = "flex-1 bg-gray-900 text-red-400 p-3 text-sm font-mono resize-none focus:outline-none";
+                stdoutBox.value = err;
+                document.getElementById("status").textContent = "Syntax Error";
+                document.getElementById("status").className = "text-sm text-red-400";
+            }
+        });
+
+        // --- D3 RENDERING ---
+        
+        function initD3Tree(data) {
+            const container = d3.select("#tree-container");
+            container.selectAll("svg").remove(); 
+
+            const width = container.node().getBoundingClientRect().width;
+            const height = container.node().getBoundingClientRect().height;
+
+            const svg = container.append("svg").attr("width", "100%").attr("height", "100%");
+            const g = svg.append("g").attr("id", "d3-master-group");
+
+            const zoom = d3.zoom().scaleExtent([0.1, 3]).on("zoom", (event) => g.attr("transform", event.transform));
+            svg.call(zoom);
+
+            const root = d3.hierarchy(data);
+            const treeLayout = d3.tree().nodeSize([240, 100]); 
+            treeLayout(root);
+
+            svg.call(zoom.transform, d3.zoomIdentity.translate(width / 2, 80).scale(1));
+
+            const links = g.selectAll(".link")
+                .data(root.links()).join("path")
+                .attr("class", "link")
+                .attr("d", d3.linkVertical().x(d => d.x).y(d => d.y))
+                .style("opacity", 0); 
+
+            const nodes = g.selectAll(".node")
+                .data(root.descendants()).join("g")
+                .attr("class", "node")
+                .attr("transform", d => `translate(${d.x},${d.y})`)
+                .style("opacity", 0); 
+
+            const drag = d3.drag()
+                .on("start", function(event, d) { d3.select(this).classed("dragging", true); })
+                .on("drag", function(event, d) {
+                    d.x += event.dx; d.y += event.dy;
+                    d3.select(this).attr("transform", `translate(${d.x},${d.y})`);
+                    links.attr("d", d3.linkVertical().x(n => n.x).y(n => n.y));
+                })
+                .on("end", function(event, d) { d3.select(this).classed("dragging", false); });
+            nodes.call(drag);
+
+            nodes.append("circle").attr("r", 8);
+
+            nodes.append("text").attr("class", "call-text-outline").attr("dy", "-1.2em").attr("text-anchor", "middle").attr("stroke", "white").attr("stroke-width", 3).attr("stroke-linejoin", "round").style("opacity", 0.8).lower().text(d => d.data.name);
+            nodes.append("text").attr("class", "call-text").attr("dy", "-1.2em").attr("text-anchor", "middle").text(d => d.data.name);
+
+            nodes.append("text").attr("class", "return-text-outline").attr("dy", "1.8em").attr("text-anchor", "middle").attr("stroke", "white").attr("stroke-width", 3).attr("stroke-linejoin", "round").style("opacity", 0.8).lower().text(d => d.data.return_val ? `➔ ${d.data.return_val}` : "");
+            nodes.append("text").attr("class", "return-text").attr("dy", "1.8em").attr("text-anchor", "middle").style("fill", "#059669").text(d => d.data.return_val ? `➔ ${d.data.return_val}` : "");
+        }
+
+        function renderCurrentStep() {
+            updateDebuggerUI();
+
+            d3.selectAll(".link")
+                .style("opacity", d => d.target.data.call_step <= currentStep ? 0.6 : 0);
+
+            d3.selectAll(".node")
+                .style("opacity", d => d.data.call_step <= currentStep ? 1 : 0)
+                .classed("active-step", d => d.data.call_step === currentStep || d.data.return_step === currentStep);
+
+            d3.selectAll(".return-text, .return-text-outline")
+                .style("opacity", d => (d.data.return_step !== -1 && d.data.return_step <= currentStep) ? 1 : 0);
+        }
+
+        init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ - Image to PDF Converter</title>
+    <!-- Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        :root {
+            --primary-bg: linear-gradient(to bottom, #4CAF50, #81C784);
+            --primary-text: #333333;
+            --card-bg: #ffffff;
+            --btn-bg: #4CAF50;
+            --btn-hover: #45a049;
+            --shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            --footer-bg: #e8f5e9;
+            --link-color: #2e7d32;
+        }
+        [data-theme="dark"] {
+            --primary-bg: linear-gradient(to bottom, #1B5E20, #4CAF50);
+            --primary-text: #e0e0e0;
+            --card-bg: #424242;
+            --btn-bg: #66bb6a;
+            --btn-hover: #5cb860;
+            --shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+            --footer-bg: #333333;
+            --link-color: #81c784;
+        }
+        body {
+            background: var(--primary-bg);
+            color: var(--primary-text);
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+        }
+        main {
+            flex: 1 0 auto;
+            overflow-y: auto;
+            padding-bottom: 100px; /* Space for fixed footer */
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+        .card {
+            background-color: var(--card-bg);
+            box-shadow: var(--shadow);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .nav-wrapper {
+            background-color: #4CAF50;
+        }
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            margin-right: 20px;
+        }
+        .theme-toggle label {
+            margin-right: 10px;
+            color: var(--primary-text);
+        }
+        .page-footer {
+            background-color: var(--footer-bg);
+            padding: 10px 0;
+            color: var(--primary-text);
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            z-index: 1000;
+            margin-top: 40px; /* Space above footer */
+        }
+        .page-footer a {
+            color: var(--link-color);
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        .page-footer a:hover {
+            color: var(--btn-hover);
+        }
+        .collapsible-header {
+            background-color: transparent;
+            color: var(--primary-text);
+            font-weight: 500;
+        }
+        .collapsible-body {
+            background-color: transparent;
+            color: var(--primary-text);
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 0 10px;
+            }
+            .card {
+                padding: 15px;
+            }
+            .page-footer {
+                padding: 5px 0;
+            }
+        }
+    </style>
+    <!-- Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav>
+        <div class="nav-wrapper">
+            <a href="index.html" class="brand-logo center">Image to PDF Converter</a>
+            <ul class="right hide-on-med-and-down">
+                <li class="theme-toggle">
+                    <label for="themeSwitch">Dark Mode</label>
+                    <div class="switch">
+                        <label>
+                            <input type="checkbox" id="themeSwitch">
+                            <span class="lever"></span>
+                        </label>
+                    </div>
+                </li>
+                <li><a href="index.html">Home</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- FAQ Section -->
+    <main>
+        <div class="container">
+            <div class="card">
+                <h4>Frequently Asked Questions</h4>
+                <ul class="collapsible">
+                    <li>
+                        <div class="collapsible-header">What image formats are supported?</div>
+                        <div class="collapsible-body"><p>We support JPEG, PNG, GIF, BMP, TIFF, and more.</p></div>
+                    </li>
+                    <li>
+                        <div class="collapsible-header">Is there a file size or quantity limit?</div>
+                        <div class="collapsible-body"><p>Up to 20 images per conversion; no strict size limit, but large files may take longer.</p></div>
+                    </li>
+                    <li>
+                        <div class="collapsible-header">Can I convert multiple images at once?</div>
+                        <div class="collapsible-body"><p>Yes, upload multiple images, and they will be combined into a single PDF.</p></div>
+                    </li>
+                    <li>
+                        <div class="collapsible-header">Is my data secure?</div>
+                        <div class="collapsible-body"><p>All processing is done locally in your browser—no data is uploaded to servers.</p></div>
+                    </li>
+                    <li>
+                        <div class="collapsible-header">Can I adjust the order of images?</div>
+                        <div class="collapsible-body"><p>Yes, drag and drop thumbnails in the preview area to reorder images before conversion.</p></div>
+                    </li>
+                    <li>
+                        <div class="collapsible-header">Does it work on mobile?</div>
+                        <div class="collapsible-body"><p>Yes, fully responsive on desktops, tablets, and phones.</p></div>
+                    </li>
+                    <li>
+                        <div class="collapsible-header">What if an image fails to load?</div>
+                        <div class="collapsible-body"><p>An error will show; try re-uploading or check file integrity.</p></div>
+                    </li>
+                    <li>
+                        <div class="collapsible-header">Can I choose page orientation?</div>
+                        <div class="collapsible-body"><p>Auto-detects landscape/portrait; customize via options on the home page.</p></div>
+                    </li>
+                    <li>
+                        <div class="collapsible-header">How does quality affect the PDF?</div>
+                        <div class="collapsible-body"><p>Higher quality preserves details but increases file size.</p></div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="page-footer">
+        <div class="container">
+            <div class="row">
+                <div class="col s12">
+                    <p>
+                        <a href="about.html">About Us</a> | 
+                        <a href="faq.html">FAQ</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Materialize
+        document.addEventListener('DOMContentLoaded', function() {
+            M.AutoInit();
+        });
+
+        // Dark Mode
+        const themeSwitch = document.getElementById('themeSwitch');
+        themeSwitch.addEventListener('change', () => {
+            document.documentElement.setAttribute('data-theme', themeSwitch.checked ? 'dark' : 'light');
+        });
+    </script>
+</body>
+</html>

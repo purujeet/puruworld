@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image to PDF Converter</title>
+    <!-- Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        :root {
+            --primary-bg: linear-gradient(to bottom, #4CAF50, #81C784);
+            --primary-text: #333333;
+            --card-bg: #ffffff;
+            --btn-bg: #4CAF50;
+            --btn-hover: #45a049;
+            --shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            --drop-zone-bg: #f9f9f9;
+            --drop-zone-border: #ddd;
+            --footer-bg: #e8f5e9;
+            --link-color: #2e7d32;
+        }
+        [data-theme="dark"] {
+            --primary-bg: linear-gradient(to bottom, #1B5E20, #4CAF50);
+            --primary-text: #e0e0e0;
+            --card-bg: #424242;
+            --btn-bg: #66bb6a;
+            --btn-hover: #5cb860;
+            --shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+            --drop-zone-bg: #333333;
+            --drop-zone-border: #555;
+            --footer-bg: #333333;
+            --link-color: #81c784;
+        }
+        body {
+            background: var(--primary-bg);
+            color: var(--primary-text);
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+        }
+        main {
+            flex: 1 0 auto;
+            overflow-y: auto;
+            padding-bottom: 100px; /* Space for fixed footer */
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+        .card {
+            background-color: var(--card-bg);
+            box-shadow: var(--shadow);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .btn {
+            background-color: var(--btn-bg);
+            border-radius: 4px;
+            text-transform: none;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover {
+            background-color: var(--btn-hover);
+        }
+        .btn:disabled {
+            background-color: #cccccc !important;
+            cursor: not-allowed;
+        }
+        #preview {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+        #preview img {
+            max-width: 100px;
+            max-height: 100px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            object-fit: cover;
+            cursor: move;
+        }
+        #preview img:hover {
+            border-color: var(--btn-bg);
+        }
+        #status {
+            margin-top: 10px;
+            color: var(--primary-text);
+            opacity: 0.7;
+        }
+        .nav-wrapper {
+            background-color: #4CAF50;
+        }
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            margin-right: 20px;
+        }
+        .theme-toggle label {
+            margin-right: 10px;
+            color: var(--primary-text);
+        }
+        .drop-zone {
+            border: 2px dashed var(--drop-zone-border);
+            background-color: var(--drop-zone-bg);
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .drop-zone:hover, .drop-zone.dragover {
+            border-color: var(--btn-bg);
+            background-color: var(--btn-bg);
+            color: white;
+        }
+        .drop-zone.dragover .privacy-badge {
+            color: white;
+        }
+        .privacy-badge {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-top: 10px;
+        }
+        .page-footer {
+            background-color: var(--footer-bg);
+            padding: 10px 0;
+            color: var(--primary-text);
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            z-index: 1000;
+            margin-top: 40px; /* Space above footer */
+        }
+        .page-footer a {
+            color: var(--link-color);
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        .page-footer a:hover {
+            color: var(--btn-hover);
+        }
+        #sizeEstimate {
+            font-size: 14px;
+            margin-top: 5px;
+            color: var(--primary-text);
+            opacity: 0.7;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 0 10px;
+            }
+            .card {
+                padding: 15px;
+            }
+            .drop-zone {
+                padding: 20px;
+            }
+            .page-footer {
+                padding: 5px 0;
+            }
+        }
+    </style>
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <!-- Sortable.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav>
+        <div class="nav-wrapper">
+            <a href="index.html" class="brand-logo center">Image to PDF Converter</a>
+            <ul class="right hide-on-med-and-down">
+                <li class="theme-toggle">
+                    <label for="themeSwitch">Dark Mode</label>
+                    <div class="switch">
+                        <label>
+                            <input type="checkbox" id="themeSwitch">
+                            <span class="lever"></span>
+                        </label>
+                    </div>
+                </li>
+                <li><a href="index.html">Home</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Converter Section -->
+    <main>
+        <div class="container">
+            <div class="card">
+                <h4>Convert Images to PDF</h4>
+                <div class="drop-zone" id="dropZone">
+                    <i class="material-icons" style="font-size: 48px; opacity: 0.5;">cloud_upload</i>
+                    <p>Drop images here or click to browse</p>
+                    <p class="privacy-badge">100% private—no server upload</p>
+                    <input type="file" id="imageInput" accept="image/*" multiple style="display: none;">
+                </div>
+                <div class="row">
+                    <div class="col s6">
+                        <label>Page Size</label>
+                        <select id="pageSize">
+                            <option value="a4">A4</option>
+                            <option value="letter">Letter</option>
+                        </select>
+                    </div>
+                    <div class="col s6">
+                        <label>Quality</label>
+                        <p class="range-field">
+                            <input type="range" id="quality" min="0.1" max="1" value="0.8" step="0.1">
+                            <span id="qualityValue">80%</span>
+                            <br>
+                            <span id="sizeEstimate">Estimated size: 0 MB</span>
+                        </p>
+                    </div>
+                </div>
+                <button class="btn waves-effect waves-light" id="convertBtn" onclick="convertToPDF()" disabled>
+                    Convert to PDF
+                    <i class="material-icons right">send</i>
+                </button>
+                <p>Drag images to reorder</p>
+                <div id="preview"></div>
+                <div id="status"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="page-footer">
+        <div class="container">
+            <div class="row">
+                <div class="col s12">
+                    <p>
+                        <a href="about.html">About Us</a> | 
+                        <a href="faq.html">FAQ</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Materialize
+        document.addEventListener('DOMContentLoaded', function() {
+            M.AutoInit();
+            const qualitySlider = document.getElementById('quality');
+            const qualityValue = document.getElementById('qualityValue');
+            qualitySlider.addEventListener('input', () => {
+                qualityValue.textContent = (qualitySlider.value * 100).toFixed(0) + '%';
+                updateSizeEstimate();
+            });
+        });
+
+        // Dark Mode
+        const themeSwitch = document.getElementById('themeSwitch');
+        themeSwitch.addEventListener('change', () => {
+            document.documentElement.setAttribute('data-theme', themeSwitch.checked ? 'dark' : 'light');
+        });
+
+        // Drag and Drop Upload
+        const dropZone = document.getElementById('dropZone');
+        const imageInput = document.getElementById('imageInput');
+        const preview = document.getElementById('preview');
+        const convertBtn = document.getElementById('convertBtn');
+        const status = document.getElementById('status');
+        let filesArray = [];
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight(e) {
+            dropZone.classList.add('dragover');
+        }
+
+        function unhighlight(e) {
+            dropZone.classList.remove('dragover');
+        }
+
+        dropZone.addEventListener('drop', handleDrop, false);
+        dropZone.addEventListener('click', () => imageInput.click());
+        imageInput.addEventListener('change', handleFiles);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files.length > 20) {
+                alert('Max 20 images at a time.');
+                return;
+            }
+            handleFiles({ target: { files } });
+        }
+
+        function handleFiles(event) {
+            const files = Array.from(event.target.files);
+            if (files.length === 0) {
+                convertBtn.disabled = true;
+                return;
+            }
+            if (filesArray.length + files.length > 20) {
+                alert('Max 20 images at a time.');
+                return;
+            }
+            filesArray = [...filesArray, ...files.filter(file => file.type.startsWith('image/'))];
+            updatePreview();
+            updateSizeEstimate();
+            imageInput.value = '';
+        }
+
+        function updatePreview() {
+            preview.innerHTML = '';
+            convertBtn.disabled = filesArray.length === 0;
+            filesArray.forEach((file, index) => {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.dataset.index = index;
+                preview.appendChild(img);
+            });
+            new Sortable(preview, {
+                animation: 150,
+                onEnd: (evt) => {
+                    const [moved] = filesArray.splice(evt.oldIndex, 1);
+                    filesArray.splice(evt.newIndex, 0, moved);
+                }
+            });
+        }
+
+        function updateSizeEstimate() {
+            const quality = parseFloat(document.getElementById('quality').value);
+            const totalSize = filesArray.reduce((sum, file) => sum + file.size, 0);
+            // Estimate: 50% base compression + quality factor (0.1–1.0)
+            const estimatedSize = (totalSize * 0.5 * quality) / (1024 * 1024); // Convert to MB
+            document.getElementById('sizeEstimate').textContent = `Estimated size: ${estimatedSize.toFixed(2)} MB`;
+        }
+
+        // PDF Conversion
+        async function convertToPDF() {
+            status.innerHTML = '<div class="preloader-wrapper small active"><div class="spinner-layer spinner-green-only"><div class="circle-clipper left"><div class="circle"></div></div><div class="gap-patch"><div class="circle"></div></div><div class="circle-clipper right"><div class="circle"></div></div></div></div> Converting...';
+            convertBtn.disabled = true;
+            const { jsPDF } = window.jspdf;
+            const pageSize = document.getElementById('pageSize').value;
+            const quality = parseFloat(document.getElementById('quality').value);
+            const doc = new jsPDF({ unit: 'mm', format: pageSize });
+
+            // Generate timestamp for filename
+            const now = new Date();
+            const timestamp = now.getFullYear() +
+                ('0' + (now.getMonth() + 1)).slice(-2) +
+                ('0' + now.getDate()).slice(-2) + '_' +
+                ('0' + now.getHours()).slice(-2) +
+                ('0' + now.getMinutes()).slice(-2) +
+                ('0' + now.getSeconds()).slice(-2);
+
+            for (let i = 0; i < filesArray.length; i++) {
+                const file = filesArray[i];
+                try {
+                    const img = await loadImage(file);
+                    if (i > 0) doc.addPage();
+                    const pageWidth = doc.internal.pageSize.getWidth();
+                    const pageHeight = doc.internal.pageSize.getHeight();
+                    const imgWidth = img.width;
+                    const imgHeight = img.height;
+                    const ratio = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
+                    const drawWidth = imgWidth * ratio;
+                    const drawHeight = imgHeight * ratio;
+                    const x = (pageWidth - drawWidth) / 2;
+                    const y = (pageHeight - drawHeight) / 2;
+
+                    if (imgWidth > imgHeight) {
+                        doc.internal.pageSize.setWidth(pageHeight);
+                        doc.internal.pageSize.setHeight(pageWidth);
+                        doc.addImage(img.src, getImageFormat(file.type), 0, 0, pageHeight, pageWidth, '', 'FAST', quality);
+                    } else {
+                        doc.addImage(img.src, getImageFormat(file.type), x, y, drawWidth, drawHeight, '', 'FAST', quality);
+                    }
+                } catch (error) {
+                    console.error('Error processing image:', error);
+                    status.textContent = 'Error converting some images.';
+                    convertBtn.disabled = false;
+                    return;
+                }
+            }
+            doc.save(`ImageToPDF_${timestamp}.pdf`);
+            status.textContent = 'Conversion complete! PDF downloaded.';
+            convertBtn.disabled = false;
+        }
+
+        function loadImage(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => resolve(img);
+                    img.onerror = reject;
+                    img.src = e.target.result;
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function getImageFormat(mimeType) {
+            if (mimeType.includes('png')) return 'PNG';
+            if (mimeType.includes('jpeg') || mimeType.includes('jpg')) return 'JPEG';
+            if (mimeType.includes('gif')) return 'GIF';
+            if (mimeType.includes('bmp')) return 'BMP';
+            if (mimeType.includes('tiff')) return 'TIFF';
+            return 'JPEG';
+        }
+    </script>
+</body>
+</html>
