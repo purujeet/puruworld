@@ -3238,7 +3238,7 @@ def main():
   
   # Load Index HTML modularly
   index_tmpl = load_template('index.html')
-  head = get_head("puru world official", "puru world official - A blog on everyday need daily. Exploring technology, lifeskills, travel, and more.", "./", "index.html", '<script src="./posts-metadata.js"></script><script src="./videos-metadata.js"></script>')
+  head = get_head("puru world official", "puru world official - A blog on everyday need daily. Exploring technology, lifeskills, travel, and more.", "./", "index.html", "")
   header = get_header("./", has_progress=False, id_val="Index")
   footer = get_footer("./")
   index_html = index_tmpl.replace('{{HEAD}}', head).replace('{{HEADER}}', header).replace('{{FOOTER}}', footer)
@@ -3310,7 +3310,7 @@ def main():
   dashboard_tmpl = load_template('dashboard.html')
   
   # 1. Main site version (located at puruworld.com/dashboard/index.html)
-  dashboard_head = get_head('Admin Dashboard - puru world official', 'Analytics dashboard for puru world official.', '../', 'dashboard/index.html', '<script src="../posts-metadata.js"></script>')
+  dashboard_head = get_head('Admin Dashboard - puru world official', 'Analytics dashboard for puru world official.', '../', 'dashboard/index.html', '')
   dashboard_header = get_header('../', has_progress=False, id_val="Dashboard")
   dashboard_footer = get_footer('../')
   
@@ -3327,7 +3327,7 @@ def main():
   subdomain_dir = os.path.join(output_dir, 'dashboard-dist')
   os.makedirs(subdomain_dir, exist_ok=True)
   
-  subdomain_head = get_head('Admin Dashboard - puruworld.com', 'Analytics dashboard for puruworld.com.', 'https://puruworld.com/', 'index.html', '<script src="https://puruworld.com/posts-metadata.js"></script>')
+  subdomain_head = get_head('Admin Dashboard - puruworld.com', 'Analytics dashboard for puruworld.com.', 'https://puruworld.com/', 'index.html', '')
   subdomain_header = get_header('https://puruworld.com/', has_progress=False, id_val="Dashboard")
   subdomain_footer = get_footer('https://puruworld.com/')
   
