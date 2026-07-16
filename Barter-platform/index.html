@@ -1,0 +1,51 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Local Barter & Swap Platform</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <header>
+        <h1>Local Barter & Swap Platform</h1>
+    </header>
+    <main>
+        <section id="add-listing">
+            <h2>Add New Listing</h2>
+            <form id="listing-form">
+                <label for="item-title">Item/Service Title<span>*</span></label>
+                <input type="text" id="item-title" name="item-title" placeholder="Enter title" required />
+
+                <label for="item-description">Description<span>*</span></label>
+                <textarea id="item-description" name="item-description" rows="3" placeholder="Enter description" required></textarea>
+
+                <label for="item-category">Category<span>*</span></label>
+                <select id="item-category" name="item-category" required>
+                    <option value="">Select category</option>
+                    <option value="Books">Books</option>
+                    <option value="Electronics">Electronics</option>
+                    <option value="Clothing">Clothing</option>
+                    <option value="Home">Home & Kitchen</option>
+                    <option value="Services">Services</option>
+                    <option value="Others">Others</option>
+                </select>
+
+                <label for="item-location">Location<span>*</span></label>
+                <input type="text" id="item-location" name="item-location" placeholder="Enter city or area" required />
+
+                <label for="item-photo">Photo URL</label>
+                <input type="url" id="item-photo" name="item-photo" placeholder="Enter image URL (optional)" />
+
+                <button type="submit">Add Listing</button>
+            </form>
+        </section>
+        <section id="listings">
+            <h2>Available Listings</h2>
+            <div id="items-container"></div>
+        </section>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

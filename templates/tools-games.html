@@ -14,6 +14,13 @@
       <p>Play virtual casual games or launch interactive developer utility products.</p>
     </section>
 
+    <!-- Category Filters -->
+    <div class="category-filters" style="display: flex; gap: 12px; justify-content: center; margin-bottom: 35px; flex-wrap: wrap;">
+      <button class="app-filter-btn active" data-category="all" style="padding: 10px 24px; border-radius: 30px; border: 1px solid transparent; background: var(--accent-gradient); color: white; cursor: pointer; font-family: 'Outfit', sans-serif; font-weight: 600; transition: all 0.2s; outline: none;">All Releases</button>
+      <button class="app-filter-btn" data-category="game" style="padding: 10px 24px; border-radius: 30px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); cursor: pointer; font-family: 'Outfit', sans-serif; font-weight: 500; transition: all 0.2s; outline: none;">Games</button>
+      <button class="app-filter-btn" data-category="tool" style="padding: 10px 24px; border-radius: 30px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); cursor: pointer; font-family: 'Outfit', sans-serif; font-weight: 500; transition: all 0.2s; outline: none;">Developer Tools</button>
+    </div>
+
     <div class="apps-page-layout" id="apps-page-layout">
       <div class="posts-grid" id="apps-grid" style="margin-bottom: 0;">
         <!-- Apps will render dynamically -->

@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SFDX Data Dictionary Generator</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --primary:#007bff;--success:#28a745;--danger:#dc3545;--gray:#6c757d;
+  --light:#f8f9fa;--dark:#212529;--border:#dee2e6;--radius:12px;--shadow:0 8px 30px rgba(0,0,0,.1);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  font-family:'Inter',sans-serif;background:linear-gradient(135deg,#f5f7fa 0%,#c3cfe2 100%);
+  color:var(--dark);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;
+}
+.container{max-width:960px;width:100%;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+header{background:var(--primary);color:#fff;padding:24px;text-align:center;}
+h1{margin:0;font-size:1.9rem;font-weight:700;}
+.subtitle{font-size:1rem;opacity:.9;margin-top:6px;}
+.content{padding:32px;}
+.instructions{
+  background:#e3f2fd;border-left:4px solid var(--primary);padding:16px;border-radius:8px;
+  margin-bottom:24px;font-size:.95rem;
+}
+.instructions h3{margin:0 0 10px;color:var(--primary);}
+.instructions ol{margin:0;padding-left:20px;}
+.instructions li{margin:6px 0;}
+
+.upload-box{
+  border:3px dashed #ccc;border-radius:var(--radius);padding:48px 24px;text-align:center;
+  transition:.3s;background:#fafafa;cursor:pointer;position:relative;
+}
+.upload-box:hover,.upload-box.dragover{border-color:var(--primary);background:#f0f8ff;}
+.upload-icon{font-size:48px;color:var(--primary);margin-bottom:12px;}
+.file-input{display:none;}
+.btn{
+  display:inline-block;padding:12px 28px;border:none;border-radius:8px;font-weight:600;
+  cursor:pointer;transition:.2s;margin-top:16px;
+}
+.btn-primary{background:var(--primary);color:#fff;}
+.btn-primary:hover:not(:disabled){background:#0056b3;transform:translateY(-1px);}
+.btn-primary:disabled{background:#ccc;cursor:not-allowed;}
+.btn-success{background:var(--success);color:#fff;}
+.btn-success:hover:not(:disabled){background:#218838;}
+
+.progress-container{
+  margin-top:20px;padding:16px;background:var(--light);border:1px solid var(--border);
+  border-radius:8px;display:none;
+}
+.progress-header{display:flex;justify-content:space-between;align-items:center;font-weight:500;}
+.spinner{
+  display:inline-block;width:16px;height:16px;border:2px solid #f3f3f3;
+  border-top:2px solid var(--primary);border-radius:50%;animation:spin 1s linear infinite;margin-right:8px;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+.file-list,.error-list{margin-top:12px;font-size:.9rem;}
+.file-item,.error-item{
+  display:flex;align-items:center;padding:4px 0;border-bottom:1px solid #eee;
+}
+.file-item::before{content:"✔️";color:var(--success);margin-right:8px;font-weight:bold;}
+.error-item::before{content:"❌";color:var(--danger);margin-right:8px;}
+footer{text-align:center;padding:20px;color:#888;font-size:.875rem;}
+@media(max-width:600px){.content{padding:20px;} h1{font-size:1.6rem;}}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>SFDX Data Dictionary</h1>
+    <p class="subtitle">SFDX Metadata → Excel (One Sheet Per Object)</p>
+  </header>
+
+  <div class="content">
+    <div class="instructions">
+      <h3>How to Use (SFDX)</h3>
+      <ol>
+        <li>Use <strong>SFDX</strong> or VS Code to retrieve objects</li>
+        <li>Zip the <code>force-app/main/default/objects/</code> folder</li>
+        <li>Drag & drop ZIP or individual <code>*.field-meta.xml</code> files</li>
+        <li>Click <strong>Generate Excel</strong></li>
+      </ol>
+    </div>
+
+    <div class="upload-box" id="uploadBox" aria-label="Upload Zone">
+      <div class="upload-icon">📁</div>
+      <p><strong>Drag & drop</strong> ZIP or field files here</p>
+      <p style="color:#666;font-size:.9rem;">Supports SFDX structure</p>
+      <input type="file" id="fileInput" class="file-input" accept=".zip,.xml" multiple>
+      <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">Choose Files</button>
+    </div>
+
+    <div id="progressContainer" class="progress-container">
+      <div class="progress-header">
+        <span id="statusText">Ready</span>
+        <span id="counter">0 objects</span>
+      </div>
+      <div id="fileList" class="file-list"></div>
+      <div id="errorList" class="error-list"></div>
+    </div>
+
+    <div style="text-align:center;margin-top:24px;">
+      <button id="generateBtn" class="btn btn-success" disabled onclick="generateExcel()">Generate Excel File</button>
+    </div>
+  </div>
+
+  <footer>100% Client-Side • SFDX Ready • JSZip + SheetJS</footer>
+</div>
+<script>
+/* --------------------------------------------------------------
+   SFDX Data Dictionary – FINAL FIXED VERSION
+   • Correctly reads ZIP + individual XML
+   • Shows ONE line per object (no duplicates)
+   • Accurate counter: X objects (Y fields)
+   -------------------------------------------------------------- */
+let objectData = {}, processed = 0, total = 0, errors = 0, totalFields = 0;
+let shownObjects = new Set();
+
+const uploadBox   = document.getElementById('uploadBox');
+const fileInput   = document.getElementById('fileInput');
+const progCont    = document.getElementById('progressContainer');
+const statusText  = document.getElementById('statusText');
+const counter     = document.getElementById('counter');
+const fileList    = document.getElementById('fileList');
+const errorList   = document.getElementById('errorList');
+const generateBtn = document.getElementById('generateBtn');
+
+/* ---- Drag & Drop ------------------------------------------------ */
+['dragenter','dragover'].forEach(ev => uploadBox.addEventListener(ev, e => {e.preventDefault(); uploadBox.classList.add('dragover');}));
+['dragleave','drop'].forEach(ev => uploadBox.addEventListener(ev, e => {e.preventDefault(); uploadBox.classList.remove('dragover');}));
+uploadBox.addEventListener('drop', e => { if (e.dataTransfer.files.length) handleFiles(e.dataTransfer.files); });
+fileInput.addEventListener('change', e => { if (e.target.files.length) handleFiles(e.target.files); });
+
+/* ---- Reset ------------------------------------------------------ */
+function reset() {
+  objectData = {}; processed = total = errors = totalFields = 0;
+  shownObjects.clear();
+  fileList.innerHTML = ''; errorList.innerHTML = ''; generateBtn.disabled = true;
+  progCont.style.display = 'none';
+}
+
+/* ---- Main ------------------------------------------------------- */
+function handleFiles(fileListObj) {
+  reset();
+  const files = Array.from(fileListObj);
+  total = files.length;
+  if (!total) return;
+  progCont.style.display = 'block';
+  statusText.innerHTML = '<div class="spinner"></div> Processing...';
+  counter.textContent = '0 objects';
+
+  const zips = files.filter(f => f.name.endsWith('.zip'));
+  const xmls = files.filter(f => f.name.endsWith('.xml'));
+
+  if (zips.length) zips.forEach(f => processZip(f));
+  else processIndividualFiles(xmls);
+}
+
+/* ---- ZIP -------------------------------------------------------- */
+async function processZip(zipFile) {
+  try {
+    const zip = await JSZip.loadAsync(zipFile);
+    const entries = [];
+
+    zip.forEach((relPath, zipEntry) => {
+      if (zipEntry.dir) return;
+      const low = relPath.toLowerCase();
+      if (low.endsWith('.object-meta.xml') || low.endsWith('.field-meta.xml')) {
+        entries.push({relPath, zipEntry});
+      }
+    });
+
+    if (!entries.length) throw new Error('No metadata files found in ZIP');
+
+    for (const {relPath, zipEntry} of entries) {
+      try {
+        const text = await zipEntry.async('text');
+        if (relPath.endsWith('.object-meta.xml')) parseObjectFile(relPath, text);
+        else parseFieldFile(relPath, text);
+      } catch (e) {
+        addError(`Error in ${relPath.split('/').pop()}: ${e.message}`);
+      }
+      updateProgress();   // only updates counter
+    }
+  } catch (e) {
+    statusText.textContent = 'Error';
+    addError(e.message);
+  }
+}
+
+/* ---- Individual XML --------------------------------------------- */
+function processIndividualFiles(files) {
+  files.forEach(f => {
+    if (!f.name.endsWith('.xml')) { addError(`Skipped: ${f.name}`); updateProgress(); return; }
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const fakePath = `objects/${f.name}`;
+        if (f.name.endsWith('.object-meta.xml')) parseObjectFile(fakePath, e.target.result);
+        else parseFieldFile(fakePath, e.target.result);
+      } catch (err) {
+        addError(`Parse error in ${f.name}: ${err.message}`);
+      }
+      updateProgress();
+    };
+    reader.onerror = () => { addError(`Read error: ${f.name}`); updateProgress(); };
+    reader.readAsText(f);
+  });
+}
+
+/* ---- Parse Object ----------------------------------------------- */
+function parseObjectFile(path, xmlText) {
+  const objectName = extractObjectNameFromPath(path);
+  if (!objectName) return;
+
+  const doc = new DOMParser().parseFromString(xmlText, 'text/xml');
+  if (doc.querySelector('parsererror')) throw new Error('Invalid XML');
+
+  const label = doc.querySelector('label')?.textContent.trim() || '';
+  const description = doc.querySelector('description')?.textContent.trim() || '';
+
+  if (!objectData[objectName]) {
+    objectData[objectName] = { label, description, fields: [] };
+  } else {
+    Object.assign(objectData[objectName], { label, description });
+  }
+}
+
+/* ---- Parse Field ------------------------------------------------ */
+function parseFieldFile(path, xmlText) {
+  const objectName = extractObjectNameFromPath(path);
+  if (!objectName) return;
+
+  const doc = new DOMParser().parseFromString(xmlText, 'text/xml');
+  if (doc.querySelector('parsererror')) throw new Error('Invalid XML');
+
+  const q = s => doc.querySelector(s)?.textContent.trim() || '';
+  const field = {
+    'Field Name':     q('fullName'),
+    'Type':           q('type'),
+    'Label':          q('label'),
+    'Description':    q('description'),
+    'Length':         q('length'),
+    'Precision':      q('precision'),
+    'Scale':          q('scale'),
+    'Required':       q('required') === 'true' ? 'Yes' : 'No',
+    'Unique':         q('unique') === 'true' ? 'Yes' : 'No',
+    'Default Value':  q('defaultValue'),
+    'Reference To':   q('referenceTo')
+  };
+
+  if (!field['Field Name']) return;
+  totalFields++;
+
+  if (!objectData[objectName]) {
+    objectData[objectName] = { label: '', description: '', fields: [] };
+  }
+  objectData[objectName].fields.push(field);
+}
+
+/* ---- Extract Object Name ---------------------------------------- */
+function extractObjectNameFromPath(path) {
+  const parts = path.replace('\\', '/').split('/');
+  const objectsIdx = parts.findIndex(p => p === 'objects');
+  if (objectsIdx !== -1 && objectsIdx + 1 < parts.length) {
+    return parts[objectsIdx + 1];
+  }
+
+  const file = parts[parts.length - 1];
+  if (file.endsWith('.field-meta.xml')) {
+    const m = file.match(/^(.+?)(?:__c)?\.field-meta\.xml$/i);
+    return m ? m[1] : null;
+  }
+  if (file.endsWith('.object-meta.xml')) {
+    const m = file.match(/^(.+?)\.object-meta\.xml$/i);
+    return m ? m[1] : null;
+  }
+  return null;
+}
+
+/* ---- UI: Add Item (no duplicates) ------------------------------- */
+function addFileItem(name) {
+  if (shownObjects.has(name)) return;
+  shownObjects.add(name);
+
+  const div = document.createElement('div');
+  div.className = 'file-item';
+  div.innerHTML = `<strong>${name}</strong> — Loaded`;
+  fileList.appendChild(div);
+}
+
+/* ---- UI: Error -------------------------------------------------- */
+function addError(msg) {
+  errors++;
+  const div = document.createElement('div');
+  div.className = 'error-item';
+  div.textContent = msg;
+  errorList.appendChild(div);
+}
+
+/* ---- Update Counter & Build List ONCE --------------------------- */
+function updateProgress() {
+  processed++;
+  const okObjects = Object.keys(objectData).filter(o => objectData[o].fields.length > 0).length;
+  counter.textContent = `${okObjects} object${okObjects === 1 ? '' : 's'} (${totalFields} field${totalFields === 1 ? '' : 's'})`;
+
+  // === ONLY when ALL files are done ===
+  if (processed >= total) {
+    setTimeout(() => {
+      statusText.textContent = 'Ready';
+      generateBtn.disabled = totalFields === 0;
+
+      // Clear previous list & reset tracker
+      fileList.innerHTML = '';
+      shownObjects.clear();
+
+      // Add ONE line per object
+      Object.keys(objectData).forEach(obj => {
+        if (objectData[obj].fields.length) addFileItem(obj);
+      });
+    }, 200);
+  }
+}
+
+/* ---- Generate Excel --------------------------------------------- */
+function generateExcel() {
+  const valid = Object.entries(objectData).filter(([,d]) => d.fields.length > 0);
+  if (!valid.length) { alert('No fields to export.'); return; }
+
+  generateBtn.disabled = true;
+  generateBtn.innerHTML = '<div class="spinner"></div> Building...';
+
+  setTimeout(() => {
+    try {
+      const wb = XLSX.utils.book_new();
+      valid.forEach(([obj, data]) => {
+        const rows = data.fields.map(f => ({
+          ...f,
+          'Object Label': data.label,
+          'Object Description': data.description
+        }));
+        const ws = XLSX.utils.json_to_sheet(rows);
+        const colW = [];
+        rows.forEach(r => Object.values(r).forEach((v, i) => {
+          const len = String(v || '').length;
+          colW[i] = Math.max(colW[i] || 10, len);
+        }));
+        ws['!cols'] = colW.map(w => ({ wch: w + 2 }));
+        XLSX.utils.book_append_sheet(wb, ws, safeName(obj));
+      });
+      const fname = `SFDX_Data_Dictionary_${new Date().toISOString().slice(0,10)}.xlsx`;
+      XLSX.writeFile(wb, fname);
+      statusText.textContent = `Downloaded ${fname}`;
+    } catch (e) {
+      alert('Export failed: ' + e.message);
+    } finally {
+      generateBtn.disabled = false;
+      generateBtn.textContent = 'Generate Excel File';
+    }
+  }, 50);
+}
+
+function safeName(n) {
+  return n.replace(/[\\\/*\[\]:?]/g, '_').substring(0, 31);
+}
+</script>
+</body>
+</html>

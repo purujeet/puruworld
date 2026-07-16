@@ -5,6 +5,12 @@
   <url><loc>https://puruworld.com/p/videos.html</loc><priority>0.9</priority><changefreq>daily</changefreq></url>
   <url><loc>https://puruworld.com/p/tools-games.html</loc><priority>0.9</priority><changefreq>weekly</changefreq></url>
   <url><loc>https://puruworld.com/dashboard/index.html</loc><priority>0.7</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://puruworld.com/pythonVisualizer/index.html</loc><priority>0.8</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://puruworld.com/universaltextconverter/index.html</loc><priority>0.8</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://puruworld.com/Image2Pdf/index.html</loc><priority>0.8</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://puruworld.com/orbit-drop/index.html</loc><priority>0.8</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://puruworld.com/Barter-platform/index.html</loc><priority>0.8</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://puruworld.com/SFMetaToExcel/index.html</loc><priority>0.8</priority><changefreq>weekly</changefreq></url>
   <url><loc>https://puruworld.com/p/json-formatter.html</loc><priority>0.8</priority><changefreq>weekly</changefreq></url>
   <url><loc>https://puruworld.com/p/tic-tac-toe.html</loc><priority>0.8</priority><changefreq>weekly</changefreq></url>
   <url><loc>https://puruworld.com/p/spin-bottle.html</loc><priority>0.8</priority><changefreq>weekly</changefreq></url>

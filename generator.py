@@ -1739,7 +1739,30 @@ document.addEventListener('DOMContentLoaded', () => {
   // Apps Grid logic (Standalone apps page)
   const appsGrid = document.getElementById('apps-grid');
   if (appsGrid) {
+    window.activeAppCategory = 'all';
     renderAppsGrid();
+    
+    // Category filtering click handlers
+    const filterButtons = document.querySelectorAll('.app-filter-btn');
+    filterButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterButtons.forEach(b => {
+          b.classList.remove('active');
+          b.style.background = 'rgba(255,255,255,0.05)';
+          b.style.borderColor = 'var(--border-color)';
+          b.style.color = 'var(--text-primary)';
+          b.style.fontWeight = '500';
+        });
+        btn.classList.add('active');
+        btn.style.background = 'var(--accent-gradient)';
+        btn.style.borderColor = 'transparent';
+        btn.style.color = 'white';
+        btn.style.fontWeight = '600';
+        
+        window.activeAppCategory = btn.getAttribute('data-category');
+        renderAppsGrid();
+      });
+    });
   }
 
   // Global search bar enter key listener for redirection
@@ -1862,30 +1885,38 @@ const allApps = [
   {
     title: "Coin Flipper",
     description: "Flip a virtual coin with realistic 3D jump physics. Perfect for quick decision-making and random draws.",
-    url: "./p/flip-coin.html",
+    url: "p/flip-coin.html",
     icon: "monetization_on",
-    tag: "Interactive Tool"
+    tag: "Casual Game",
+    category: "game",
+    isExternal: false
   },
   {
     title: "Tic Tac Toe",
     description: "Play the classic Tic Tac Toe game with a friend or challenge the AI bot.",
-    url: "./p/tic-tac-toe.html",
+    url: "p/tic-tac-toe.html",
     icon: "grid_on",
-    tag: "Casual Game"
+    tag: "Classic Game",
+    category: "game",
+    isExternal: false
   },
   {
     title: "Spin the Bottle",
     description: "An interactive spin-the-bottle party game with smooth CSS rotation physics.",
-    url: "./p/spin-bottle.html",
+    url: "p/spin-bottle.html",
     icon: "cached",
-    tag: "Party Game"
+    tag: "Party Game",
+    category: "game",
+    isExternal: false
   },
   {
     title: "JSON Formatter",
     description: "A developer tool to format, validate, and beautify raw JSON strings easily.",
-    url: "./p/json-formatter.html",
+    url: "p/json-formatter.html",
     icon: "code",
-    tag: "Developer Tool"
+    tag: "Utility Tool",
+    category: "tool",
+    isExternal: false
   },
   {
     title: "JSON to Apex Converter",
@@ -1893,6 +1924,7 @@ const allApps = [
     url: "https://json2apex.com",
     icon: "cloud_queue",
     tag: "External Tool",
+    category: "tool",
     isExternal: true
   },
   {
@@ -1901,23 +1933,26 @@ const allApps = [
     url: "pythonVisualizer/index.html",
     icon: "visibility",
     tag: "Interactive Tool",
+    category: "tool",
     isExternal: false
   },
   {
     title: "SFDX Data Dictionary",
     description: "Convert Salesforce SFDX metadata/object definitions directly into formatted Excel sheets.",
-    url: "https://purujeet.github.io/SFMetaToExcel/",
+    url: "SFMetaToExcel/index.html",
     icon: "table_chart",
     tag: "Salesforce Tool",
-    isExternal: true
+    category: "tool",
+    isExternal: false
   },
   {
     title: "Local Barter & Swap",
     description: "Post listings and swap goods or services locally without money on this decentralized barter platform.",
-    url: "https://purujeet.github.io/Barter-platform/",
+    url: "Barter-platform/index.html",
     icon: "swap_horiz",
     tag: "Web App",
-    isExternal: true
+    category: "tool",
+    isExternal: false
   },
   {
     title: "Orbit Drop",
@@ -1925,6 +1960,7 @@ const allApps = [
     url: "orbit-drop/index.html",
     icon: "rocket_launch",
     tag: "Arcade Game",
+    category: "game",
     isExternal: false
   },
   {
@@ -1933,6 +1969,7 @@ const allApps = [
     url: "Image2Pdf/index.html",
     icon: "picture_as_pdf",
     tag: "Utility Tool",
+    category: "tool",
     isExternal: false
   },
   {
@@ -1941,6 +1978,7 @@ const allApps = [
     url: "universaltextconverter/index.html",
     icon: "transform",
     tag: "Developer Tool",
+    category: "tool",
     isExternal: false
   }
 ];
@@ -1949,7 +1987,12 @@ function renderAppsGrid() {
   const grid = document.getElementById('apps-grid');
   if (!grid) return;
   
-  grid.innerHTML = allApps.map(app => {
+  const filteredApps = allApps.filter(app => {
+    if (!window.activeAppCategory || window.activeAppCategory === 'all') return true;
+    return app.category === window.activeAppCategory;
+  });
+
+  grid.innerHTML = filteredApps.map(app => {
     const targetAttr = app.isExternal ? 'target="_blank"' : '';
     
     // Resolve URL depending on relative path depth prefix
@@ -3900,6 +3943,17 @@ Simply initialize/push this build directory to its own GitHub repository (e.g., 
     '  <url><loc>https://puruworld.com/p/tools-games.html</loc><priority>0.9</priority><changefreq>weekly</changefreq></url>',
     '  <url><loc>https://puruworld.com/dashboard/index.html</loc><priority>0.7</priority><changefreq>weekly</changefreq></url>'
   ]
+  
+  # Add standalone merged tools & games
+  for clean_url in [
+    'pythonVisualizer/index.html',
+    'universaltextconverter/index.html',
+    'Image2Pdf/index.html',
+    'orbit-drop/index.html',
+    'Barter-platform/index.html',
+    'SFMetaToExcel/index.html'
+  ]:
+    sitemap_entries.append(f'  <url><loc>https://puruworld.com/{clean_url}</loc><priority>0.8</priority><changefreq>weekly</changefreq></url>')
   
   # Add tools & games
   for page in raw_pages:
