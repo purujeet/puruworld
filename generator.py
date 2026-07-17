@@ -3280,7 +3280,7 @@ def main():
   
   # Generate standard ads.txt
   with open(os.path.join(output_dir, 'ads.txt'), 'w', encoding='utf-8') as f:
-    f.write("google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0\n")
+    f.write("google.com, pub-8980910491820091, DIRECT, f08c47fec0942fa0\n")
   print("Generated ads.txt")
   
   # Generate standard legal/info pages
